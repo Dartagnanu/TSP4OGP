@@ -1,0 +1,13 @@
+{
+  "name": "store-editor-server",
+  "version": "1.0.0",
+  "description": "Collaborative store map editor backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  }
+}

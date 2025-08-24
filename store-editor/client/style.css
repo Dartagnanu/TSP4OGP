@@ -1,0 +1,24 @@
+#saveMapBtn {
+  position: absolute;
+  top: 10px;       /* distance from top */
+  right: 10px;     /* distance from right edge */
+  z-index: 1000;   /* make sure it’s above other elements */
+}
+#topBar {
+  position: absolute;
+  top: 10px;
+  left: 220px; /* leave space for sidebar when expanded */
+  right: 10px;
+  display: flex;
+  justify-content: flex-end; /* pushes Save Map to the right */
+  gap: 10px; /* spacing between buttons */
+  z-index: 1000;
+}
+
+#toggleSidebar {
+  position: relative; /* inside topBar, stays on left */
+}
+
+#saveMapBtn {
+  position: relative; /* inside topBar, stays on right */
+}
