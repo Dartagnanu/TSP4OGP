@@ -16,7 +16,6 @@ export class Sidebar {
     this.populateTemplates();
     this.setupToggle();
     this.setupDragAndDrop();
-    this.setupContextMenu();
   }
 
   populateTemplates() {
@@ -40,13 +39,7 @@ export class Sidebar {
 
   setupToggle() {
     this.toggleBtn.addEventListener('click', () => {
-      if (this.sidebarEl.style.width === '0px') {
-        this.sidebarEl.style.width = '200px';
-        document.getElementById('container').style.marginLeft = '200px';
-      } else {
-        this.sidebarEl.style.width = '0px';
-        document.getElementById('container').style.marginLeft = '0px';
-      }
+      this.sidebarEl.classList.toggle('collapsed');
     });
   }
 
@@ -70,36 +63,9 @@ export class Sidebar {
         template: templateId,
       };
 
-      window.addShelf(newShelf, template); // assumes addShelf is global
+      window.createAndAddShelf(newShelf, template);
     });
   }
 
-  setupContextMenu() {
-    this.stage.on('contextmenu', (e) => {
-      e.evt.preventDefault();
-      this.contextMenu.style.display = 'block';
-      this.contextMenu.style.left = e.evt.clientX + 'px';
-      this.contextMenu.style.top = e.evt.clientY + 'px';
 
-      this.addShelfBtn.onclick = () => {
-        const shelfId = this.newShelfInput.value || `shelf_${Date.now()}`;
-        const template = Object.values(this.templates)[0]; // default template
-
-        const newShelf = {
-          id: shelfId,
-          placement: [Math.round(e.evt.layerX / window.scaleX), Math.round(e.evt.layerY / window.scaleY)],
-          modulars: [],
-          flex_items: [],
-          template: template ? template.id : 'default',
-        };
-
-        window.addShelf(newShelf, template);
-        this.contextMenu.style.display = 'none';
-      };
-    });
-
-    document.addEventListener('click', () => {
-      this.contextMenu.style.display = 'none';
-    });
-  }
 }

@@ -1,4 +1,5 @@
 import { Sidebar } from './js/sidebar.js';
+import { ContextMenu } from './js/contextMenu.js';
 
 const socket = io();
 
@@ -7,6 +8,7 @@ const stageWidth = 1000;
 const stageHeight = 600;
 let scaleX;
 let scaleY;
+const MAP_ID = 3260; // Replace with dynamic value later
 
 const stage = new Konva.Stage({
   container: 'container',
@@ -102,23 +104,38 @@ function addShelf(shelfData, template) {
     layer.batchDraw();
   });
 
+
   // live broadcast drag for realtime sync maybe?
-  // polygon.on('dragmove', () => {
-  //   const pos = polygon.position();
-  //   socket.emit('updateShelf', { id: shelfData.id, x: pos.x, y: pos.y });
-  // });
+  //polygon.on('dragmove', () => {
+  //  const pos = polygon.position();
+  //  socket.emit('updateShelf', { id: shelfData.id, x: pos.x, y: pos.y });
+  //});
 
   layer.draw();
 }
 
+// add shelf data to map
+function addShelfToMapData(shelfData) {
+  fetch('/map', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(shelfData, null, 2),
+  });
+}
+
+//add new shelf to store
+function createAndAddShelf(shelfData, template) {
+  addShelf(shelfData, template);
+  addShelfToMapData(shelfData);
+}
+window.createAndAddShelf = createAndAddShelf;
+
 // Fetch and render map
-fetch('/map')
+fetch(`/map/${MAP_ID}`)
   .then((res) => res.json())
   .then((map) => {
     window.templates = map.shelf_templates;
-
     drawStoreBoundary(map.store_shape, map.map_size);
-
     map.shelves.forEach((shelfData) => {
       const template = window.templates[shelfData.template];
       if (!template) {
@@ -127,8 +144,9 @@ fetch('/map')
       }
       addShelf(shelfData, template);
     });
-
     new Sidebar(stage, window.templates);
+    const contextMenu = new ContextMenu(stage, window.templates, layer);
+    contextMenu.init();
   });
 
 // Listen for updates from other clients
@@ -140,33 +158,30 @@ socket.on('updateShelf', (data) => {
   }
 });
 
+
+
 // Save map 
 document.getElementById('saveMapBtn').addEventListener('click', () => {
-  fetch('/map')
+  fetch(`/map/${MAP_ID}`)
     .then((res) => res.json())
     .then((map) => {
       map.shelves.forEach((shelf) => {
         const shelfNode = layer.findOne(`#${shelf.id}`);
         if (!shelfNode) return;
-
         const pos = shelfNode.position();
         const newX = Math.round(pos.x / scaleX);
         const newY = Math.round(pos.y / scaleY);
-
         shelf.placement = [newX, newY];
         shelf.rotation = shelfNode.rotation();
-
-        console.log(`Shelf ${shelf.id} saved at (${newX}, ${newY}) rot=${shelf.rotation}`);
       });
-
-      return fetch('/map', {
+      return fetch(`/map/${MAP_ID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(map),
+        body: JSON.stringify(map, null, 2),
       });
     })
     .then((res) => {
-      if (!res) return; // in case previous step failed silently
+      if (!res) return;
       if (res.ok) {
         alert('Map saved!');
       } else {
@@ -179,19 +194,32 @@ document.getElementById('saveMapBtn').addEventListener('click', () => {
     });
 });
 
-
-document.getElementById('toggleSidebar').addEventListener('click', () => {
-  const sidebar = document.getElementById('sidebar');
-  const container = document.getElementById('container');
-  const topBar = document.getElementById('topBar');
-
-  if (sidebar.style.width === '0px') {
-    sidebar.style.width = '200px';
-    container.style.marginLeft = '200px';
-    topBar.style.left = '220px';
-  } else {
-    sidebar.style.width = '0px';
-    container.style.marginLeft = '0px';
-    topBar.style.left = '20px';
+function deleteShelf(shelfId) {
+  const shelfNode = layer.findOne(`#${shelfId}`);
+  if (shelfNode) {
+    shelfNode.destroy();
+    layer.draw();
   }
-});
+  fetch(`/map/${MAP_ID}`)
+    .then((res) => res.json())
+    .then((map) => {
+      map.shelves = map.shelves.filter(shelf => shelf.id !== shelfId);
+      return fetch(`/map/${MAP_ID}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(map, null, 2),
+      });
+    })
+    .then((res) => {
+      if (res && res.ok) {
+        alert('Shelf deleted!');
+      } else {
+        alert('Error deleting shelf.');
+      }
+    })
+    .catch((err) => {
+      console.error('Delete failed:', err);
+      alert('Delete failed. Check console.');
+    });
+}
+window.deleteShelf = deleteShelf;
