@@ -1,0 +1,65 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="storeSchema" name="Store Schema">
+    <mxGraphModel dx="1364" dy="730" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Store -->
+        <mxCell id="store" value="Store" style="swimlane;fontStyle=1;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="200" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="storeFields" value="• _id : ObjectId (PK)
+• id : Number (Unique)
+• map_size.width : Number
+• map_size.height : Number
+• store_shape : Array
+• shelf_templates : Map
+• starting_points : Array
+• registers : Array" style="text;align=left;verticalAlign=top;spacingTop=5;spacingLeft=5;" vertex="1" parent="store">
+          <mxGeometry x="0" y="30" width="200" height="210" as="geometry" />
+        </mxCell>
+
+        <!-- Shelf -->
+        <mxCell id="shelf" value="Shelf" style="swimlane;fontStyle=1;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="400" y="100" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="shelfFields" value="• _id : ObjectId (PK)
+• store : ObjectId (FK → Store)
+• id : String
+• template : String
+• placement : Array
+• rotation : Number
+• flex_items : Array
+• department : String" style="text;align=left;verticalAlign=top;spacingTop=5;spacingLeft=5;" vertex="1" parent="shelf">
+          <mxGeometry x="0" y="30" width="200" height="170" as="geometry" />
+        </mxCell>
+
+        <!-- ModularItem -->
+        <mxCell id="modularItem" value="ModularItem" style="swimlane;fontStyle=1;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="700" y="100" width="220" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="modularItemFields" value="• _id : ObjectId (PK)
+• store : ObjectId (FK → Store)
+• shelf : ObjectId (FK → Shelf)
+• modular_id : Number
+• modular_section : Number
+• location : Number
+• upc : Number" style="text;align=left;verticalAlign=top;spacingTop=5;spacingLeft=5;" vertex="1" parent="modularItem">
+          <mxGeometry x="0" y="30" width="220" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- Relationships -->
+        <mxCell id="edge1" edge="1" parent="1" source="shelf" target="store" style="endArrow=block;endFill=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" edge="1" parent="1" source="modularItem" target="store" style="endArrow=block;endFill=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" edge="1" parent="1" source="modularItem" target="shelf" style="endArrow=block;endFill=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

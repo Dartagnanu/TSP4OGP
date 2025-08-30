@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Store Map Editor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="topBar">
+        <button id="toggleSidebar">Toggle Sidebar</button>
+        <button id="saveMapBtn">Save Map</button>
+    </div>
+    <!-- Sidebar -->
+    <div id="sidebar" class="collapsed">
+        <!-- Filled dynamically with shape templates -->
+        <div id="shelfTemplates">
+        </div>
+    </div>
+
+    <!-- Right-click menu -->
+    <div id="contextMenu" style="position:absolute; display:none; background:#fff; border:1px solid #ccc; z-index:1000; padding:5px;">
+        <input type="text" id="newShelfName" placeholder="Shelf ID">
+        <button id="addShelfBtn">Add Shelf Here</button>
+        <button id="deleteShelfBtn" style="display:none;">Delete Shelf</button>
+        <button id="cloneShelfBtn" style="display:none;">Clone Shelf</button>  
+    </div>
+    <!-- Stage container  -->
+    <div id="container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/konva@8/konva.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>
