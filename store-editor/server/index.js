@@ -38,29 +38,8 @@ const MAP_FILE = path.join(__dirname, 'maps', 'store_map_3260.json');
 app.use(express.static(path.join(__dirname, '../client')));
 app.use(express.json());
 
-// Load map JSON
-app.get('/map', (req, res) => {
-    fs.readFile(MAP_FILE, 'utf8', (err, data) => {
-        if (err) return res.status(500).send(err);
-        res.send(JSON.parse(data));
-    });
-});
 
-// Save map JSON
-app.post('/map', (req, res) => {
-    fs.writeFile(MAP_FILE, JSON.stringify(req.body, null, 2), (err) => { // <-- no pretty-print
-        if (err) return res.status(500).send(err);
-        res.send({status: 'ok'});
-        io.emit('mapUpdate', req.body);  // broadcast update to all clients
-    });
-});
 
-// Save map JSON
-app.post('/save-map', (req, res) => {
-    const updatedMap = req.body;
-    fs.writeFileSync('map.json', JSON.stringify(updatedMap, null, 2));
-    res.sendStatus(200);
-});
 
 // TODO: reconfigure backend delete functions
 // delete shelf by id off map by id
@@ -86,6 +65,7 @@ io.on('connection', (socket) => {
     });
 });
 
+// get map data by id
 app.get('/map/:id', async (req, res) => {
   try {
     const map = await MapModel.findOne({ store_id: Number(req.params.id) });
@@ -96,6 +76,25 @@ app.get('/map/:id', async (req, res) => {
   }
 });
 
+// post additional shelf to map by map id and shelfdata
+app.post('/map/:id/shelf', async (req, res) => {
+  try {
+    const mapId = Number(req.params.id);
+    const shelfData = req.body;
+    const map = await MapModel.findOne({ store_id: mapId });
+    if (!map) return res.status(404).send({ error: 'Map not found' });
+
+    // Add shelf data to map
+    map.shelves.push(shelfData);
+    await map.save();
+    res.send({ status: 'ok', map });
+    io.emit('mapUpdate', map);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// post map data by id
 app.post('/map/:id', async (req, res) => {
   try {
     const mapId = Number(req.params.id);

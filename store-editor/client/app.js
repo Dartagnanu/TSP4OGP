@@ -1,25 +1,26 @@
 import { Sidebar } from './js/sidebar.js';
-import { ContextMenu } from './js/contextMenu.js';
+import { createStage } from './js/Konva/konvaSetup.js';
+import { drawStoreBoundary, drawShelf, loadShelves } from './js/Konva/drawUtils.js';
+import { fetchMap, saveMap} from './js/mapApi.js';
+
 
 const socket = io();
 
 // Stage setup
 const stageWidth = 1000;
 const stageHeight = 600;
-let scaleX;
-let scaleY;
+
 const MAP_ID = 3260; // Replace with dynamic value later
+const { stage, layer } = createStage('container', stageWidth, stageHeight);
+const map = await fetchMap(MAP_ID);
+console.log('Fetched map');
+const {scaleX, scaleY} = drawStoreBoundary(layer, map, stageWidth, stageHeight);
+console.log('Scale factors:', scaleX, scaleY);
+// load shelves from map
+loadShelves(layer, stage, map.shelves, map.shelf_templates, scaleX, scaleY);
 
-const stage = new Konva.Stage({
-  container: 'container',
-  width: stageWidth,
-  height: stageHeight,
-});
-
-const layer = new Konva.Layer();
-stage.add(layer);
-
-// Draw store boundary (scaled to stage)
+// Todo: delete function
+/* Draw store boundary (scaled to stage) 
 function drawStoreBoundary(storeShape, mapSize) {
   // global scales
   scaleX = stageWidth / mapSize.width;
@@ -39,6 +40,7 @@ function drawStoreBoundary(storeShape, mapSize) {
   layer.add(boundary);
   layer.draw();
 }
+  
 
 // Add a shelf or feature using its shape (placement via node position only)
 function addShelf(shelfData, template) {
@@ -114,8 +116,10 @@ function addShelf(shelfData, template) {
   layer.draw();
 }
 
+*/
+
 // add shelf data to map
-function addShelfToMapData(shelfData) {
+function addShelfToMapData(mapData, shelfData) {
   fetch('/map', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -125,29 +129,11 @@ function addShelfToMapData(shelfData) {
 
 //add new shelf to store
 function createAndAddShelf(shelfData, template) {
-  addShelf(shelfData, template);
+  drawShelf(layer, stage, shelfData, template, scaleX, scaleY);
   addShelfToMapData(shelfData);
 }
 window.createAndAddShelf = createAndAddShelf;
 
-// Fetch and render map
-fetch(`/map/${MAP_ID}`)
-  .then((res) => res.json())
-  .then((map) => {
-    window.templates = map.shelf_templates;
-    drawStoreBoundary(map.store_shape, map.map_size);
-    map.shelves.forEach((shelfData) => {
-      const template = window.templates[shelfData.template];
-      if (!template) {
-        console.warn(`Template not found: ${shelfData.template}`);
-        return;
-      }
-      addShelf(shelfData, template);
-    });
-    new Sidebar(stage, window.templates);
-    const contextMenu = new ContextMenu(stage, window.templates, layer);
-    contextMenu.init();
-  });
 
 // Listen for updates from other clients
 socket.on('updateShelf', (data) => {
@@ -162,64 +148,5 @@ socket.on('updateShelf', (data) => {
 
 // Save map 
 document.getElementById('saveMapBtn').addEventListener('click', () => {
-  fetch(`/map/${MAP_ID}`)
-    .then((res) => res.json())
-    .then((map) => {
-      map.shelves.forEach((shelf) => {
-        const shelfNode = layer.findOne(`#${shelf.id}`);
-        if (!shelfNode) return;
-        const pos = shelfNode.position();
-        const newX = Math.round(pos.x / scaleX);
-        const newY = Math.round(pos.y / scaleY);
-        shelf.placement = [newX, newY];
-        shelf.rotation = shelfNode.rotation();
-      });
-      return fetch(`/map/${MAP_ID}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(map, null, 2),
-      });
-    })
-    .then((res) => {
-      if (!res) return;
-      if (res.ok) {
-        alert('Map saved!');
-      } else {
-        alert('Error saving map.');
-      }
-    })
-    .catch((err) => {
-      console.error('Save failed:', err);
-      alert('Save failed. Check console.');
-    });
+  saveMap(map);
 });
-
-function deleteShelf(shelfId) {
-  const shelfNode = layer.findOne(`#${shelfId}`);
-  if (shelfNode) {
-    shelfNode.destroy();
-    layer.draw();
-  }
-  fetch(`/map/${MAP_ID}`)
-    .then((res) => res.json())
-    .then((map) => {
-      map.shelves = map.shelves.filter(shelf => shelf.id !== shelfId);
-      return fetch(`/map/${MAP_ID}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(map, null, 2),
-      });
-    })
-    .then((res) => {
-      if (res && res.ok) {
-        alert('Shelf deleted!');
-      } else {
-        alert('Error deleting shelf.');
-      }
-    })
-    .catch((err) => {
-      console.error('Delete failed:', err);
-      alert('Delete failed. Check console.');
-    });
-}
-window.deleteShelf = deleteShelf;
