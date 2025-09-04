@@ -16,14 +16,14 @@ export const createShelf = async (shelfData) => {
 };
 
 // get shelf by ID and store ID
-export const getShelf = async (shelfId, storeId) => {
+export const getShelf = async (shelfId, store_number) => {
+
   try {
-    const response = await fetch(`/shelf/${shelfId}`, {
+    const response = await fetch(`/shelf/${shelfId}?store=${store_number}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ store: storeId }),
     });
     if (!response.ok) throw new Error('Failed to fetch shelf');
     return await response.json();
@@ -32,15 +32,16 @@ export const getShelf = async (shelfId, storeId) => {
   }
 };
 
-// update shelf with shelf data 
-export const updateShelf = async (shelfData) => {
+// update shelf with shelf data and store_number
+export const updateShelf = async (shelfData, store_number) => {
   try {
-    const response = await fetch(`/shelf/${shelfData.id}`, {
+    console.log('Updating shelf:', shelfData.shelf_id, 'for store:', store_number);
+    const response = await fetch(`/shelf/${shelfData.shelf_id}/store/${store_number}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ ...shelfData, store: shelfData.store }),
+      body: JSON.stringify({ ...shelfData, store_number }), // Include store_number in the body
     });
     if (!response.ok) throw new Error('Failed to update shelf');
     return await response.json();
@@ -49,17 +50,36 @@ export const updateShelf = async (shelfData) => {
   }
 };
 
-// delete shelf by ID 
-export const deleteShelf = async (shelfData) => {
+// delete shelf by ID and store ID
+export const deleteShelf = async (shelfId, store_number) => {
   try {
-    const response = await fetch(`/shelf/${shelfData.id}`, {
+    const response = await fetch(`/shelf/${shelfId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ store: shelfData.store }),
+      body: JSON.stringify({ store: store_number }),
     });
     if (!response.ok) throw new Error('Failed to delete shelf');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+// get all shelves by store_number returns array of shelves
+export const getShelvesByStore = async (store_number) => {
+
+  try {
+    console.log(`Sending request to fetch shelves for store_number: ${store_number}`); // Debug log
+    const response = await fetch(`/shelves?store=${store_number}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) throw new Error(`Failed to fetch shelves for store: ${store_number}`);
     return await response.json();
   } catch (error) {
     console.error(error);

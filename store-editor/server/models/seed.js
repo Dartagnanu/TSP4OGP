@@ -1,124 +1,157 @@
+import mongoose from 'mongoose';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs/promises';
+import Store from './store.js';
+import Shelf from './shelf.js';
+import Item from './item.js';
+import Modular from './modular.js';
+import ItemIndex from './itemIndex.js';
+
 console.log('Seed script started');
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/storemaps', { useNewUrlParser: true, useUnifiedTopology: true });
-const fs = require('fs').promises;
-const path = require('path');
-const Store = require('./store').default;
-const Shelf = require('./shelf').default;
-const Item = require('./item').default;
-const Modular = require('./modular').default;
-const ItemIndex = require('./itemIndex').default;
+
+// Resolve __dirname in ES Modules
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/storemaps', { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // Exit the process if the connection fails
+  });
 
 async function populateTestDataFromSeed() {
-    try {
-        const seedPath = path.join(__dirname, '../data/dataseed.json');
-        const raw = await fs.readFile(seedPath, 'utf8');
-        const data = JSON.parse(raw);
-        // Create Store
-        const store = await Store.findOneAndUpdate(
-            {id: data.id},
+  try {
+    const seedPath = path.join(__dirname, '../data/dataseed.json');
+    const raw = await fs.readFile(seedPath, 'utf8');
+    const data = JSON.parse(raw);
+
+    // Validate seed data
+    if (!data.store_number || !data.shelves || !data.modulars || !data.items) {
+      throw new Error('dataseed.json is missing required fields.');
+    }
+
+    // Clear existing data
+    await Store.deleteMany({});
+    await Shelf.deleteMany({});
+    await Modular.deleteMany({});
+    await Item.deleteMany({});
+    await ItemIndex.deleteMany({});
+    console.log('Cleared existing data from the database.');
+
+    // Create Store
+    const store = await Store.findOneAndUpdate(
+      { store_number: data.store_number },
+      {
+        name: data.name,
+        location: data.location,
+        map_size: data.map_size,
+        store_shape: data.store_shape,
+        walls: data.walls,
+        shelf_templates: data.shelf_templates,
+        starting_points: data.starting_points,
+        registers: data.registers,
+      },
+      { upsert: true, new: true }
+    );
+
+    // Create Modulars
+    const modularIdMap = {};
+    for (const modular of data.modulars) {
+      const modDoc = await Modular.findOneAndUpdate(
+        { modular_id: modular.modular_id },
+        { ...modular, store: store._id },
+        { upsert: true, new: true }
+      );
+      modularIdMap[modular.modular_id] = modDoc._id;
+    }
+
+    // Create Shelves
+    const shelfIdMap = {};
+    for (const shelf of data.shelves) {
+      const modulars = (shelf.modulars || []).map((id) => modularIdMap[id]);
+  
+      const shelfDoc = await Shelf.findOneAndUpdate(
+        { shelf_id: shelf.shelf_id, store_number: shelf.store_number },
+        {
+          ...shelf,
+          store: store._id,
+          modulars,
+        },
+        { upsert: true, new: true }
+      );
+      shelfIdMap[shelf.shelf_id] = shelfDoc._id;
+    }
+
+    // Create Items
+    console.log('Seeding items...');
+    for (const item of data.items) {
+      try {
+        const itemDoc = await Item.findOneAndUpdate(
+          { item_number: item.item_number },
+          { ...item },
+          { upsert: true, new: true }
+        );
+        console.log(`Saved item: ${itemDoc.item_number}`);
+      } catch (err) {
+        console.error(`Error saving item ${item.item_number}:`, err);
+      }
+    }
+
+    // Create Item Indexes
+    console.log('Seeding item indexes...');
+    const itemLocationMap = {};
+    for (const modular of data.modulars) {
+      for (const modItem of modular.items) {
+        for (const shelf of data.shelves) {
+          if ((shelf.modulars || []).includes(modular.modular_id)) {
+            if (!itemLocationMap[modItem.item_number]) itemLocationMap[modItem.item_number] = [];
+            itemLocationMap[modItem.item_number].push({
+              shelf_id: shelfIdMap[shelf.shelf_id],
+              location: modItem.location,
+            });
+          }
+        }
+      }
+    }
+    console.log('Item Location Map:', itemLocationMap);
+
+    for (const item of data.items) {
+      const upcs = Array.isArray(item.upcs) ? item.upcs : [item.upc];
+      for (const upc of upcs) {
+        try {
+          const itemIndex = await ItemIndex.findOneAndUpdate(
+            { store: store.store_number.toString(), upcs: upc },
             {
-                name: data.name,
-                location: data.location,
-                map_size: data.map_size,
-                store_shape: data.store_shape,
-                walls: data.walls,
-                shelf_templates: data.shelf_templates,
-                starting_points: data.starting_points,
-                registers: data.registers
+              store: store.store_number.toString(), // Save store_number as a string
+              store_number: store.store_number,
+              item_number: item.item_number,
+              upcs: [upc],
+              locations: itemLocationMap[item.item_number] || [],
+              price: item.price,
+              photo: item.photo,
+              name: item.name,
+              pickwalk: item.pickwalk,
             },
             { upsert: true, new: true }
-        );
-
-        // Create Modulars
-        const modularIdMap = {};
-        for (const modular of data.modulars) {
-            const modDoc = await Modular.findOneAndUpdate(
-                { modular_id: modular.modular_id},
-                { ...modular, store: store._id },
-                { upsert: true, new: true }
-            );
-            modularIdMap[modular.modular_id] = modDoc._id;
+          );
+          console.log(itemIndex);
+          console.log(`Saved item index for UPC: ${upc}`);
+        } catch (err) {
+          console.error(`Error saving item index for UPC ${upc}:`, err);
         }
-
-        // Create Shelves
-        const shelfIdMap = {};
-        for (const shelf of data.shelves) {
-            const modulars = (shelf.modulars || []).map(id => modularIdMap[id]);
-            const shelfDoc = await Shelf.findOneAndUpdate(
-                { shelf_id: shelf.shelf_id },
-                {
-                    ...shelf,
-                    store: store._id,
-                    modulars
-                },
-                { upsert: true, new: true }
-            );
-            shelfIdMap[shelf.shelf_id] = shelfDoc._id;
-        }
-
-        // Create Items
-        const itemIdMap = {};
-        for (const item of data.items) {
-            const itemDoc = await Item.findOneAndUpdate(
-                { item_number: item.item_number },
-                { ...item },
-                { upsert: true, new: true }
-            );
-            itemIdMap[item.item_number] = itemDoc._id;
-        }
-
-        // Build a map: item_number -> array of { shelf_id, location }
-        const itemLocationMap = {};
-        for (const modular of data.modulars) {
-          for (const modItem of modular.items) {
-            for (const shelf of data.shelves) {
-              if ((shelf.modulars || []).includes(modular.modular_id)) {
-                if (!itemLocationMap[modItem.item_number]) itemLocationMap[modItem.item_number] = [];
-                itemLocationMap[modItem.item_number].push({
-                  shelf_id: shelfIdMap[shelf.shelf_id],
-                  location: modItem.location
-                });
-              }
-            }
-          }
-        }
-
-        // Remove existing ItemIndexes for this store (optional, for clean seed)
-        await ItemIndex.deleteMany({ store: store._id });
-
-        // For each item, for each UPC
-        for (const item of data.items) {
-          const upcs = Array.isArray(item.upcs) ? item.upcs : [item.upc];
-          for (const upc of upcs) {
-            await ItemIndex.findOneAndUpdate(
-              { store: store._id, upcs: upc },
-              {
-                store: store._id,
-                item_number: item.item_number,
-                upcs: [upc],
-                locations: itemLocationMap[item.item_number] || [],
-                price: item.price,
-                photo: item.photo,
-                name: item.name,
-                pickwalk: item.pickwalk
-              },
-              { upsert: true, new: true }
-            );
-          }
-        }
-
-        console.log('Test data populated from dataseed.json!');
-    } catch (error) {
-        console.error('Error populating test data:', error);
+      }
     }
-}
 
-module.exports = { populateTestDataFromSeed };
-
-if (require.main === module) {
-  populateTestDataFromSeed().then(() => {
-    console.log('Seeding complete');
+    console.log('Test data populated from dataseed.json!');
+  } catch (error) {
+    console.error('Error populating test data:', error);
+  } finally {
     mongoose.connection.close();
-  });
+  }
 }
+
+populateTestDataFromSeed().then(() => {
+  console.log('Seeding complete');
+});

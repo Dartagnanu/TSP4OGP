@@ -1,5 +1,5 @@
 {
-  "id": 3260,
+  "store_number": 3260,
   "map_size": { "width": 50, "height": 30 },
   "store_shape": [[0,0],[0,30],[50,30],[50,0]],
   "walls": [],
@@ -23,59 +23,64 @@
   ],
   "shelves": [
     {
+      "store_number": 3260,
       "shelf_id": "shelf_001",
       "template": "standard_shelf",
       "placement_x": 5,
       "placement_y": 5,
       "rotation": 0,
       "flex_items": [],
-      "modulars": [201],
+      "modulars": ["201"],
       "department": "frozen"
     },
     {
+      "store_number": 3260,
       "shelf_id": "shelf_002",
       "template": "standard_shelf",
       "placement_x": 10,
       "placement_y": 5,
       "rotation": 0,
       "flex_items": [],
-      "modulars": [202],
+      "modulars": ["202"],
       "department": "dairy"
     },
     {
+      "store_number": 3260,
       "shelf_id": "shelf_003",
       "template": "standard_shelf",
       "placement_x": 15,
       "placement_y": 10,
       "rotation": 0,
       "flex_items": [],
-      "modulars": [203],
+      "modulars": ["203"],
       "department": "produce"
     },
     {
+      "store_number": 3260,
       "shelf_id": "shelf_004",
       "template": "standard_shelf",
       "placement_x": 20,
       "placement_y": 15,
       "rotation": 0,
       "flex_items": [],
-      "modulars": [204],
+      "modulars": ["204"],
       "department": "meat"
     },
     {
+      "store_number": 3260,
       "shelf_id": "shelf_005",
       "template": "feature_bin",
       "placement_x": 25,
       "placement_y": 20,
       "rotation": 10,
       "flex_items": [],
-      "modulars": [205],
+      "modulars": ["205"],
       "department": "bakery"
     }
   ],
   "modulars": [
     {
-      "modular_id": 201,
+      "modular_id": "201",
       "modular": 1,
       "modular_section": 1,
       "items": [
@@ -86,7 +91,7 @@
       ]
     },
     {
-      "modular_id": 202,
+      "modular_id": "202",
       "modular": 2,
       "modular_section": 1,
       "items": [
@@ -97,7 +102,7 @@
       ]
     },
     {
-      "modular_id": 203,
+      "modular_id": "203",
       "modular": 3,
       "modular_section": 1,
       "items": [
@@ -108,7 +113,7 @@
       ]
     },
     {
-      "modular_id": 204,
+      "modular_id": "204",
       "modular": 4,
       "modular_section": 1,
       "items": [
@@ -119,7 +124,7 @@
       ]
     },
     {
-      "modular_id": 205,
+      "modular_id": "205",
       "modular": 5,
       "modular_section": 1,
       "items": [

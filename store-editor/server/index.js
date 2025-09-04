@@ -1,4 +1,21 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import express from 'express';
+import http from 'http';
+import { Server as SocketIo } from 'socket.io';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import Store from './models/store.js';
+import Shelf from './models/shelf.js';
+import Item from './models/item.js';
+import Modular from './models/modular.js';
+import ItemIndex from './models/itemIndex.js';
+import { stringify } from 'querystring';
+import store from './models/store.js';
+
+// Resolve __dirname in ES Modules
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const dbURI = 'mongodb://localhost:27017/storemaps';
 
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -13,193 +30,164 @@ mongoose.connection.on('disconnected', () => {
   console.log('Mongoose disconnected');
 });
 
-const gracefulShutdown = (msg) => {
-  mongoose.connection.close(() => {
-    console.log(`Mongoose disconnected through ${msg}`);
-  });
-};
-
-process.once('SIGUSR2', () => {
-  gracefulShutdown('nodemon restart');
-  process.kill(process.pid, 'SIGUSR2');
-});
-process.on('SIGINT', () => {
-  gracefulShutdown('app termination');
-  process.exit(0);
-});
-process.on('SIGTERM', () => {
-  gracefulShutdown('app shutdown');
-  process.exit(0);
-});
-
-const Store = require('./models/store');
-const Shelf = require('./models/shelf');
-const Item = require('./models/item');
-const ItemIndex = require('./models/itemIndex');
-const Modular = require('./models/modular');
-const MapModel = mongoose.model('Map', mapSchema);
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const fs = require('fs');
-const path = require('path');
-
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = new SocketIo(server);
 
-const MAP_FILE = path.join(__dirname, 'maps', 'store_map_3260.json');
-
-app.use(express.static(path.join(__dirname, '../client')));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../client')));
+
+// Serve the index.html file
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/index.html'));
+});
+
+// -------------------- Store Routes --------------------
 
 // Create a new store
 app.post('/store', async (req, res) => {
   try {
     const store = new Store(req.body);
     await store.save();
-    res.send({ status: 'ok', store });
+    res.status(201).send(store);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({ error: err.message });
   }
 });
 
-// Get store by ID
-app.get('/store/:id', async (req, res) => {
+// Get store by store number
+app.get('/store/:number', async (req, res) => {
   try {
-    const store = await Store.findOne({ id: Number(req.params.id) });
+    const store = await Store.findOne({ store_number: req.params.number });
     if (!store) return res.status(404).send({ error: 'Store not found' });
     res.send(store);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({ error: err.message });
   }
 });
 
-// Update store by ID
-app.put('/store/:id', async (req, res) => {
+// Update store by store number
+app.put('/store/:number', async (req, res) => {
   try {
-    const store = await Store.findOneAndUpdate({ id: Number(req.params.id) }, req.body, { new: true });
+    const store = await Store.findOneAndUpdate(
+      { store_number: Number(req.params.number) },
+      req.body,
+      { new: true }
+    );
     if (!store) return res.status(404).send({ error: 'Store not found' });
-    res.send({ status: 'ok', store });
+    res.send(store);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({ error: err.message });
   }
 });
 
-// delete store by ID
-app.delete('/store/:id', async (req, res) => {
+// Delete store by store number
+app.delete('/store/:number', async (req, res) => {
   try {
-    const store = await Store.findOneAndDelete({ id: Number(req.params.id) });
+    const store = await Store.findOneAndDelete({ store_number: Number(req.params.number) });
     if (!store) return res.status(404).send({ error: 'Store not found' });
-    res.send({ status: 'ok', store });
+    res.send(store);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({ error: err.message });
   }
 });
+
+// -------------------- Shelf Routes --------------------
 
 // Create a new shelf
 app.post('/shelf', async (req, res) => {
   try {
     const shelf = new Shelf(req.body);
     await shelf.save();
-    res.send({ status: 'ok', shelf });
+    res.status(201).send(shelf);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({ error: err.message });
   }
 });
 
-// Get shelf by shelf ID and store ID
-app.get('/shelf/:id', async (req, res) => {
+// Get shelf by ID
+app.get('/shelf/:shelf_id', async (req, res) => {
   try {
-    const shelf = await Shelf.findOne({ _id: req.params.id, store: req.body.store });
+    const shelf = await Shelf.findOne({ shelf_id: req.params.shelf_id });
     if (!shelf) return res.status(404).send({ error: 'Shelf not found' });
     res.send(shelf);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({ error: err.message });
   }
 });
 
-// Update shelf by ID and store ID
-app.put('/shelf/:id', async (req, res) => {
+// Update shelf by shelf_id and store_number
+app.put('/shelf/:shelf_id/store/:store_number', async (req, res) => {
   try {
-    const shelf = await Shelf.findOneAndUpdate({ _id: req.params.id, store: req.body.store }, req.body, { new: true });
-    if (!shelf) return res.status(404).send({ error: 'Shelf not found' });
-    res.send({ status: 'ok', shelf });
+    const { shelf_id, store_number } = req.params;
+    console.log(req.params.shelf_id, req.params.store_number);
+    // Ensure both shelf_id and store_number are provided
+    if (!store_number) {
+      return res.status(400).send({ error: 'store_number is required'});
+    }
+    // is not a number
+    if (isNaN(store_number)) {
+      return res.status(400).send({ error: 'store_number must be a number' });
+    }
+    console.log(req.body);
+    const shelf = await Shelf.findOneAndUpdate(
+      { shelf_id, store_number: store_number }, // Match both shelf_id and store_number
+      req.body,
+      { new: true }
+    );
+
+    if (!shelf) return res.status(404).send({ error: 'Shelf not found', shelf_id, store_number});
+    res.send(shelf);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({ error: err.message });
   }
 });
 
-// Delete shelf by ID and store ID
-app.delete('/shelf/:id', async (req, res) => {
+// Delete shelf by shelf_id and store_number
+app.delete('/shelf/:shelf_id/store/:store_number', async (req, res) => {
   try {
-    const shelf = await Shelf.findOneAndDelete({ _id: req.params.id, store: req.body.store });
-    if (!shelf) return res.status(404).send({ error: 'Shelf not found' });
-    res.send({ status: 'ok', shelf });
+    const { store_number } = req.params;
+    if (!store_number) {
+      return res.status(400).send({ error: 'store_number is required' });
+    }
+    const shelf = await Shelf.findOneAndDelete({ shelf_id: req.params.shelf_id, store: store_number });
+    if (!shelf) return res.status(404).send({ error: 'Shelf not found', shelf_id: req.params.shelf_id, store_number });
+    res.send(shelf);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({ error: err.message });
   }
 });
 
-// Create a new item
-app.post('/item', async (req, res) => {
+// Get all shelves by store number
+app.get('/shelves', async (req, res) => {
   try {
-    const item = new Item(req.body);
-    await item.save();
-    res.send({ status: 'ok', item });
+    req.query.store = Number(req.query.store);
+    console.log('Query for shelves of store number:', req.query.store);
+    const shelves = await Shelf.find({ store: req.query.store_number });
+    res.send(shelves);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({ error: err.message });
   }
 });
 
-// Get item by ID
-app.get('/item/:id', async (req, res) => {
-  try {
-    const item = await Item.findById(req.params.id);
-    if (!item) return res.status(404).send({ error: 'Item not found' });
-    res.send(item);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
 
-// Update item by ID
-app.put('/item/:id', async (req, res) => {
-  try {
-    const item = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!item) return res.status(404).send({ error: 'Item not found' });
-    res.send({ status: 'ok', item });
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
-
-// Delete item by ID
-app.delete('/item/:id', async (req, res) => {
-  try {
-    const item = await Item.findByIdAndDelete(req.params.id);
-    if (!item) return res.status(404).send({ error: 'Item not found' });
-    res.send({ status: 'ok', item });
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
+// -------------------- Modular Routes --------------------
 
 // Create a new modular
 app.post('/modular', async (req, res) => {
   try {
     const modular = new Modular(req.body);
     await modular.save();
-    res.send({ status: 'ok', modular });
+    res.status(201).send(modular);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({ error: err.message });
   }
 });
 
-// Get modular by ID
-app.get('/modular/:id', async (req, res) => {
+// Get modular by modular_id
+app.get('/modular/:modular_id', async (req, res) => {
   try {
-    const modular = await Modular.findById(req.params.id);
+    const modular = await Modular.findOne({ modular_id: req.params.modular_id });
     if (!modular) return res.status(404).send({ error: 'Modular not found' });
     res.send(modular);
   } catch (err) {
@@ -207,10 +195,20 @@ app.get('/modular/:id', async (req, res) => {
   }
 });
 
-// Update modular by ID
-app.put('/modular/:id', async (req, res) => {
+// Update modular by modular_id
+app.put('/modular/:modular_id', async (req, res) => {
   try {
-    const modular = await Modular.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const modular = await Modular.findOneAndUpdate({ modular_id: req.params.modular_id }, req.body, { new: true });
+    if (!modular) return res.status(404).send({ error: 'Modular not found' });
+    res.send({ status: 'ok', modular });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+// Delete modular by modular_id
+app.delete('/modular/:modular_id', async (req, res) => {
+  try {
+    const modular = await Modular.findOneAndDelete({ modular_id: req.params.modular_id });
     if (!modular) return res.status(404).send({ error: 'Modular not found' });
     res.send({ status: 'ok', modular });
   } catch (err) {
@@ -218,16 +216,57 @@ app.put('/modular/:id', async (req, res) => {
   }
 });
 
-// Delete modular by ID
-app.delete('/modular/:id', async (req, res) => {
+// -------------------- Item Routes --------------------
+
+
+// Create item by item number
+app.post('/item', async (req, res) => {
   try {
-    const modular = await Modular.findByIdAndDelete(req.params.id);
-    if (!modular) return res.status(404).send({ error: 'Modular not found' });
-    res.send({ status: 'ok', modular });
+    const item = new Item(req.body);
+    await item.save();
+    res.status(201).send(item);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({ error: err.message });
   }
 });
+
+// Get item by number
+app.get('/item/:item_number', async (req, res) => {
+  try {
+    const item = await Item.findOne({ item_number: req.params.item_number });
+    if (!item) return res.status(404).send({ error: 'Item not found' });
+    res.send(item);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// Update item by number
+app.put('/item/:item_number', async (req, res) => {
+  try {
+    const item = await Item.findOneAndUpdate({ item_number: req.params.item_number }, req.body, { new: true });
+    if (!item) return res.status(404).send({ error: 'Item not found' });
+    res.send(item);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// Delete item by number
+app.delete('/item/:item_number', async (req, res) => {
+  try {
+    const item = await Item.findOneAndDelete({ item_number: req.params.item_number });
+    if (!item) return res.status(404).send({ error: 'Item not found' });
+    res.send(item);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+
+
+// -------------------- Item Index Routes --------------------
+
 
 // Create a new item index 
 app.post('/itemindex', async (req, res) => {
@@ -243,7 +282,7 @@ app.post('/itemindex', async (req, res) => {
 // Get itemIndex by upc and store ID
 app.get('/itemindex/upc/:upc/store/:storeId', async (req, res) => {
   try {
-    const itemIndexes = await ItemIndex.find({ upc: req.params.upc, store: req.params.storeId });
+    const itemIndexes = await ItemIndex.find({ upcs: req.params.upc, store: req.params.storeId });
     res.send(itemIndexes);
   } catch (err) {
     res.status(500).send(err);
@@ -254,7 +293,7 @@ app.get('/itemindex/upc/:upc/store/:storeId', async (req, res) => {
 app.put('/itemindex', async (req, res) => {
   try {
     const { store, upcs } = req.body;
-    // Use the first UPC as the unique key, or adapt for your schema
+    // Use the first UPC as the unique key, or adapt for the schema
     const upc = Array.isArray(upcs) ? upcs[0] : upcs;
     const itemIndex = await ItemIndex.findOneAndUpdate(
       { store, upcs: upc },
@@ -267,10 +306,10 @@ app.put('/itemindex', async (req, res) => {
   }
 });
 
-// Update item index by upc and store ID
-app.put('/itemindex/upc/:upc', async (req, res) => {
+// Update item index by upc and store number
+app.put('/itemindex/upc/:upc/store/:store_number', async (req, res) => {
   try {
-    const itemIndex = await ItemIndex.findOneAndUpdate({ upc: req.params.upc, store: req.body.store }, req.body, { new: true });
+    const itemIndex = await ItemIndex.findOneAndUpdate({ upc: req.params.upc, store_number: req.params.store_number }, req.body, { new: true });
     if (!itemIndex) return res.status(404).send({ error: 'ItemIndex not found' });
     res.send({ status: 'ok', itemIndex });
   } catch (err) {
@@ -326,13 +365,21 @@ app.post('/generate-itemindex/:storeId', async (req, res) => {
   }
 });
 
-// WebSocket connection for live updates
+// -------------------- WebSocket Connection --------------------
+
 io.on('connection', (socket) => {
-    console.log('Client connected:', socket.id);
-    socket.on('updateShelf', (data) => {
-        io.emit('updateShelf', data);  // broadcast to other clients
-    });
+  console.log('Client connected:', socket.id);
+
+  socket.on('updateShelf', (data) => {
+    io.emit('updateShelf', data); // Broadcast to other clients
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});

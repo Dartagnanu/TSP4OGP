@@ -10,6 +10,4 @@ const itemSchema = new mongoose.Schema({
     department: { type: String, required: true},
     pickwalk: { type: String, required: true},
 });
-const Item = mongoose.model('Item', itemSchema);
-
-export default Item;
+export default mongoose.model('Item', itemSchema);

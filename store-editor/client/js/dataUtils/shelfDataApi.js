@@ -1,8 +1,5 @@
-import { createItemIndex, getItemIndex, updateItemIndex, deleteItemIndex, updateItemIndexByUpc } from './ItemIndexUtils';
-import { createStore, getStore, updateStore, deleteStore } from './storeUtils.js';
-import { createItem, getItem, updateItem, deleteItem } from './itemUtils.js';
-import { createModular, getModular, updateModular, deleteModular } from './modularUtils.js';
-import { createShelf, getShelf, updateShelf, deleteShelf } from './shelfUtils.js';
+import { updateItemIndex } from './ItemIndexUtils.js';
+import { createShelf, updateShelf } from './shelfUtils.js';
 
 // batch update item indexes using modular and shelf this uses the modular's 
 // items to look up all the indexes necessary, takes the shelf off the index
@@ -72,7 +69,7 @@ export async function moveShelf(shelfData, x, y) {
         // Update the shelf's position
         shelfData.placement_x = x;
         shelfData.placement_y = y;
-        await updateShelf(shelfData, shelfData.store);
+        await updateShelf(shelfData, shelfData.store_number);
 
         return { success: true };
     } catch (error) {
@@ -91,3 +88,6 @@ export async function addShelf(shelfData) {
         throw error;
     }
 }
+
+
+

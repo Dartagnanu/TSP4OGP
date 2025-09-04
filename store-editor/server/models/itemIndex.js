@@ -10,7 +10,8 @@ const shelfAndLocationSchema = new mongoose.Schema({
 // used to quickly lookup items in a store by upc
 // generated using the store map, shelf, item, and modular information
 const itemIndexSchema = new mongoose.Schema({
-    store: { type: mongoose.Schema.Types.ObjectId, ref: "Store", required: true },
+    store: { type: String, required: true },
+    store_number: { type: Number, required: true },
     upcs: [{ type: String, required: true }],
     item_number: { type: Number, required: true },
     locations: { type: [shelfAndLocationSchema], default: [] }, // array of shelfs with locations attached
@@ -19,6 +20,7 @@ const itemIndexSchema = new mongoose.Schema({
     photo: { type: String, required: true }, // url reference
     price: { type: Number, required: true },
 });
+
 itemIndexSchema.index({ store: 1, upcs: 1 }, { unique: true }); // fast UPC lookup
-const ItemIndex = mongoose.model('ItemIndex', itemIndexSchema);
-export default ItemIndex;
+
+export default mongoose.model('ItemIndex', itemIndexSchema);

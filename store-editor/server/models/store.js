@@ -12,7 +12,7 @@ const shelfTemplateSchema = new mongoose.Schema({
 }, { _id: false });
 
 const storeSchema = new mongoose.Schema({
-    id: { type: Number, required: true, unique: true, index: true }, // store_id
+    store_number: { type: Number, required: true, unique: true, index: true }, // store_id
     map_size: {
         width: { type: Number, required: true },
         height: { type: Number, required: true }
@@ -27,6 +27,4 @@ const storeSchema = new mongoose.Schema({
     registers: { type: [pointSchema], default: [] }
 }, { timestamps: true });
 
-const Store = mongoose.model('Store', storeSchema);
-
-export default Store;
+export default mongoose.model('Store', storeSchema);
