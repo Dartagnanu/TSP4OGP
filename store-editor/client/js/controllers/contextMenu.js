@@ -9,10 +9,12 @@ export class ContextMenu {
     this.deleteShelfBtn = document.getElementById('deleteShelfBtn');
     this.cloneShelfBtn = document.getElementById('cloneShelfBtn');
     this.currentShelfNode = null;
+    this.isDraggingMap = false; // Track if the map is being dragged
   }
 
   init() {
     this.setupContextMenu();
+    this.setupMapDrag();
   }
 
   setupContextMenu() {
@@ -59,14 +61,15 @@ export class ContextMenu {
 
     // Right-click on empty space (stage)
     this.stage.on('contentContextmenu', (e) => {
-      // Only show if not clicking a shelf
+      if (this.isDraggingMap) return; // Prevent context menu if dragging the map
+
       const pointer = this.stage.getPointerPosition();
       const shape = this.stage.getIntersection(pointer);
       if (!shape) {
-        e.preventDefault();
+        e.evt.preventDefault();
         this.contextMenu.style.display = 'block';
-        this.contextMenu.style.left = pointer.x + 'px';
-        this.contextMenu.style.top = pointer.y + 'px';
+        this.contextMenu.style.left = e.evt.clientX + 'px';
+        this.contextMenu.style.top = e.evt.clientY + 'px';
 
         // Show add, hide shelf actions
         this.addShelfBtn.style.display = '';
@@ -82,14 +85,12 @@ export class ContextMenu {
           const shelfData = {
             id: `shelf_${Date.now()}`,
             template: templateKey,
-            placement: [
-              Math.round(pointer.x / scaleX),
-              Math.round(pointer.y / scaleY)
-            ],
+            placement_x: Math.round(pointer.x / 20), // Adjust grid size as needed
+            placement_y: Math.round(pointer.y / 20),
             rotation: 0,
             modulars: [],
             flex_items: [],
-            department: ''
+            department: '',
           };
           window.createAndAddShelf(shelfData, template);
           this.contextMenu.style.display = 'none';
@@ -100,6 +101,56 @@ export class ContextMenu {
     // Hide menu on click elsewhere
     document.addEventListener('click', () => {
       this.contextMenu.style.display = 'none';
+    });
+  }
+
+  setupMapDrag() {
+    let isRightMouseDown = false;
+    let lastMousePosition = null;
+
+    // Detect right mouse button down
+    this.stage.on('mousedown', (e) => {
+      if (e.evt.button === 2) { // Right mouse button
+        isRightMouseDown = true;
+        lastMousePosition = this.stage.getPointerPosition();
+        this.isDraggingMap = false; // Reset dragging flag
+      }
+    });
+
+    // Handle mouse move for dragging
+    this.stage.on('mousemove', (e) => {
+      if (isRightMouseDown) {
+        const pointer = this.stage.getPointerPosition();
+        if (lastMousePosition) {
+          const dx = pointer.x - lastMousePosition.x;
+          const dy = pointer.y - lastMousePosition.y;
+
+          // Move the stage
+          const newPos = {
+            x: this.stage.x() + dx,
+            y: this.stage.y() + dy,
+          };
+          this.stage.position(newPos);
+          this.stage.batchDraw();
+
+          this.isDraggingMap = true; // Set dragging flag
+        }
+        lastMousePosition = pointer;
+      }
+    });
+
+    // Detect right mouse button up
+    this.stage.on('mouseup', () => {
+      isRightMouseDown = false;
+      lastMousePosition = null;
+    });
+
+    // Prevent context menu if dragging
+    this.stage.on('contentContextmenu', (e) => {
+      if (this.isDraggingMap) {
+        e.evt.preventDefault();
+        this.isDraggingMap = false; // Reset dragging flag
+      }
     });
   }
 }

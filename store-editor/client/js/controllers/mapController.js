@@ -2,6 +2,8 @@ import { createStage } from '../Konva/konvaSetup.js';
 import { drawStoreBoundary, drawShelf, loadShelves } from '../Konva/drawUtils.js';
 import {getStore} from '../dataUtils/storeUtils.js';
 import {getShelf, getShelvesByStore} from '../dataUtils/shelfUtils.js';
+import { ContextMenu} from './contextMenu.js';
+
 
 // fetch and collect map data
 export async function fetchMap(store_number) {
@@ -23,7 +25,12 @@ export async function stageMap(store_number, stage_width, stage_height, socket) 
   // load shelves from map
 
   loadShelves(layer, stage, map.shelves, map.store.shelf_templates, scaleX, scaleY, socket);
-  return { map, layer};
+
+  // Initialize the context menu
+  const contextMenu = new ContextMenu(stage, map.store.shelf_templates, layer);
+  contextMenu.init();
+
+  return { contextMenu, layer, map, stage, };
 }
 
 
