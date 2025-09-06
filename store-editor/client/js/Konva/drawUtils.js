@@ -90,12 +90,26 @@ export function drawShelf(layer, stage, shelfData, template, scaleX, scaleY, soc
 
         const snappedX = Math.round(pos.x / gridSize) * gridSize;
         const snappedY = Math.round(pos.y / gridSize) * gridSize;
+
         // TODO: update shelfdata only when position snapped and changes
         polygon.position({ x: snappedX, y: snappedY });
+        // Update the tooltip position to follow the shape
+        tooltip.position({ x: snappedX + 20, y: snappedY - 20 });
+
         console.log('Snapped position:', { x: snappedX, y: snappedY });
         // TODO: Finish auto update functionality
-        socket.emit('updateShelf', { id: shelfData.id, x: pos.x, y: pos.y });
-        console.log('updated shelf to', { id: shelfData.id, x: snappedX / scaleX, y: snappedY / scaleY });
+        socket.emit('updateShelf', {
+            shelf_id: shelfData.shelf_id,
+            x: snappedX / scaleX,
+            y: snappedY / scaleY,
+            rotation: shelfData.rotation,
+            store_id: shelfData.store_id,
+        });
+        console.log('updated shelf', { id: shelfData.shelf_id,
+            x: snappedX / scaleX,
+            y: snappedY / scaleY,
+            rotation: shelfData.rotation,
+            store_id: shelfData.store_id,});
         moveShelf(shelfData, snappedX / scaleX, snappedY / scaleY);
         layer.batchDraw();
     });
@@ -115,4 +129,40 @@ export function loadShelves(layer, stage, shelvesData, templates, scaleX, scaleY
             drawShelf(layer, stage, shelfData, template, scaleX, scaleY, socket);
         }
     });
+}
+
+
+export function drawStartingPoints(layer, startingPoints, scaleX, scaleY) {
+    
+
+    startingPoints.forEach((point) => {
+        console.log('Drawing starting point:', point);
+        const [x, y] = point.point;
+
+        // Draw the starting point as a circle
+        const circle = new Konva.Circle({
+            x: x * scaleX,
+            y: y * scaleY,
+            radius: 5, // Radius of the dot
+            fill: 'red',
+            stroke: 'black',
+            strokeWidth: 1,
+        });
+
+        // Draw the label for the starting point
+        const label = new Konva.Text({
+            x: x * scaleX + 10, // Offset the label slightly
+            y: y * scaleY - 10,
+            text: 'Starting Point',
+            fontSize: 14,
+            fontFamily: 'Calibri',
+            fill: 'black',
+        });
+
+        // Add the circle and label to the layer
+        layer.add(circle);
+        layer.add(label);
+    });
+
+    layer.draw(); // Redraw the layer to show the starting points
 }

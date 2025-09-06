@@ -1,13 +1,14 @@
 export class ContextMenu {
-  constructor(stage, templates, layer) {
+  constructor(stage, templates, layer, shelves) {
     this.stage = stage;
+    this.shelves = shelves;
     this.templates = templates;
     this.layer = layer;
     this.contextMenu = document.getElementById('contextMenu');
     this.addShelfBtn = document.getElementById('addShelfBtn');
-    this.newShelfInput = document.getElementById('newShelfName');
     this.deleteShelfBtn = document.getElementById('deleteShelfBtn');
     this.cloneShelfBtn = document.getElementById('cloneShelfBtn');
+    this.editShelfBtn = document.getElementById('editShelfBtn');
     this.currentShelfNode = null;
     this.isDraggingMap = false; // Track if the map is being dragged
   }
@@ -27,21 +28,39 @@ export class ContextMenu {
         this.contextMenu.style.left = e.evt.clientX + 'px';
         this.contextMenu.style.top = e.evt.clientY + 'px';
 
+        // Find the shelf data using the target's ID
+        const shelfId = target.id();
+        const shelfData = this.shelves.find((shelf) => shelf.shelf_id === shelfId);
+        console.log('Right-clicked on shelf:', shelfData);
+
         // Show shelf actions, hide add
         this.addShelfBtn.style.display = 'none';
         this.deleteShelfBtn.style.display = '';
         this.cloneShelfBtn.style.display = '';
-        this.newShelfInput.value = target.id();
         this.currentShelfNode = target;
 
         // Edit shelf name
-        this.addShelfBtn.onclick = null; // Disable add
+        this.editShelfBtn.onclick = () => {
+          console.log("edit shelf button clicked");
+          const newName = prompt("Enter new shelf name:", target.attrs.name);
+          if (newName) {
+            target.setAttrs({ name: newName });
+            this.layer.draw();
+          }
+          this.contextMenu.style.display = 'none';
+        };
+
+        this.addShelfBtn.onclick = () => {
+          console.log("add shelf button clicked");
+        };
         this.deleteShelfBtn.onclick = () => {
+          console.log("delete shelf button clicked");
           target.destroy();
           this.layer.draw();
           this.contextMenu.style.display = 'none';
         };
         this.cloneShelfBtn.onclick = () => {
+          console.log("clone shelf button clicked");
           const shelfData = {
             ...target.attrs,
             id: `shelf_${Date.now()}`,
@@ -52,10 +71,7 @@ export class ContextMenu {
           window.createAndAddShelf(shelfData, template);
           this.contextMenu.style.display = 'none';
         };
-        this.newShelfInput.onchange = () => {
-          target.id(this.newShelfInput.value);
-          this.layer.draw();
-        };
+    
       }
     });
 
@@ -75,7 +91,6 @@ export class ContextMenu {
         this.addShelfBtn.style.display = '';
         this.deleteShelfBtn.style.display = 'none';
         this.cloneShelfBtn.style.display = 'none';
-        this.newShelfInput.value = '';
         this.currentShelfNode = null;
 
         this.addShelfBtn.onclick = () => {

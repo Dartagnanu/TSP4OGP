@@ -23,6 +23,9 @@
 }
 #container {
   margin-top: 50px;
+  position: relative;
+  z-index: 1; /* Ensure it is below the context menu */
+
 }
 
 #sidebar {
@@ -42,4 +45,15 @@
   width: 0px;
   overflow: hidden;
   padding: 0;
+}
+
+#contextMenu {
+  display: none;
+  position: absolute;
+  z-index: 1000; /* Ensure it appears above the Konva canvas */
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 4px;
 }

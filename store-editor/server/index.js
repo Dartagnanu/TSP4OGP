@@ -370,8 +370,12 @@ app.post('/generate-itemindex/:storeId', async (req, res) => {
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
+  // Listen for shelf updates
   socket.on('updateShelf', (data) => {
-    io.emit('updateShelf', data); // Broadcast to other clients
+    console.log('Shelf updated:', data);
+
+    // Broadcast the update to all other clients, including the sender's socket ID
+    socket.broadcast.emit('updateShelf', { ...data, senderId: socket.id });
   });
 
   socket.on('disconnect', () => {

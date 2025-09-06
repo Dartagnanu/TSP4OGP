@@ -1,6 +1,8 @@
-import { Sidebar } from './js/controllers/sidebar.js';
-import { stageMap } from './js/controllers/mapController.js';
-import { ContextMenu } from './js/controllers/contextMenu.js';
+import { Sidebar } from './js/controllers/sidebar/sidebar.js';
+import { mapController } from './js/controllers/mapController.js';
+import { ContextMenu } from './js/controllers/contextMenu/contextMenu.js';
+
+// Initialize socket.io
 const socket = io();
 
 // Stage setup
@@ -9,16 +11,12 @@ const stageHeight = 600;
 
 const STORE_NUMBER = Number(3260); // Replace with dynamic value later
 
-// Initialize the map and get the layer
-let { contextMenu, layer, map, stage, } = await stageMap(STORE_NUMBER, stageWidth, stageHeight, socket);
-  // Listen for updates from other clients
-  socket.on('updateShelf', (data) => {
-    const shelf = layer.findOne(`#${data.id}`);
-    if (shelf) {
-      shelf.position({ x: data.x, y: data.y });
-      layer.draw();
-    }
-  });
+// Initialize the mapController and stage map
+const mapCtrl = new mapController(STORE_NUMBER, stageWidth, stageHeight, socket);
+mapCtrl.init();
+
+
+
 
 // Initialize sidebar
 
