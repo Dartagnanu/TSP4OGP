@@ -1,0 +1,164 @@
+{
+  "store_number": 3260,
+  "map_size": { "width": 100, "height": 60 },
+  "store_shape": [[0,0],[0,60],[100,60],[100,0]],
+  "walls": [],
+  "shelf_templates": {
+    "standard_shelf": {
+      "shape": [[0,0],[0,2],[4,2],[4,0]],
+      "access": "front",
+      "color": "#b0c4de"
+    },
+    "feature_bin": {
+      "shape": [[0,0],[0,4],[4,4],[4,0]],
+      "access": "all_sides",
+      "color": "#ffa500"
+    }
+  },
+  "starting_points": [
+    { "id": "Main_Entrance", "point": [0,0] }
+  ],
+  "registers": [
+    { "id": "Checkout_1", "point": [40,0] }
+  ],
+  "shelves": [
+    {
+      "store_number": 3260,
+      "shelf_id": "shelf_001",
+      "template": "standard_shelf",
+      "placement_x": 5,
+      "placement_y": 5,
+      "rotation": 0,
+      "flex_items": [],
+      "modulars": ["201"],
+      "department": "frozen"
+    },
+    {
+      "store_number": 3260,
+      "shelf_id": "shelf_002",
+      "template": "standard_shelf",
+      "placement_x": 10,
+      "placement_y": 5,
+      "rotation": 0,
+      "flex_items": [],
+      "modulars": ["202"],
+      "department": "dairy"
+    },
+    {
+      "store_number": 3260,
+      "shelf_id": "shelf_003",
+      "template": "standard_shelf",
+      "placement_x": 15,
+      "placement_y": 10,
+      "rotation": 0,
+      "flex_items": [],
+      "modulars": ["203"],
+      "department": "produce"
+    },
+    {
+      "store_number": 3260,
+      "shelf_id": "shelf_004",
+      "template": "standard_shelf",
+      "placement_x": 20,
+      "placement_y": 15,
+      "rotation": 0,
+      "flex_items": [],
+      "modulars": ["204"],
+      "department": "meat"
+    },
+    {
+      "store_number": 3260,
+      "shelf_id": "shelf_005",
+      "template": "feature_bin",
+      "placement_x": 25,
+      "placement_y": 20,
+      "rotation": 10,
+      "flex_items": [],
+      "modulars": ["205"],
+      "department": "bakery"
+    }
+  ],
+  "modulars": [
+    {
+      "modular_id": "201",
+      "modular": 1,
+      "modular_section": 1,
+      "items": [
+        { "location": 1, "item_number": 1000001 },
+        { "location": 2, "item_number": 1000002 },
+        { "location": 3, "item_number": 1000003 },
+        { "location": 4, "item_number": 1000004 }
+      ]
+    },
+    {
+      "modular_id": "202",
+      "modular": 2,
+      "modular_section": 1,
+      "items": [
+        { "location": 1, "item_number": 1000011 },
+        { "location": 2, "item_number": 1000012 },
+        { "location": 3, "item_number": 1000013 },
+        { "location": 4, "item_number": 1000014 }
+      ]
+    },
+    {
+      "modular_id": "203",
+      "modular": 3,
+      "modular_section": 1,
+      "items": [
+        { "location": 1, "item_number": 1000021 },
+        { "location": 2, "item_number": 1000022 },
+        { "location": 3, "item_number": 1000023 },
+        { "location": 4, "item_number": 1000024 }
+      ]
+    },
+    {
+      "modular_id": "204",
+      "modular": 4,
+      "modular_section": 1,
+      "items": [
+        { "location": 1, "item_number": 1000031 },
+        { "location": 2, "item_number": 1000032 },
+        { "location": 3, "item_number": 1000033 },
+        { "location": 4, "item_number": 1000034 }
+      ]
+    },
+    {
+      "modular_id": "205",
+      "modular": 5,
+      "modular_section": 1,
+      "items": [
+        { "location": 1, "item_number": 1000041 },
+        { "location": 2, "item_number": 1000042 },
+        { "location": 3, "item_number": 1000043 },
+        { "location": 4, "item_number": 1000044 }
+      ]
+    }
+  ],
+  "items": [
+    { "item_number": 1000001, "upcs": ["0010001000001"], "name": "Whole Milk", "department": "dairy", "photo": "milk.jpg", "price": 3.49, "pickwalk": "chilled"},
+    { "item_number": 1000002, "upcs": ["0010001000002"], "name": "Cheddar Cheese", "department": "dairy", "photo": "cheddar.jpg", "price": 4.99, "pickwalk": "chilled" },
+    { "item_number": 1000003, "upcs": ["0010001000003"], "name": "Greek Yogurt", "department": "dairy", "photo": "yogurt.jpg", "price": 1.29, "pickwalk": "chilled" },
+    { "item_number": 1000004, "upcs": ["0010001000004"], "name": "Butter", "department": "dairy", "photo": "butter.jpg", "price": 2.99, "pickwalk": "chilled" },
+
+    { "item_number": 1000011, "upcs": ["0020001000011"], "name": "Chicken Breast", "department": "meat", "photo": "chicken.jpg", "price": 5.99, "pickwalk": "chilled" },
+    { "item_number": 1000012, "upcs": ["0020001000012"], "name": "Ground Beef", "department": "meat", "photo": "beef.jpg", "price": 6.49, "pickwalk": "chilled" },
+    { "item_number": 1000013, "upcs": ["0020001000013"], "name": "Pork Chops", "department": "meat", "photo": "pork.jpg", "price": 4.99, "pickwalk": "chilled" },
+    { "item_number": 1000014, "upcs": ["0020001000014"], "name": "Turkey Slices", "department": "meat", "photo": "turkey.jpg", "price": 3.99, "pickwalk": "chilled" },
+
+    { "item_number": 1000021, "upcs": ["0030001000021"], "name": "Apples", "department": "produce", "photo": "apples.jpg", "price": 2.49, "pickwalk": "ambient" },
+    { "item_number": 1000022, "upcs": ["0030001000022"], "name": "Bananas", "department": "produce", "photo": "bananas.jpg", "price": 1.19, "pickwalk": "ambient" },
+    { "item_number": 1000023, "upcs": ["0030001000023"], "name": "Carrots", "department": "produce", "photo": "carrots.jpg", "price": 1.99, "pickwalk": "ambient" },
+    { "item_number": 1000024, "upcs": ["0030001000024"], "name": "Broccoli", "department": "produce", "photo": "broccoli.jpg", "price": 2.29, "pickwalk": "ambient" },
+
+    { "item_number": 1000031, "upcs": ["0040001000031"], "name": "Frozen Pizza", "department": "frozen", "photo": "pizza.jpg", "price": 5.49, "pickwalk": "frozen" },
+    { "item_number": 1000032, "upcs": ["0040001000032"], "name": "Ice Cream", "department": "frozen", "photo": "icecream.jpg", "price": 3.99, "pickwalk": "frozen" },
+    { "item_number": 1000033, "upcs": ["0040001000033"], "name": "Frozen Peas", "department": "frozen", "photo": "peas.jpg", "price": 1.49, "pickwalk": "frozen" },
+    { "item_number": 1000034, "upcs": ["0040001000034"], "name": "Frozen Corn", "department": "frozen", "photo": "corn.jpg", "price": 1.49, "pickwalk": "frozen" },
+
+    { "item_number": 1000041, "upcs": ["0050001000041"], "name": "White Bread", "department": "bakery", "photo": "bread.jpg", "price": 2.49, "pickwalk": "ambient" },
+    { "item_number": 1000042, "upcs": ["0050001000042"], "name": "Bagels", "department": "bakery", "photo": "bagels.jpg", "price": 3.49, "pickwalk": "ambient" },
+    { "item_number": 1000043, "upcs": ["0050001000043"], "name": "Croissants", "department": "bakery", "photo": "croissants.jpg", "price": 4.29, "pickwalk": "ambient" },
+    { "item_number": 1000044, "upcs": ["0050001000044"], "name": "Donuts", "department": "bakery", "photo": "donuts.jpg", "price": 2.99, "pickwalk": "ambient" }
+  ]
+}
