@@ -1,16 +1,17 @@
+import {moveShelf} from "../dataUtils/shelfDataApi.js";
+const gridSize = 20; // Size of each grid cell
 
-export function drawStoreBoundary(layer, map, stageWidth, stageHeight) {
+
+export function drawStoreBoundary(layer, store, stageWidth, stageHeight) {
+    console.log('Drawing store boundary for store:', store);
     // Clear previous boundary
     layer.find('.store-boundary').forEach((shape) => shape.destroy());
 
-    // Todo: storeShape check causing issues after modularization of function
-    //if (!map.storeShape || map.storeShape.length === 0) return;
-
-    console.log('mapSize:', map.map_size.width, map.map_size.height);
-    const scaleX = stageWidth / map.map_size.width;
-    const scaleY = stageHeight / map.map_size.height;
-    console.log('storeShape:', map.store_shape);
-    const scaledPoints = map.store_shape.flatMap(([x, y]) => [x * scaleX, y * scaleY]);
+    console.log('mapSize:', store.map_size.width, store.map_size.height);
+    const scaleX = stageWidth / store.map_size.width;
+    const scaleY = stageHeight / store.map_size.height;
+    console.log('storeShape:', store.store_shape);
+    const scaledPoints = store.store_shape.flatMap(([x, y]) => [x * scaleX, y * scaleY]);
 
     const boundary = new Konva.Line({
         points: scaledPoints,
@@ -25,8 +26,8 @@ export function drawStoreBoundary(layer, map, stageWidth, stageHeight) {
     return { scaleX, scaleY };
 }
 
-export function drawShelf(layer, stage, shelfData, template, scaleX, scaleY) {
-    console.log('Drawing shelf:', shelfData.id, 'with template:', template);
+export function drawShelf(layer, stage, shelfData, template, scaleX, scaleY, socket) {
+    console.log('Drawing shelf:', shelfData.shelf_id, 'with template:', template);
     const points = template.shape
         .map(([x, y]) => [x * scaleX, y * scaleY])
         .flat();
@@ -39,17 +40,18 @@ export function drawShelf(layer, stage, shelfData, template, scaleX, scaleY) {
         closed: true,
         draggable: true,
         rotation: shelfData.rotation || 0,
-        x: (shelfData.placement?.[0] || 0) * scaleX,
-        y: (shelfData.placement?.[1] || 0) * scaleY,
+        x: (shelfData.placement_x || 0) * scaleX,
+        y: (shelfData.placement_y || 0) * scaleY,
     });
 
-    polygon.id(shelfData.id);
+    polygon.id(shelfData.shelf_id);
     layer.add(polygon);
 
-    
+    console.log('Shelf drawn at:', polygon.position(), 'with original data:', shelfData);
+
     // Tooltip added
     const tooltip = new Konva.Text({
-        text: `Shelf ID: ${shelfData.id}\nModulars: ${shelfData.modulars?.join(', ')}\nFlex Items: ${shelfData.flex_items?.length}\n`,
+        text: `Shelf ID: ${shelfData.shelf_id}\nModulars: ${shelfData.modulars?.join(', ')}\nFlex Items: ${shelfData.flex_items?.length}\n`,
         fontSize: 14,
         fontFamily: 'Calibri',
         fill: 'black',
@@ -80,22 +82,87 @@ export function drawShelf(layer, stage, shelfData, template, scaleX, scaleY) {
         tooltip.visible(false);
         layer.batchDraw();
     });
+    
+    // Snap to grid on dragmove and emit update via socket
+    polygon.on('dragmove', () => {
+        const pos = polygon.position();
+        console.log('Dragging shelf:', shelfData, 'to position:', pos);
 
+        const snappedX = Math.round(pos.x / gridSize) * gridSize;
+        const snappedY = Math.round(pos.y / gridSize) * gridSize;
 
-    // live broadcast drag for realtime sync maybe?
-    //polygon.on('dragmove', () => {
-    //  const pos = polygon.position();
-    //  socket.emit('updateShelf', { id: shelfData.id, x: pos.x, y: pos.y });
-    //});
+        // TODO: update shelfdata only when position snapped and changes
+        polygon.position({ x: snappedX, y: snappedY });
+        // Update the tooltip position to follow the shape
+        tooltip.position({ x: snappedX + 20, y: snappedY - 20 });
+
+        console.log('Snapped position:', { x: snappedX, y: snappedY });
+        // TODO: Finish auto update functionality
+        socket.emit('updateShelf', {
+            shelf_id: shelfData.shelf_id,
+            x: snappedX / scaleX,
+            y: snappedY / scaleY,
+            rotation: shelfData.rotation,
+            store_id: shelfData.store_id,
+        });
+        console.log('updated shelf', { id: shelfData.shelf_id,
+            x: snappedX / scaleX,
+            y: snappedY / scaleY,
+            rotation: shelfData.rotation,
+            store_id: shelfData.store_id,});
+        moveShelf(shelfData, snappedX / scaleX, snappedY / scaleY);
+        layer.batchDraw();
+    });
+    
+
+   
 
     layer.draw();
 }
 
-export function loadShelves(layer, stage, shelvesData, templates, scaleX, scaleY) {
+export function loadShelves(layer, stage, shelvesData, templates, scaleX, scaleY, socket) {
+    console.log('Loading shelves with templates:', templates);
     shelvesData.forEach((shelfData) => {
+        console.log('Loading shelf data:', shelfData);
         const template = templates[shelfData.template];
         if (template) {
-            drawShelf(layer, stage, shelfData, template, scaleX, scaleY);
+            drawShelf(layer, stage, shelfData, template, scaleX, scaleY, socket);
         }
     });
+}
+
+
+export function drawStartingPoints(layer, startingPoints, scaleX, scaleY) {
+    
+
+    startingPoints.forEach((point) => {
+        console.log('Drawing starting point:', point);
+        const [x, y] = point.point;
+
+        // Draw the starting point as a circle
+        const circle = new Konva.Circle({
+            x: x * scaleX,
+            y: y * scaleY,
+            radius: 5, // Radius of the dot
+            fill: 'red',
+            stroke: 'black',
+            strokeWidth: 1,
+        });
+
+        // Draw the label for the starting point
+        const label = new Konva.Text({
+            x: x * scaleX + 10, // Offset the label slightly
+            y: y * scaleY - 10,
+            text: 'Starting Point',
+            fontSize: 14,
+            fontFamily: 'Calibri',
+            fill: 'black',
+        });
+
+        // Add the circle and label to the layer
+        layer.add(circle);
+        layer.add(label);
+    });
+
+    layer.draw(); // Redraw the layer to show the starting points
 }
