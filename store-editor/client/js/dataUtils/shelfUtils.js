@@ -51,14 +51,13 @@ export const updateShelf = async (shelfData, store_number) => {
 };
 
 // delete shelf by ID and store ID
-export const deleteShelf = async (shelfId, store_number) => {
+export const deleteShelf = async (shelf_Id, store_number) => {
   try {
-    const response = await fetch(`/shelf/${shelfId}`, {
+    const response = await fetch(`/shelf/${shelf_Id}/store/${store_number}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ store: store_number }),
+      }
     });
     if (!response.ok) throw new Error('Failed to delete shelf');
     return await response.json();
