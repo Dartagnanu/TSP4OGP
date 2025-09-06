@@ -107,6 +107,7 @@ app.post('/shelf', async (req, res) => {
 
 // Get shelf by ID
 app.get('/shelf/:shelf_id', async (req, res) => {
+  throw new Error('search shelf by ID only Not implemented');
   try {
     const shelf = await Shelf.findOne({ shelf_id: req.params.shelf_id });
     if (!shelf) return res.status(404).send({ error: 'Shelf not found' });
@@ -145,17 +146,29 @@ app.put('/shelf/:shelf_id/store/:store_number', async (req, res) => {
 
 // Delete shelf by shelf_id and store_number
 app.delete('/shelf/:shelf_id/store/:store_number', async (req, res) => {
-  try {
-    const { store_number } = req.params;
-    if (!store_number) {
-      return res.status(400).send({ error: 'store_number is required' });
+    try {
+        console.log('Delete request received for shelf_id:', req.params.shelf_id, 'store_number:', req.params.store_number);
+
+        if (!req.params.store_number) {
+            return res.status(400).send({ error: 'store_number is required' });
+        }
+        const shelf = await Shelf.findOneAndDelete({
+            shelf_id: req.params.shelf_id,
+            store_number: Number(req.params.store_number),
+        });
+        if (!shelf) {
+            console.log('Shelf not found:', req.params.shelf_id, req.params.store_number);
+            return res.status(404).send({
+                error: 'Shelf not found',
+                shelf_id: req.params.shelf_id,
+                store_number: req.params.store_number,
+            });
+        }
+        res.send(shelf);
+    } catch (err) {
+        console.error('Error deleting shelf:', err.message);
+        res.status(500).send({ error: err.message });
     }
-    const shelf = await Shelf.findOneAndDelete({ shelf_id: req.params.shelf_id, store: store_number });
-    if (!shelf) return res.status(404).send({ error: 'Shelf not found', shelf_id: req.params.shelf_id, store_number });
-    res.send(shelf);
-  } catch (err) {
-    res.status(500).send({ error: err.message });
-  }
 });
 
 // Get all shelves by store number
