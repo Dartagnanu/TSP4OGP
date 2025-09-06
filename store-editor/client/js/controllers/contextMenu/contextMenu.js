@@ -1,9 +1,6 @@
 export class ContextMenu {
-  constructor(stage, templates, layer, shelves) {
-    this.stage = stage;
-    this.shelves = shelves;
-    this.templates = templates;
-    this.layer = layer;
+  constructor(mapController) {
+    this.mapController = mapController; // store instance of mapController
     this.contextMenu = document.getElementById('contextMenu');
     this.addShelfBtn = document.getElementById('addShelfBtn');
     this.deleteShelfBtn = document.getElementById('deleteShelfBtn');
@@ -17,10 +14,9 @@ export class ContextMenu {
     this.setupContextMenu();
     this.setupMapDrag();
   }
-
   setupContextMenu() {
     // Right-click on shelves
-    this.layer.on('contextmenu', (e) => {
+    this.mapController.layer.on('contextmenu', (e) => {
       const target = e.target;
       if (target && target.id()) {
         e.evt.preventDefault();
@@ -30,7 +26,7 @@ export class ContextMenu {
 
         // Find the shelf data using the target's ID
         const shelfId = target.id();
-        const shelfData = this.shelves.find((shelf) => shelf.shelf_id === shelfId);
+        const shelfData = this.mapController.map.shelves.find((shelf) => shelf.shelf_id === shelfId);
         console.log('Right-clicked on shelf:', shelfData);
 
         // Show shelf actions, hide add
@@ -45,7 +41,7 @@ export class ContextMenu {
           const newName = prompt("Enter new shelf name:", target.attrs.name);
           if (newName) {
             target.setAttrs({ name: newName });
-            this.layer.draw();
+            this.mapController.layer.draw();
           }
           this.contextMenu.style.display = 'none';
         };
@@ -55,20 +51,24 @@ export class ContextMenu {
         };
         this.deleteShelfBtn.onclick = () => {
           console.log("delete shelf button clicked");
-          target.destroy();
-          this.layer.draw();
-          this.contextMenu.style.display = 'none';
+          window.deleteShelfFromMap(shelfData.shelf_id);
         };
         this.cloneShelfBtn.onclick = () => {
           console.log("clone shelf button clicked");
-          const shelfData = {
-            ...target.attrs,
-            id: `shelf_${Date.now()}`,
-            x: target.x() + 20,
-            y: target.y() + 20,
+
+          const clonedShelfData = {
+            ...shelfData,
+            _id: undefined, // Remove the original _id
+            shelf_id: `${shelfData.shelf_id}_copy_${Date.now()}`, // Generate a unique shelf_id
+            placement_x: shelfData.placement_x + 1, // Offset the cloned shelf slightly
+            placement_y: shelfData.placement_y + 1,
           };
-          const template = this.templates[shelfData.template] || Object.values(this.templates)[0];
-          window.createAndAddShelf(shelfData, template);
+
+          console.log('Cloned shelf data:', clonedShelfData);
+
+          const template = this.mapController.map.store.shelf_templates[clonedShelfData.template] || Object.values(this.mapController.store.shelf_templates)[0];
+          window.createAndAddShelf(clonedShelfData, template);
+
           this.contextMenu.style.display = 'none';
         };
     
@@ -76,11 +76,11 @@ export class ContextMenu {
     });
 
     // Right-click on empty space (stage)
-    this.stage.on('contentContextmenu', (e) => {
+    this.mapController.stage.on('contentContextmenu', (e) => {
       if (this.isDraggingMap) return; // Prevent context menu if dragging the map
 
-      const pointer = this.stage.getPointerPosition();
-      const shape = this.stage.getIntersection(pointer);
+      const pointer = this.mapController.stage.getPointerPosition();
+      const shape = this.mapController.stage.getIntersection(pointer);
       if (!shape) {
         e.evt.preventDefault();
         this.contextMenu.style.display = 'block';
@@ -95,8 +95,8 @@ export class ContextMenu {
 
         this.addShelfBtn.onclick = () => {
           // Pick a default template
-          const templateKey = Object.keys(this.templates)[0];
-          const template = this.templates[templateKey];
+          const templateKey = Object.keys(this.mapController.templates)[0];
+          const template = this.mapController.templates[templateKey];
           const shelfData = {
             id: `shelf_${Date.now()}`,
             template: templateKey,
@@ -124,29 +124,29 @@ export class ContextMenu {
     let lastMousePosition = null;
 
     // Detect right mouse button down
-    this.stage.on('mousedown', (e) => {
+    this.mapController.stage.on('mousedown', (e) => {
       if (e.evt.button === 2) { // Right mouse button
         isRightMouseDown = true;
-        lastMousePosition = this.stage.getPointerPosition();
+        lastMousePosition = this.mapController.stage.getPointerPosition();
         this.isDraggingMap = false; // Reset dragging flag
       }
     });
 
     // Handle mouse move for dragging
-    this.stage.on('mousemove', (e) => {
+    this.mapController.stage.on('mousemove', (e) => {
       if (isRightMouseDown) {
-        const pointer = this.stage.getPointerPosition();
+        const pointer = this.mapController.stage.getPointerPosition();
         if (lastMousePosition) {
           const dx = pointer.x - lastMousePosition.x;
           const dy = pointer.y - lastMousePosition.y;
 
           // Move the stage
           const newPos = {
-            x: this.stage.x() + dx,
-            y: this.stage.y() + dy,
+            x: this.mapController.stage.x() + dx,
+            y: this.mapController.stage.y() + dy,
           };
-          this.stage.position(newPos);
-          this.stage.batchDraw();
+          this.mapController.stage.position(newPos);
+          this.mapController.stage.batchDraw();
 
           this.isDraggingMap = true; // Set dragging flag
         }
@@ -155,13 +155,13 @@ export class ContextMenu {
     });
 
     // Detect right mouse button up
-    this.stage.on('mouseup', () => {
+    this.mapController.stage.on('mouseup', () => {
       isRightMouseDown = false;
       lastMousePosition = null;
     });
 
     // Prevent context menu if dragging
-    this.stage.on('contentContextmenu', (e) => {
+    this.mapController.stage.on('contentContextmenu', (e) => {
       if (this.isDraggingMap) {
         e.evt.preventDefault();
         this.isDraggingMap = false; // Reset dragging flag

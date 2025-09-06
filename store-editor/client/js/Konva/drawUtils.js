@@ -1,5 +1,5 @@
 import {moveShelf} from "../dataUtils/shelfDataApi.js";
-const gridSize = 20; // Size of each grid cell
+const gridSize = 10; // Size of each grid cell
 
 
 export function drawStoreBoundary(layer, store, stageWidth, stageHeight) {
@@ -8,10 +8,10 @@ export function drawStoreBoundary(layer, store, stageWidth, stageHeight) {
     layer.find('.store-boundary').forEach((shape) => shape.destroy());
 
     console.log('mapSize:', store.map_size.width, store.map_size.height);
-    const scaleX = stageWidth / store.map_size.width;
-    const scaleY = stageHeight / store.map_size.height;
+    const scale_X = stageWidth / store.map_size.width;
+    const scale_Y = stageHeight / store.map_size.height;
     console.log('storeShape:', store.store_shape);
-    const scaledPoints = store.store_shape.flatMap(([x, y]) => [x * scaleX, y * scaleY]);
+    const scaledPoints = store.store_shape.flatMap(([x, y]) => [x * scale_X, y * scale_Y]);
 
     const boundary = new Konva.Line({
         points: scaledPoints,
@@ -23,13 +23,13 @@ export function drawStoreBoundary(layer, store, stageWidth, stageHeight) {
 
     layer.add(boundary);
     layer.draw();
-    return { scaleX, scaleY };
+    return { scale_X, scale_Y };
 }
 
-export function drawShelf(layer, stage, shelfData, template, scaleX, scaleY, socket) {
+export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, socket) {
     console.log('Drawing shelf:', shelfData.shelf_id, 'with template:', template);
     const points = template.shape
-        .map(([x, y]) => [x * scaleX, y * scaleY])
+        .map(([x, y]) => [x * scale_X, y * scale_Y])
         .flat();
 
     const polygon = new Konva.Line({
@@ -40,8 +40,8 @@ export function drawShelf(layer, stage, shelfData, template, scaleX, scaleY, soc
         closed: true,
         draggable: true,
         rotation: shelfData.rotation || 0,
-        x: (shelfData.placement_x || 0) * scaleX,
-        y: (shelfData.placement_y || 0) * scaleY,
+        x: (shelfData.placement_x || 0) * scale_X,
+        y: (shelfData.placement_y || 0) * scale_Y,
     });
 
     polygon.id(shelfData.shelf_id);
@@ -86,53 +86,57 @@ export function drawShelf(layer, stage, shelfData, template, scaleX, scaleY, soc
     // Snap to grid on dragmove and emit update via socket
     polygon.on('dragmove', () => {
         const pos = polygon.position();
-        console.log('Dragging shelf:', shelfData, 'to position:', pos);
 
         const snappedX = Math.round(pos.x / gridSize) * gridSize;
         const snappedY = Math.round(pos.y / gridSize) * gridSize;
+        
+        //console.log('Dragging shelf:', shelfData, 'to position:', pos);
 
         // TODO: update shelfdata only when position snapped and changes
         polygon.position({ x: snappedX, y: snappedY });
         // Update the tooltip position to follow the shape
         tooltip.position({ x: snappedX + 20, y: snappedY - 20 });
 
-        console.log('Snapped position:', { x: snappedX, y: snappedY });
+        //console.log('Snapped position:', { x: snappedX, y: snappedY });
+        if (snappedX == shelfData.placement_x * scale_X && snappedY == shelfData.placement_y * scale_Y) {
+            // Position is snapped and unchanged
+
+            return;
+        }
+        
         // TODO: Finish auto update functionality
         socket.emit('updateShelf', {
             shelf_id: shelfData.shelf_id,
-            x: snappedX / scaleX,
-            y: snappedY / scaleY,
+            x: snappedX / scale_X,
+            y: snappedY / scale_Y,
             rotation: shelfData.rotation,
             store_id: shelfData.store_id,
         });
         console.log('updated shelf', { id: shelfData.shelf_id,
-            x: snappedX / scaleX,
-            y: snappedY / scaleY,
+            x: snappedX / scale_X,
+            y: snappedY / scale_Y,
             rotation: shelfData.rotation,
             store_id: shelfData.store_id,});
-        moveShelf(shelfData, snappedX / scaleX, snappedY / scaleY);
+        moveShelf(shelfData, snappedX / scale_X, snappedY / scale_Y);
         layer.batchDraw();
     });
-    
-
-   
 
     layer.draw();
 }
 
-export function loadShelves(layer, stage, shelvesData, templates, scaleX, scaleY, socket) {
+export function loadShelves(layer, stage, shelvesData, templates, scale_X, scale_Y, socket) {
     console.log('Loading shelves with templates:', templates);
     shelvesData.forEach((shelfData) => {
         console.log('Loading shelf data:', shelfData);
         const template = templates[shelfData.template];
         if (template) {
-            drawShelf(layer, stage, shelfData, template, scaleX, scaleY, socket);
+            drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, socket);
         }
     });
 }
 
 
-export function drawStartingPoints(layer, startingPoints, scaleX, scaleY) {
+export function drawStartingPoints(layer, startingPoints, scale_X, scale_Y) {
     
 
     startingPoints.forEach((point) => {
@@ -141,8 +145,8 @@ export function drawStartingPoints(layer, startingPoints, scaleX, scaleY) {
 
         // Draw the starting point as a circle
         const circle = new Konva.Circle({
-            x: x * scaleX,
-            y: y * scaleY,
+            x: x * scale_X,
+            y: y * scale_Y,
             radius: 5, // Radius of the dot
             fill: 'red',
             stroke: 'black',
@@ -151,8 +155,8 @@ export function drawStartingPoints(layer, startingPoints, scaleX, scaleY) {
 
         // Draw the label for the starting point
         const label = new Konva.Text({
-            x: x * scaleX + 10, // Offset the label slightly
-            y: y * scaleY - 10,
+            x: x * scale_X + 10, // Offset the label slightly
+            y: y * scale_Y - 10,
             text: 'Starting Point',
             fontSize: 14,
             fontFamily: 'Calibri',

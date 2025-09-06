@@ -1,9 +1,9 @@
 import { createStage } from '../Konva/konvaSetup.js';
 import { drawStoreBoundary, drawShelf, loadShelves, drawStartingPoints } from '../Konva/drawUtils.js';
 import {getStore} from '../dataUtils/storeUtils.js';
-import {getShelf, getShelvesByStore} from '../dataUtils/shelfUtils.js';
+import {deleteShelf, getShelf, getShelvesByStore} from '../dataUtils/shelfUtils.js';
 import { ContextMenu} from './contextMenu/contextMenu.js';
-
+import { createShelf } from '../dataUtils/shelfUtils.js';
 export class mapController {
   constructor(store_number, stage_width, stage_height, socket) {
     this.store_number = store_number;
@@ -19,7 +19,9 @@ export class mapController {
     this.layer = layer; // Store the layer for later use
     this.stage = stage; // Store the stage for later use
     this.map = map; // Store the map data for later use
-
+   // Expose createAndAddShelf globally for use in the context menu
+    window.createAndAddShelf = this.createAndAddShelf.bind(this);
+    window.deleteShelfFromMap = this.deleteShelfFromMap.bind(this);
 
     // TODO: finish auto update functionality
     // Listen for updates from other clients
@@ -54,21 +56,63 @@ export class mapController {
   async stageMap() {
 
     const { stage, layer } = createStage('container', this.stage_width, this.stage_height);
+    this.stage = stage;
+    this.layer = layer;
     const map = await this.fetchMap(this.store_number);
+    this.map = map;
     console.log('Fetched map');
-    const {scaleX, scaleY} = drawStoreBoundary(layer, map.store, this.stage_width, this.stage_height);
-    console.log('Scale factors:', scaleX, scaleY);
+    const {scale_X, scale_Y} = drawStoreBoundary(layer, map.store, this.stage_width, this.stage_height);
+    this.scale_X = scale_X;
+    this.scale_Y = scale_Y;
+    console.log('Scale factors:', this.scale_X, this.scale_Y);
+
     // load shelves from map
 
-    loadShelves(layer, stage, map.shelves, map.store.shelf_templates, scaleX, scaleY, this.socket);
-    drawStartingPoints(layer, map.store.starting_points, scaleX, scaleY);
+    loadShelves(layer, stage, map.shelves, map.store.shelf_templates, this.scale_X, this.scale_Y, this.socket);
+    drawStartingPoints(layer, map.store.starting_points, this.scale_X, this.scale_Y);
     // 
     // Initialize the context menu
-    const contextMenu = new ContextMenu(stage, map.store.shelf_templates, layer, map.shelves);
+    const contextMenu = new ContextMenu(this);
     contextMenu.init();
 
     return { contextMenu, layer, map, stage};
   }
 
-}
+  createAndAddShelf(shelfData) {
+    console.log('Creating and adding shelf:', shelfData);
+    const template = this.map.store.shelf_templates[shelfData.template];
 
+    // Add the new shelf to the shelves array
+    this.map.shelves.push(shelfData);
+
+    createShelf(shelfData);
+
+    // Draw the new shelf on the canvas
+    console.log('Drawing new shelf with data:', shelfData, " using scale factors:", this.stage.scale_X, this.stage.scale_Y);
+    drawShelf(this.layer, this.stage, shelfData, template, this.scale_X, this.scale_Y, this.socket);
+
+    // Redraw the layer
+    this.layer.batchDraw();
+  }
+
+  deleteShelfFromMap(shelf_id) {
+    console.log('Deleting shelf with ID:', shelf_id, this.store_number);
+
+    // Call the deleteShelf function from the dataUtils
+    deleteShelf(shelf_id, this.store_number);
+
+    // Remove the shelf from the shelves array
+    this.map.shelves = this.map.shelves.filter((shelf) => shelf.shelf_id !== shelf_id);
+    // Remove the shelf from the layer
+    const shelf = this.layer.findOne(`#${shelf_id}`);
+    if (shelf) {
+      shelf.destroy();
+    }
+    // TODO: fix Emit deleteShelf event
+    //this.socket.emit('deleteShelf', { shelf_id: shelfId });
+
+
+    // Redraw the layer
+    this.layer.batchDraw();
+  }
+}

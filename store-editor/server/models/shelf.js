@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 // shelf schema represents a shelf in a store, can be changed by manager
 // updates item index when changed
 const shelfSchema = new mongoose.Schema({
-    store_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Store', required: true },
     store_number: { type: Number, required: true },
     shelf_id: { type: String, required: true },
     template: { type: String, required: true },

@@ -16,7 +16,7 @@
     }
   },
   "starting_points": [
-    { "id": "Main_Entrance", "point": [0,0] }
+    { "id": "Main_Entrance", "point": [10,50] }
   ],
   "registers": [
     { "id": "Checkout_1", "point": [40,0] }
