@@ -7,6 +7,7 @@ import Shelf from './shelf.js';
 import Item from './item.js';
 import Modular from './modular.js';
 import ItemIndex from './itemIndex.js';
+import Pickwalk from './pickwalk.js';
 
 console.log('Seed script started');
 
@@ -14,7 +15,8 @@ console.log('Seed script started');
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/storemaps', { useNewUrlParser: true, useUnifiedTopology: true })
+const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/storemaps';
+mongoose.connect(mongoUrl)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => {
     console.error('MongoDB connection error:', err);
@@ -152,6 +154,41 @@ async function populateTestDataFromSeed() {
   }
 }
 
-populateTestDataFromSeed().then(() => {
-  console.log('Seeding complete');
-});
+
+async function populatePickwalks() {
+  try {
+    const pickwalkSeedPath = path.join(__dirname, '../data/pickwalksseed.json');
+    const raw = await fs.readFile(pickwalkSeedPath, 'utf8');
+    const data = JSON.parse(raw);
+
+    // Validate pickwalk data
+    if (!data.pickwalks || !Array.isArray(data.pickwalks)) {
+      throw new Error('pickwalksseed.json is missing required fields or is not an array.');
+    }
+
+    // Clear existing pickwalks
+    await Pickwalk.deleteMany({});
+    console.log('Cleared existing pickwalks from the database.');
+
+    // Insert pickwalks
+    for (const pickwalk of data.pickwalks) {
+      try {
+        const pickwalkDoc = await Pickwalk.findOneAndUpdate(
+          { pickwalk_id: pickwalk.pickwalk_id, store_id: pickwalk.store_id },
+          pickwalk,
+          { upsert: true, new: true }
+        );
+        console.log(`Saved pickwalk: ${pickwalkDoc.pickwalk_id}`);
+      } catch (err) {
+        console.error(`Error saving pickwalk ${pickwalk.pickwalk_id}:`, err);
+      }
+    }
+
+    console.log('Pickwalk data populated from pickwalksseed.json!');
+  } catch (error) {
+    console.error('Error populating pickwalk data:', error);
+  } 
+}
+
+populatePickwalks().then(() => console.log('Pickwalk seeding complete'));
+populateTestDataFromSeed().then(() => console.log('Seeding complete'));

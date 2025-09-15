@@ -4,6 +4,8 @@ import {getStore} from '../dataUtils/storeUtils.js';
 import {deleteShelf, getShelf, getShelvesByStore} from '../dataUtils/shelfUtils.js';
 import { ContextMenu} from './contextMenu/contextMenu.js';
 import { createShelf } from '../dataUtils/shelfUtils.js';
+import { PathFinder } from '../pathFinder.js';
+
 export class mapController {
   constructor(store_number, stage_width, stage_height, socket) {
     this.store_number = store_number;
@@ -114,5 +116,22 @@ export class mapController {
 
     // Redraw the layer
     this.layer.batchDraw();
+  }
+
+  testWalks() {
+    // Implement test walks functionality
+    console.log('Testing walks...');
+    if (!this.pathFinder) {
+      this.pathFinder = new PathFinder(this.map);
+      this.pathFinder.init();
+    }
+    this.pathFinder.createVectorMap();
+    pickwalk = {
+      itemList: [
+        { upc: '123456789012', quantity: 1 },
+        { upc: '987654321098', quantity: 2 },
+      ],
+    };
+    this.pathFinder.findPath(pickwalk);
   }
 }

@@ -10,18 +10,23 @@ import Shelf from './models/shelf.js';
 import Item from './models/item.js';
 import Modular from './models/modular.js';
 import ItemIndex from './models/itemIndex.js';
-import { stringify } from 'querystring';
-import store from './models/store.js';
+import Pickwalk from './models/pickwalk.js';
+
 
 // Resolve __dirname in ES Modules
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const dbURI = 'mongodb://localhost:27017/storemaps';
+const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/storemaps';
 
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(mongoUrl)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
 
 mongoose.connection.on('connected', () => {
-  console.log(`Mongoose connected to ${dbURI}`);
+  console.log(`Mongoose connected to ${mongoUrl}`);
 });
 mongoose.connection.on('error', err => {
   console.log('Mongoose connection error:', err);
@@ -378,6 +383,74 @@ app.post('/generate-itemindex/:storeId', async (req, res) => {
   }
 });
 
+// -------------------- Pickwalk Routes --------------------
+
+// create a new pickwalk
+app.post('/pickwalk', async (req, res) => {
+  try {
+    const pickwalk = new Pickwalk(req.body);
+    await pickwalk.save();
+    res.send({ status: 'ok', pickwalk });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+//Get a pickwalk by pickwalk_id and store_id
+app.get('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
+  try {
+    const pickwalk = await Pickwalk.findById(req.params.pickwalk_id);
+    if (!pickwalk) return res.status(404).send({ error: 'Pickwalk not found' });
+    if (pickwalk.store_id !== req.params.store_id) {
+      return res.status(403).send({ error: 'No store ID for pickwalk' });
+    }
+    res.send(pickwalk);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// Update pickwalk by pickwalk_id and store_id
+app.put('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
+  try {
+    const pickwalk = await Pickwalk.findById(req.params.pickwalk_id);
+    if (!pickwalk) return res.status(404).send({ error: 'Pickwalk not found' });
+    if (pickwalk.store_id !== req.params.store_id) {
+      return res.status(403).send({ error: 'No store ID for pickwalk' });
+    }
+    Object.assign(pickwalk, req.body);
+    await pickwalk.save();
+    res.send({ status: 'ok', pickwalk });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// delete pickwalk by pickwalk_id and store_id
+app.delete('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
+  try {
+    const pickwalk = await Pickwalk.findById(req.params.pickwalk_id);
+    if (!pickwalk) return res.status(404).send({ error: 'Pickwalk not found' });
+    if (pickwalk.store_id !== req.params.store_id) {
+      return res.status(403).send({ error: 'No store ID for pickwalk' });
+    }
+    await pickwalk.remove();
+    res.send({ status: 'ok' });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// get all pickwalks by store_id
+app.get('/pickwalks/store/:store_id', async (req, res) => {
+  try {
+    const pickwalks = await Pickwalk.find({ store_id: req.params.store_id });
+    res.send(pickwalks);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 // -------------------- WebSocket Connection --------------------
 
 io.on('connection', (socket) => {
@@ -396,7 +469,7 @@ io.on('connection', (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 42069;
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

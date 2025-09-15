@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: store-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    build: .
+    container_name: store-app
+    ports:
+      - "42069:42069"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/storemaps
+    depends_on:
+      - mongo
+    volumes:
+      - .:/usr/src/app
+    command: node store-editor/server/index.js
+
+  seed:
+    build: .
+    container_name: store-seed
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/storemaps
+    command: node store-editor/server/models/seed.js
+    volumes:
+      - .:/usr/src/app
+
+volumes:
+  mongo-data:

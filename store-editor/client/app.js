@@ -21,9 +21,9 @@ mapCtrl.init();
 // Initialize sidebar
 
 
-  // save map button
-document.getElementById('saveMapBtn').addEventListener('click', () => {
-  saveMap(map);
+  // test walks button
+document.getElementById('testWalksBtn').addEventListener('click', () => {
+  mapCtrl.testWalks();
 });
 
 // Disable the default browser context menu

@@ -15,10 +15,10 @@ export const createItemIndex = async (itemIndexData) => {
   }
 };
 
-// get item index by ID and store ID
-export const getItemIndex = async (itemIndexId, storeId) => {
+// get item index by upc and store ID
+export const getItemIndex = async (upc, storeId) => {
     try {
-        const response = await fetch(`/itemIndex/${itemIndexId}`, {
+        const response = await fetch(`/itemIndex/upc/${upc}/store/${storeId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -67,4 +67,19 @@ export const deleteItemIndex = async (itemIndexId, storeId) => {
 };
 
 
-
+// search for index by upc
+export const searchItemIndexByUpc = async (upc, storeId) => {
+  try {
+    const response = await fetch(`/itemIndex/search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ upc, store: storeId }),
+    });
+    if (!response.ok) throw new Error('Failed to search item index');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+};  
