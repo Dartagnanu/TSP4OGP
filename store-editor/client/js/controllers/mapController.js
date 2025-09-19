@@ -4,7 +4,7 @@ import {getStore} from '../dataUtils/storeUtils.js';
 import {deleteShelf, getShelf, getShelvesByStore} from '../dataUtils/shelfUtils.js';
 import { ContextMenu} from './contextMenu/contextMenu.js';
 import { createShelf } from '../dataUtils/shelfUtils.js';
-import { PathFinder } from '../pathFinder.js';
+import {walkFinder} from '../pathFinder/walkFinder.js';
 
 export class mapController {
   constructor(store_number, stage_width, stage_height, socket) {
@@ -121,17 +121,17 @@ export class mapController {
   testWalks() {
     // Implement test walks functionality
     console.log('Testing walks...');
-    if (!this.pathFinder) {
-      this.pathFinder = new PathFinder(this.map);
-      this.pathFinder.init();
+    if (!this.walkFinder) {
+      this.walkFinder = new walkFinder(this.map);
+      this.walkFinder.init();
     }
-    this.pathFinder.createVectorMap();
-    pickwalk = {
+    const pickwalk = {
       itemList: [
-        { upc: '123456789012', quantity: 1 },
-        { upc: '987654321098', quantity: 2 },
+        { upc: '0020001000011', quantity: 1 },
+        { upc: '0030001000022', quantity: 2 },
       ],
     };
-    this.pathFinder.findPath(pickwalk);
+    //this.walkFinder.findPath(pickwalk);
   }
 }
+
