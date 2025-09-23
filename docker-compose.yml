@@ -10,7 +10,7 @@ services:
       - mongo-data:/data/db
 
   app:
-    build: .
+    build: ./store-editor
     container_name: store-app
     ports:
       - "42069:42069"
@@ -22,14 +22,21 @@ services:
       - .:/usr/src/app
     command: node store-editor/server/index.js
 
+  gtsp-server:
+    build: ./gtsp-server
+    container_name: gtsp-server
+    ports:
+      - "5000:5000"   # Flask/FastAPI default port
+    restart: always
+
   seed:
-    build: .
+    build: ./store-editor
     container_name: store-seed
     depends_on:
       - mongo
     environment:
       - MONGO_URL=mongodb://mongo:27017/storemaps
-    command: node store-editor/server/models/seed.js
+    command: node server/models/seed.js
     volumes:
       - .:/usr/src/app
 

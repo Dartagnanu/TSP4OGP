@@ -76,6 +76,28 @@
       "flex_items": [],
       "modulars": ["205"],
       "department": "bakery"
+    },
+    {
+      "store_number": 3260,
+      "shelf_id": "blank_shelf_001",
+      "template": "standard_shelf",
+      "placement_x": 30,
+      "placement_y": 20,
+      "rotation": 0,
+      "flex_items": [],
+      "modulars": [],
+      "department": "Unknown"
+    },
+    {
+      "store_number": 3260,
+      "shelf_id": "blank_shelf_002",
+      "template": "standard_shelf",
+      "placement_x": 30,
+      "placement_y": 20,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [],
+      "department": "Unknown"
     }
   ],
   "modulars": [
