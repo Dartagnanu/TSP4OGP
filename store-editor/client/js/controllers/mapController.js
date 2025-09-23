@@ -4,7 +4,8 @@ import {getStore} from '../dataUtils/storeUtils.js';
 import {deleteShelf, getShelf, getShelvesByStore} from '../dataUtils/shelfUtils.js';
 import { ContextMenu} from './contextMenu/contextMenu.js';
 import { createShelf } from '../dataUtils/shelfUtils.js';
-import {walkFinder} from '../pathFinder/walkFinder.js';
+import { GTSP_SERVER_URL } from '../../config.js';
+import { walkFinder } from './pathFinder/walkFinder.js';
 
 export class mapController {
   constructor(store_number, stage_width, stage_height, socket) {
@@ -118,11 +119,11 @@ export class mapController {
     this.layer.batchDraw();
   }
 
-  testWalks() {
+ async testWalks() {
     // Implement test walks functionality
     console.log('Testing walks...');
     if (!this.walkFinder) {
-      this.walkFinder = new walkFinder(this.map);
+      this.walkFinder = new walkFinder(this.map, GTSP_SERVER_URL);
       this.walkFinder.init();
     }
     const pickwalk = {
@@ -131,7 +132,8 @@ export class mapController {
         { upc: '0030001000022', quantity: 2 },
       ],
     };
-    //this.walkFinder.findPath(pickwalk);
+    console.log('Finding path for pickwalk:', pickwalk);
+    this.walkFinder.findPath(this.store_number, pickwalk);
   }
 }
 

@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import networkx as nx
-from pathFinder import find_shortest_path
+from pathFinder import Pathfinder
 from graphBuilder import GraphBuilder
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -19,6 +19,8 @@ db = client[db_name]
 #init GraphBuilder
 builder = GraphBuilder(db)
 
+# Initialize Pathfinder
+pathfinder = Pathfinder(db, builder)
 
 # Test if server is running
 @app.route('/ping', methods=['GET'])
@@ -35,13 +37,24 @@ def get_graph(store_number):
 # Find shortest path given store, list of upcs, start and end points
 @app.route('/find-path', methods=['POST'])
 def find_path():
+    print("Received request:", request.json)
     data = request.json
+    required_fields = ['store', 'upcs']
+    #check for required fields
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'Missing "{field}" in request'}), 400
     store = data['store']
     upcs = data['upcs']
-    start = tuple(data['start'])
-    end = tuple(data['end'])
+    # check for optional start and end points
+    if 'start' in data and 'end' in data:
+        start = tuple(data['start'])
+        end = tuple(data['end'])
+        return jsonify(pathfinder.find_path_with_endpoints(store, upcs, start, end))
 
-    return jsonify(find_shortest_path(store, upcs, start, end))
+    return jsonify(pathfinder.find_path(store, upcs))
+
+
 
 # Get store by store number
 @app.route('/store/<int:number>', methods=['GET'])

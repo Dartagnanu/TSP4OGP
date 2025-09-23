@@ -1,6 +1,8 @@
 import { Sidebar } from './js/controllers/sidebar/sidebar.js';
 import { mapController } from './js/controllers/mapController.js';
 import { ContextMenu } from './js/controllers/contextMenu/contextMenu.js';
+import { GTSP_SERVER_URL } from './config.js';
+
 
 // Initialize socket.io
 const socket = io();
@@ -16,7 +18,7 @@ const mapCtrl = new mapController(STORE_NUMBER, stageWidth, stageHeight, socket)
 mapCtrl.init();
 
 // test if GTSP server is running
-fetch('http://localhost:5000/ping')
+fetch(`${GTSP_SERVER_URL}/ping`)
   .then(response => response.json())
   .then(data => {
     console.log('GTSP server is running:', data);
@@ -38,9 +40,10 @@ document.getElementById('container').addEventListener('contextmenu', (e) => {
   e.preventDefault();
 });
 
+ 
 
 
-// In your JS
+// attempt to visualize the graph using vis-network
 function visualizeGraph(graphData) {
   // Ensure every node has a string id
   const nodes = graphData.nodes.map(node => {
@@ -68,9 +71,10 @@ function visualizeGraph(graphData) {
   new vis.Network(container, data, options);
   console.log('Graph visualized:', graphData);
 }
-
-fetch(`http://localhost:5000/graph/${STORE_NUMBER}`)
-  .then(response => response.json())
-  .then(data => {
-    visualizeGraph(data);
-  })
+// Fetch the graph data from the GTSP server and visualize it
+// commented out for now since it overloads the browser with too many nodes/edges
+// fetch(`${GTSP_SERVER_URL}/graph/${STORE_NUMBER}`)
+//   .then(response => response.json())
+//   .then(data => {
+//     visualizeGraph(data);
+//   console.log('Graph data fetched:', data);
