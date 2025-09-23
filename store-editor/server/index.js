@@ -4,6 +4,7 @@ import http from 'http';
 import { Server as SocketIo } from 'socket.io';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import axios from 'axios';
 
 import Store from './models/store.js';
 import Shelf from './models/shelf.js';
@@ -11,6 +12,8 @@ import Item from './models/item.js';
 import Modular from './models/modular.js';
 import ItemIndex from './models/itemIndex.js';
 import Pickwalk from './models/pickwalk.js';
+import StoreGraph from './models/storeGraph.js';
+
 
 
 // Resolve __dirname in ES Modules
@@ -112,6 +115,7 @@ app.post('/shelf', async (req, res) => {
 
 // Get shelf by ID
 app.get('/shelf/:shelf_id', async (req, res) => {
+  // TODO: fix search shelf by ID only
   throw new Error('search shelf by ID only Not implemented');
   try {
     const shelf = await Shelf.findOne({ shelf_id: req.params.shelf_id });
@@ -450,6 +454,7 @@ app.get('/pickwalks/store/:store_id', async (req, res) => {
     res.status(500).send(err);
   }
 });
+// -------------------- End of Store Routes --------------------
 
 // -------------------- WebSocket Connection --------------------
 
@@ -472,4 +477,45 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 42069;
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+});
+
+
+// -------------------- GTSP Routes --------------------
+
+// Endpoint to check GTSP server status
+app.get('/gtsp-status', async (req, res) => {
+  try {
+    const response = await axios.get('http://gtsp-server:5000/ping');
+    res.send({ status: 'up', data: response.data });
+  } catch (err) {
+    res.status(503).send({ status: 'down', error: err.message });
+  }
+});
+
+// endpoint to request a pickwalk from GTSP server
+// using store number and list of upcs
+app.post('/request-pickwalk', async (req, res) => {
+  try {
+    const { store_number, upcs } = req.body;
+    if (!store_number || !upcs || !Array.isArray(upcs)) {
+      return res.status(400).send({ error: 'store_number and upcs array are required' });
+    }
+    const response = await axios.post('http://gtsp-server:5000/compute-pickwalk', {
+      store_number,
+      upcs
+    });
+    res.send({ status: 'ok', pickwalk: response.data });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// -------------------- End of GTSP Routes --------------------
+
+// For graceful shutdown
+process.on('SIGINT', () => {
+  mongoose.connection.close(() => {
+    console.log('MongoDB connection closed');
+    process.exit(0);
+  });
 });

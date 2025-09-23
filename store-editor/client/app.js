@@ -15,8 +15,15 @@ const STORE_NUMBER = Number(3260); // Replace with dynamic value later
 const mapCtrl = new mapController(STORE_NUMBER, stageWidth, stageHeight, socket);
 mapCtrl.init();
 
-
-
+// test if GTSP server is running
+fetch('http://localhost:5000/ping')
+  .then(response => response.json())
+  .then(data => {
+    console.log('GTSP server is running:', data);
+  })
+  .catch(error => {
+    console.error('Error pinging GTSP server:', error);
+  });
 
 // Initialize sidebar
 
@@ -33,3 +40,37 @@ document.getElementById('container').addEventListener('contextmenu', (e) => {
 
 
 
+// In your JS
+function visualizeGraph(graphData) {
+  // Ensure every node has a string id
+  const nodes = graphData.nodes.map(node => {
+    let id = node.id !== undefined ? node.id : node;
+    // If id is an array (e.g., [x, y]), convert to string
+    if (Array.isArray(id)) id = `${id[0]},${id[1]}`;
+    return {
+      id: id,
+      label: id
+    };
+  });
+
+  const edges = graphData.links.map(link => {
+    let from = link.source;
+    let to = link.target;
+    // If from/to are arrays, convert to string
+    if (Array.isArray(from)) from = `${from[0]},${from[1]}`;
+    if (Array.isArray(to)) to = `${to[0]},${to[1]}`;
+    return { from, to };
+  });
+
+  const container = document.getElementById('graph');
+  const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+  const options = {};
+  new vis.Network(container, data, options);
+  console.log('Graph visualized:', graphData);
+}
+
+fetch(`http://localhost:5000/graph/${STORE_NUMBER}`)
+  .then(response => response.json())
+  .then(data => {
+    visualizeGraph(data);
+  })

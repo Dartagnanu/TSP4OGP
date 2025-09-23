@@ -1,2 +1,4 @@
 flask
 networkx
+flask_cors
+pymongo
