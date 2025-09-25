@@ -180,13 +180,13 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
             x: snappedX / scale_X,
             y: snappedY / scale_Y,
             rotation: shelfData.rotation,
-            store_id: shelfData.store_id,
+            store_number: shelfData.store_number,
         });
         console.log('updated shelf', { id: shelfData.shelf_id,
             x: snappedX / scale_X,
             y: snappedY / scale_Y,
             rotation: shelfData.rotation,
-            store_id: shelfData.store_id,});
+            store_number: shelfData.store_number,});
         moveShelf(shelfData, snappedX / scale_X, snappedY / scale_Y);
         layer.batchDraw();
     });

@@ -126,7 +126,28 @@ app.get('/shelf/:shelf_id', async (req, res) => {
   }
 });
 
-// Update shelf by shelf_id and store_number
+// Update shelf by MongoDB _id
+app.put('/shelf/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('Updating shelf with _id:', id);
+    console.log('Update data:', req.body);
+    
+    const shelf = await Shelf.findByIdAndUpdate(
+      id, // Use MongoDB _id
+      req.body,
+      { new: true }
+    );
+
+    if (!shelf) return res.status(404).send({ error: 'Shelf not found', id});
+    res.send(shelf);
+  } catch (err) {
+    console.error('Error updating shelf:', err.message);
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// Update shelf by shelf_id and store_number (keep for backward compatibility)
 app.put('/shelf/:shelf_id/store/:store_number', async (req, res) => {
   try {
     const { shelf_id, store_number } = req.params;
@@ -183,9 +204,9 @@ app.delete('/shelf/:shelf_id/store/:store_number', async (req, res) => {
 // Get all shelves by store number
 app.get('/shelves', async (req, res) => {
   try {
-    req.query.store = Number(req.query.store);
-    console.log('Query for shelves of store number:', req.query.store);
-    const shelves = await Shelf.find({ store: req.query.store_number });
+    const store_number = Number(req.query.store);
+    console.log('Query for shelves of store number:', store_number);
+    const shelves = await Shelf.find({ store_number: store_number });
     res.send(shelves);
   } catch (err) {
     res.status(500).send({ error: err.message });

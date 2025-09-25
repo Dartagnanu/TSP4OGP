@@ -1,7 +1,7 @@
 import { createStage } from '../Konva/konvaSetup.js';
 import { drawStoreBoundary, drawShelf, loadShelves, drawStartingPoints } from '../Konva/drawUtils.js';
 import {getStore} from '../dataUtils/storeUtils.js';
-import {deleteShelf, getShelf, getShelvesByStore} from '../dataUtils/shelfUtils.js';
+import {deleteShelf, getShelf, updateShelfById, getShelvesByStore} from '../dataUtils/shelfUtils.js';
 import { ContextMenu} from './contextMenu/contextMenu.js';
 import { createShelf } from '../dataUtils/shelfUtils.js';
 import { GTSP_SERVER_URL } from '../../config.js';
@@ -25,7 +25,7 @@ export class mapController {
    // Expose createAndAddShelf globally for use in the context menu
     window.createAndAddShelf = this.createAndAddShelf.bind(this);
     window.deleteShelfFromMap = this.deleteShelfFromMap.bind(this);
-
+    window.updateShelf = this.updateShelf.bind(this);
     // TODO: finish auto update functionality
     // Listen for updates from other clients
     /*this.socket.on('updateShelf', (data) => {
@@ -69,6 +69,15 @@ export class mapController {
     this.scale_Y = scale_Y;
     console.log('Scale factors:', this.scale_X, this.scale_Y);
 
+    // Ensure all shelves have store_number property
+    map.shelves.forEach(shelf => {
+      if (!shelf.store_number) {
+        // throw an error and alert user about broken shelf data
+        console.error('Shelf missing store_number:', shelf);
+        alert(`Error: Shelf with ID ${shelf.shelf_id} is missing store_number. Please fix the shelf data.`);
+      }
+    });
+
     // load shelves from map
 
     loadShelves(layer, stage, map.shelves, map.store.shelf_templates, this.scale_X, this.scale_Y, this.socket);
@@ -88,10 +97,14 @@ export class mapController {
     // Add the new shelf to the shelves array
     this.map.shelves.push(shelfData);
 
-    createShelf(shelfData);
+    // Create shelf on server (async, don't block UI)
+    createShelf(shelfData).catch(error => {
+      console.error('Failed to save shelf to server:', error);
+      // Could show user notification here
+    });
 
-    // Draw the new shelf on the canvas
-    console.log('Drawing new shelf with data:', shelfData, " using scale factors:", this.stage.scale_X, this.stage.scale_Y);
+    // Draw the new shelf on the canvas immediately
+    console.log('Drawing new shelf with data:', shelfData, " using scale factors:", this.scale_X, this.scale_Y);
     drawShelf(this.layer, this.stage, shelfData, template, this.scale_X, this.scale_Y, this.socket);
 
     // Redraw the layer
@@ -117,6 +130,36 @@ export class mapController {
 
     // Redraw the layer
     this.layer.batchDraw();
+  }
+
+  async updateShelf(shelfData) {
+    console.log('Updating shelf:', shelfData);
+    if (!shelfData._id) {
+      console.error('Shelf _id is required for update');
+      return null;
+    }
+    try {
+      const updatedShelf = await updateShelfById(shelfData._id, shelfData);
+      console.log('Shelf updated successfully:', updatedShelf);
+      
+      // Update the shelf in the local map data using _id
+      const index = this.map.shelves.findIndex(s => s._id === shelfData._id);
+      if (index !== -1) {
+        console.log('Updating shelf in local map data at index:', index);
+        console.log('Old shelf data:', this.map.shelves[index]);
+        console.log('New shelf data:', updatedShelf);
+        this.map.shelves[index] = updatedShelf;
+      } else {
+        console.warn('Could not find shelf in local map data to update');
+      }
+      // Redraw the layer to reflect changes
+      this.layer.batchDraw();
+
+      return updatedShelf;
+    } catch (error) {
+      console.error('Error updating shelf:', error);
+      throw error;
+    }
   }
 
  async testWalks() {

@@ -1,3 +1,5 @@
+import { ShelfEditor } from './shelfEditor.js';
+
 export class ContextMenu {
   constructor(mapController) {
     this.mapController = mapController; // store instance of mapController
@@ -8,6 +10,9 @@ export class ContextMenu {
     this.editShelfBtn = document.getElementById('editShelfBtn');
     this.currentShelfNode = null;
     this.isDraggingMap = false; // Track if the map is being dragged
+    
+    // Initialize the shelf editor
+    this.shelfEditor = new ShelfEditor(mapController);
   }
 
   init() {
@@ -29,6 +34,13 @@ export class ContextMenu {
         const shelfData = this.mapController.map.shelves.find((shelf) => shelf.shelf_id === shelfId);
         console.log('Right-clicked on shelf:', shelfData);
 
+        // Check if shelf data was found
+        if (!shelfData) {
+          console.warn('Could not find shelf data for ID:', shelfId);
+          this.contextMenu.style.display = 'none';
+          return;
+        }
+
         // Show shelf actions, hide add
         this.addShelfBtn.style.display = 'none';
         this.deleteShelfBtn.style.display = '';
@@ -38,11 +50,7 @@ export class ContextMenu {
         // Edit shelf name
         this.editShelfBtn.onclick = () => {
           console.log("edit shelf button clicked");
-          const newName = prompt("Enter new shelf name:", target.attrs.name);
-          if (newName) {
-            target.setAttrs({ name: newName });
-            this.mapController.layer.draw();
-          }
+          this.shelfEditor.openEditor(shelfData);
           this.contextMenu.style.display = 'none';
         };
 

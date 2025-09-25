@@ -13,9 +13,33 @@ const stageHeight = 600;
 
 const STORE_NUMBER = Number(3260); // Replace with dynamic value later
 
-// Initialize the mapController and stage map
-const mapCtrl = new mapController(STORE_NUMBER, stageWidth, stageHeight, socket);
-mapCtrl.init();
+// Initialize the app
+async function initApp() {
+  // Initialize the mapController and stage map
+  const mapCtrl = new mapController(STORE_NUMBER, stageWidth, stageHeight, socket);
+  await mapCtrl.init();
+
+  // Make mapController available globally for sidebar
+  window.mapController = mapCtrl;
+
+  // Initialize sidebar after mapController is ready (to get templates)
+  const sidebar = new Sidebar(mapCtrl.stage, mapCtrl.map.store.shelf_templates, STORE_NUMBER);
+
+  // test walks button
+  document.getElementById('testWalksBtn').addEventListener('click', () => {
+    mapCtrl.testWalks();
+  });
+
+  // Disable the default browser context menu
+  document.getElementById('container').addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+  });
+
+  return mapCtrl;
+}
+
+// Start the app
+initApp().catch(console.error);
 
 // test if GTSP server is running
 fetch(`${GTSP_SERVER_URL}/ping`)
@@ -26,22 +50,6 @@ fetch(`${GTSP_SERVER_URL}/ping`)
   .catch(error => {
     console.error('Error pinging GTSP server:', error);
   });
-
-// Initialize sidebar
-
-
-  // test walks button
-document.getElementById('testWalksBtn').addEventListener('click', () => {
-  mapCtrl.testWalks();
-});
-
-// Disable the default browser context menu
-document.getElementById('container').addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-});
-
- 
-
 
 // attempt to visualize the graph using vis-network
 function visualizeGraph(graphData) {
