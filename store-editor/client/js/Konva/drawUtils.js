@@ -1,6 +1,23 @@
 import {moveShelf} from "../dataUtils/shelfDataApi.js";
 const gridSize = 10; // Size of each grid cell
 
+// Helper function to calculate the centroid of a polygon
+function calculatePolygonCentroid(shape, scale_X, scale_Y) {
+    let sumX = 0;
+    let sumY = 0;
+    const numPoints = shape.length;
+    
+    for (const [x, y] of shape) {
+        sumX += x * scale_X;
+        sumY += y * scale_Y;
+    }
+    
+    return {
+        x: sumX / numPoints,
+        y: sumY / numPoints
+    };
+}
+
 
 export function drawStoreBoundary(layer, store, stageWidth, stageHeight) {
     console.log('Drawing store boundary for store:', store);
@@ -45,9 +62,62 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
     });
 
     polygon.id(shelfData.shelf_id);
-    layer.add(polygon);
+    
+    // Calculate the centroid (center) of the polygon
+    const centroid = calculatePolygonCentroid(template.shape, scale_X, scale_Y);
+    
+    // Create an arrow pointing down in the center of the polygon
+    const arrow = new Konva.Line({
+        points: [0, -10, 0, 10, -5, 5, 0, 10, 5, 5], // Arrow shape pointing down
+        stroke: '#000',
+        strokeWidth: 2,
+        lineCap: 'round',
+        lineJoin: 'round',
+        x: centroid.x, // Position at polygon center
+        y: centroid.y, // Position at polygon center
+        rotation: 0, // Group handles rotation
+    });
 
-    console.log('Shelf drawn at:', polygon.position(), 'with original data:', shelfData);
+    // Create shelf name text overlay
+    const shelfNameText = new Konva.Text({
+        text: shelfData.shelf_id || 'Unknown',
+        fontSize: 12,
+        fontFamily: 'Arial',
+        fill: '#000',
+        align: 'center',
+        x: centroid.x,
+        y: centroid.y - 25, // Position above the arrow
+        offsetX: 0, // Will be set after measuring text width
+        offsetY: 0,
+    });
+
+    // Center the text horizontally
+    shelfNameText.offsetX(shelfNameText.width() / 2);
+    shelfNameText.offsetY(shelfNameText.height() / 2);
+
+    // Group the polygon and arrow together so they move as one unit
+    const shelfGroup = new Konva.Group({
+        x: (shelfData.placement_x || 0) * scale_X,
+        y: (shelfData.placement_y || 0) * scale_Y,
+        rotation: shelfData.rotation || 0,
+        draggable: true,
+    });
+
+    // Reset polygon position since it's now inside the group
+    polygon.x(0);
+    polygon.y(0);
+    polygon.rotation(0);
+    polygon.draggable(false);
+
+    // Reset arrow rotation since the group handles rotation
+    arrow.rotation(0);
+
+    shelfGroup.add(polygon);
+    shelfGroup.add(arrow);
+    shelfGroup.id(shelfData.shelf_id);
+    layer.add(shelfGroup);
+
+    console.log('Shelf drawn at:', shelfGroup.position(), 'with original data:', shelfData);
 
     // Tooltip added
     const tooltip = new Konva.Text({
@@ -61,7 +131,7 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
     layer.add(tooltip);
 
     // Show tooltip on hover
-    polygon.on('mouseenter', () => {
+    shelfGroup.on('mouseenter', () => {
         polygon.strokeWidth(2);
         const mousePos = stage.getPointerPosition();
         tooltip.position({ x: mousePos.x + 10, y: mousePos.y - 10 });
@@ -70,22 +140,22 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
     });
 
     // Update tooltip position on mouse move
-    polygon.on('mousemove', () => {
+    shelfGroup.on('mousemove', () => {
         const mousePos = stage.getPointerPosition();
         tooltip.position({ x: mousePos.x + 10, y: mousePos.y - 10 });
         layer.batchDraw();
     });
 
     // Hide tooltip on mouse leave
-    polygon.on('mouseleave', () => {
+    shelfGroup.on('mouseleave', () => {
         polygon.strokeWidth(1);
         tooltip.visible(false);
         layer.batchDraw();
     });
     
     // Snap to grid on dragmove and emit update via socket
-    polygon.on('dragmove', () => {
-        const pos = polygon.position();
+    shelfGroup.on('dragmove', () => {
+        const pos = shelfGroup.position();
 
         const snappedX = Math.round(pos.x / gridSize) * gridSize;
         const snappedY = Math.round(pos.y / gridSize) * gridSize;
@@ -93,7 +163,7 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
         //console.log('Dragging shelf:', shelfData, 'to position:', pos);
 
         // TODO: update shelfdata only when position snapped and changes
-        polygon.position({ x: snappedX, y: snappedY });
+        shelfGroup.position({ x: snappedX, y: snappedY });
         // Update the tooltip position to follow the shape
         tooltip.position({ x: snappedX + 20, y: snappedY - 20 });
 
