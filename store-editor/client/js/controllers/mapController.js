@@ -31,12 +31,12 @@ export class mapController {
     /*this.socket.on('updateShelf', (data) => {
       // Ignore updates from the same client
       if (data.senderId === this.socket.id) {
-          console.log(`Ignoring self-emitted update for shelf ID ${data.id}`);
+          console.log(`Ignoring self-emitted update for shelf ID ${data._id}`);
           return;
       }
-      const shelf = this.layer.findOne(`#${data.shelf_id}`);
+      const shelf = this.layer.findOne(`#${data.shelf_name}`);
       if (shelf) {
-        shelfData = this.map.shelves[data.shelf_id];
+        shelfData = this.map.shelves[data.shelf_name];
         moveShelf(shelfData, data.x, data.y);
         this.layer.draw();
       } else {
@@ -74,7 +74,7 @@ export class mapController {
       if (!shelf.store_number) {
         // throw an error and alert user about broken shelf data
         console.error('Shelf missing store_number:', shelf);
-        alert(`Error: Shelf with ID ${shelf.shelf_id} is missing store_number. Please fix the shelf data.`);
+        alert(`Error: Shelf with ID ${shelf.shelf_name} is missing store_number. Please fix the shelf data.`);
       }
     });
 
@@ -111,21 +111,21 @@ export class mapController {
     this.layer.batchDraw();
   }
 
-  deleteShelfFromMap(shelf_id) {
-    console.log('Deleting shelf with ID:', shelf_id, this.store_number);
+  deleteShelfFromMap(shelf_name) {
+    console.log('Deleting shelf with ID:', shelf_name, this.store_number);
 
     // Call the deleteShelf function from the dataUtils
-    deleteShelf(shelf_id, this.store_number);
+    deleteShelf(shelf_name, this.store_number);
 
     // Remove the shelf from the shelves array
-    this.map.shelves = this.map.shelves.filter((shelf) => shelf.shelf_id !== shelf_id);
+    this.map.shelves = this.map.shelves.filter((shelf) => shelf.shelf_name !== shelf_name);
     // Remove the shelf from the layer
-    const shelf = this.layer.findOne(`#${shelf_id}`);
+    const shelf = this.layer.findOne(`#${shelf_name}`);
     if (shelf) {
       shelf.destroy();
     }
     // TODO: fix Emit deleteShelf event
-    //this.socket.emit('deleteShelf', { shelf_id: shelfId });
+    //this.socket.emit('deleteShelf', { shelf_name: shelfId });
 
 
     // Redraw the layer

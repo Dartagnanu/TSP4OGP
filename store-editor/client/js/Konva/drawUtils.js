@@ -44,7 +44,7 @@ export function drawStoreBoundary(layer, store, stageWidth, stageHeight) {
 }
 
 export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, socket) {
-    console.log('Drawing shelf:', shelfData.shelf_id, 'with template:', template);
+    console.log('Drawing shelf:', shelfData.shelf_name, 'with template:', template);
     const points = template.shape
         .map(([x, y]) => [x * scale_X, y * scale_Y])
         .flat();
@@ -61,7 +61,7 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
         y: (shelfData.placement_y || 0) * scale_Y,
     });
 
-    polygon.id(shelfData.shelf_id);
+    polygon.id(shelfData.shelf_name);
     
     // Calculate the centroid (center) of the polygon
     const centroid = calculatePolygonCentroid(template.shape, scale_X, scale_Y);
@@ -80,7 +80,7 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
 
     // Create shelf name text overlay
     const shelfNameText = new Konva.Text({
-        text: shelfData.shelf_id || 'Unknown',
+        text: shelfData.shelf_name || 'Unknown',
         fontSize: 12,
         fontFamily: 'Arial',
         fill: '#000',
@@ -114,14 +114,14 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
 
     shelfGroup.add(polygon);
     shelfGroup.add(arrow);
-    shelfGroup.id(shelfData.shelf_id);
+    shelfGroup.id(shelfData.shelf_name);
     layer.add(shelfGroup);
 
     console.log('Shelf drawn at:', shelfGroup.position(), 'with original data:', shelfData);
 
     // Tooltip added
     const tooltip = new Konva.Text({
-        text: `Shelf ID: ${shelfData.shelf_id}\nModulars: ${shelfData.modulars?.join(', ')}\nFlex Items: ${shelfData.flex_items?.length}\n`,
+        text: `Shelf Name: ${shelfData.shelf_name}\nModulars: ${shelfData.modulars?.join(', ')}\nFlex Items: ${shelfData.flex_items?.length}\n`,
         fontSize: 14,
         fontFamily: 'Calibri',
         fill: 'black',
@@ -176,13 +176,13 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
         
         // TODO: Finish auto update functionality
         socket.emit('updateShelf', {
-            shelf_id: shelfData.shelf_id,
+            shelf_name: shelfData.shelf_name,
             x: snappedX / scale_X,
             y: snappedY / scale_Y,
             rotation: shelfData.rotation,
             store_number: shelfData.store_number,
         });
-        console.log('updated shelf', { id: shelfData.shelf_id,
+        console.log('updated shelf', { id: shelfData.shelf_name,
             x: snappedX / scale_X,
             y: snappedY / scale_Y,
             rotation: shelfData.rotation,

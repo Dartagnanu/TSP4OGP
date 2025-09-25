@@ -60,7 +60,7 @@ export class ShelfEditor {
         this.populateTemplateDropdown();
         
         // Populate form with current shelf data
-        this.elements.shelfId.value = shelfData.shelf_id || '';
+        this.elements.shelfId.value = shelfData.shelf_name || '';
         this.elements.template.value = shelfData.template || '';
         this.elements.rotation.value = shelfData.rotation || 0;
         this.elements.modulars.value = (shelfData.modulars || []).join(', ');
@@ -81,12 +81,12 @@ export class ShelfEditor {
     async saveShelf() {
         if (!this.currentShelf) return;
 
-        const oldShelfId = this.currentShelf.shelf_id;
+        const oldShelfId = this.currentShelf.shelf_name;
         
         // Get updated values from form
         const updatedShelf = {
             ...this.currentShelf,
-            shelf_id: this.elements.shelfId.value.trim(),
+            shelf_name: this.elements.shelfId.value.trim(),
             template: this.elements.template.value,
             rotation: parseInt(this.elements.rotation.value) || 0,
             modulars: this.elements.modulars.value.split(',').map(m => m.trim()).filter(m => m),
@@ -96,7 +96,7 @@ export class ShelfEditor {
 
         try {
             // Update shelf data in the map
-            const shelfIndex = this.mapController.map.shelves.findIndex(s => s.shelf_id === oldShelfId);
+            const shelfIndex = this.mapController.map.shelves.findIndex(s => s.shelf_name === oldShelfId);
             if (shelfIndex !== -1) {
                 this.mapController.map.shelves[shelfIndex] = updatedShelf;
             }
@@ -104,16 +104,16 @@ export class ShelfEditor {
             // Use mapController's updateShelf method to handle the server update
             await this.mapController.updateShelf(updatedShelf);
 
-            // If shelf ID changed, we need to update the visual element ID
+            // If shelf name changed, we need to update the visual element ID
             const shelfElement = this.mapController.layer.findOne(`#${oldShelfId}`);
-            if (shelfElement && updatedShelf.shelf_id !== oldShelfId) {
+            if (shelfElement && updatedShelf.shelf_name !== oldShelfId) {
                 // Check if it's a group or individual element
                 if (shelfElement.parent && shelfElement.parent.nodeType === 'Group') {
                     // If the element is inside a group, update the group's ID
-                    shelfElement.parent.id(updatedShelf.shelf_id);
+                    shelfElement.parent.id(updatedShelf.shelf_name);
                 } else {
                     // If it's a direct element, update its ID
-                    shelfElement.id(updatedShelf.shelf_id);
+                    shelfElement.id(updatedShelf.shelf_name);
                 }
             }
 
@@ -124,8 +124,8 @@ export class ShelfEditor {
             }
 
             // Update the shelf name text using mapController
-            if (updatedShelf.shelf_id !== oldShelfId) {
-                this.updateShelfNameText(oldShelfId, updatedShelf.shelf_id);
+            if (updatedShelf.shelf_name !== oldShelfId) {
+                this.updateShelfNameText(oldShelfId, updatedShelf.shelf_name);
             }
 
             this.mapController.layer.batchDraw();

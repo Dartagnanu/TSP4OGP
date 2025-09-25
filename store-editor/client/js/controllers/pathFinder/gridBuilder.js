@@ -154,7 +154,7 @@ export function initializeTestData() {
         this.shelves = [
     {
       "store_number": 3260,
-      "shelf_id": "shelf_001",
+      "shelf_name": "shelf_001",
       "template": "standard_shelf",
       "placement_x": 0,
       "placement_y": 0,
@@ -165,7 +165,7 @@ export function initializeTestData() {
     },
     {
       "store_number": 3260,
-      "shelf_id": "shelf_002",
+      "shelf_name": "shelf_002",
       "template": "standard_shelf",
       "placement_x": 5,
       "placement_y": 5,
@@ -176,7 +176,7 @@ export function initializeTestData() {
     },
     {
       "store_number": 3260,
-      "shelf_id": "shelf_003",
+      "shelf_name": "shelf_003",
       "template": "standard_shelf",
       "placement_x": 15,
       "placement_y": 10,
@@ -187,7 +187,7 @@ export function initializeTestData() {
     },
     {
       "store_number": 3260,
-      "shelf_id": "shelf_004",
+      "shelf_name": "shelf_004",
       "template": "standard_shelf",
       "placement_x": 20,
       "placement_y": 15,
@@ -198,7 +198,7 @@ export function initializeTestData() {
     },
     {
       "store_number": 3260,
-      "shelf_id": "shelf_005",
+      "shelf_name": "shelf_005",
       "template": "feature_bin",
       "placement_x": 25,
       "placement_y": 20,

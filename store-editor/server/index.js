@@ -114,11 +114,11 @@ app.post('/shelf', async (req, res) => {
 });
 
 // Get shelf by ID
-app.get('/shelf/:shelf_id', async (req, res) => {
+app.get('/shelf/:shelf_name', async (req, res) => {
   // TODO: fix search shelf by ID only
   throw new Error('search shelf by ID only Not implemented');
   try {
-    const shelf = await Shelf.findOne({ shelf_id: req.params.shelf_id });
+    const shelf = await Shelf.findOne({ shelf_name: req.params.shelf_name });
     if (!shelf) return res.status(404).send({ error: 'Shelf not found' });
     res.send(shelf);
   } catch (err) {
@@ -147,12 +147,12 @@ app.put('/shelf/:id', async (req, res) => {
   }
 });
 
-// Update shelf by shelf_id and store_number (keep for backward compatibility)
-app.put('/shelf/:shelf_id/store/:store_number', async (req, res) => {
+// Update shelf by shelf_name and store_number (keep for backward compatibility)
+app.put('/shelf/:shelf_name/store/:store_number', async (req, res) => {
   try {
-    const { shelf_id, store_number } = req.params;
-    console.log(req.params.shelf_id, req.params.store_number);
-    // Ensure both shelf_id and store_number are provided
+    const { shelf_name, store_number } = req.params;
+    console.log(req.params.shelf_name, req.params.store_number);
+    // Ensure both shelf_name and store_number are provided
     if (!store_number) {
       return res.status(400).send({ error: 'store_number is required'});
     }
@@ -162,35 +162,35 @@ app.put('/shelf/:shelf_id/store/:store_number', async (req, res) => {
     }
     console.log(req.body);
     const shelf = await Shelf.findOneAndUpdate(
-      { shelf_id, store_number: store_number }, // Match both shelf_id and store_number
+      { shelf_name, store_number: store_number }, // Match both shelf_name and store_number
       req.body,
       { new: true }
     );
 
-    if (!shelf) return res.status(404).send({ error: 'Shelf not found', shelf_id, store_number});
+    if (!shelf) return res.status(404).send({ error: 'Shelf not found', shelf_name, store_number});
     res.send(shelf);
   } catch (err) {
     res.status(500).send({ error: err.message });
   }
 });
 
-// Delete shelf by shelf_id and store_number
-app.delete('/shelf/:shelf_id/store/:store_number', async (req, res) => {
+// Delete shelf by shelf_name and store_number
+app.delete('/shelf/:shelf_name/store/:store_number', async (req, res) => {
     try {
-        console.log('Delete request received for shelf_id:', req.params.shelf_id, 'store_number:', req.params.store_number);
+        console.log('Delete request received for shelf_name:', req.params.shelf_name, 'store_number:', req.params.store_number);
 
         if (!req.params.store_number) {
             return res.status(400).send({ error: 'store_number is required' });
         }
         const shelf = await Shelf.findOneAndDelete({
-            shelf_id: req.params.shelf_id,
+            shelf_name: req.params.shelf_name,
             store_number: Number(req.params.store_number),
         });
         if (!shelf) {
-            console.log('Shelf not found:', req.params.shelf_id, req.params.store_number);
+            console.log('Shelf not found:', req.params.shelf_name, req.params.store_number);
             return res.status(404).send({
                 error: 'Shelf not found',
-                shelf_id: req.params.shelf_id,
+                shelf_name: req.params.shelf_name,
                 store_number: req.params.store_number,
             });
         }

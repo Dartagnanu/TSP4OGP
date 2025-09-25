@@ -65,7 +65,7 @@ export class Sidebar {
       }
       
       const newShelf = {
-        shelf_id: `shelf_${Date.now()}`,
+        shelf_name: `shelf_${Date.now()}`,
         placement_x: Math.round(mousePos.x / mapCtrl.scale_X / 10) * 10, // Convert to original coords and snap to 10-unit grid
         placement_y: Math.round(mousePos.y / mapCtrl.scale_Y / 10) * 10, // Convert to original coords and snap to 10-unit grid
         rotation: 0,

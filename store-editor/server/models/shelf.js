@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 // updates item index when changed
 const shelfSchema = new mongoose.Schema({
     store_number: { type: Number, required: true },
-    shelf_id: { type: String, required: true },
+    shelf_name: { type: String, required: true },
     template: { type: String, required: true },
     placement_x: { type: Number, required: true, default: 0 },
     placement_y: { type: Number, required: true, default: 0 },
@@ -15,7 +15,7 @@ const shelfSchema = new mongoose.Schema({
 });
 
 // enforce uniqueness per store
-shelfSchema.index({ store: 1, shelf_id: 1 }, { unique: true });
+shelfSchema.index({ store: 1, shelf_name: 1 }, { unique: true });
 
 
 export default mongoose.model('Shelf', shelfSchema);

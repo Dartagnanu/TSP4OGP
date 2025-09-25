@@ -31,7 +31,7 @@ export class ContextMenu {
 
         // Find the shelf data using the target's ID
         const shelfId = target.id();
-        const shelfData = this.mapController.map.shelves.find((shelf) => shelf.shelf_id === shelfId);
+        const shelfData = this.mapController.map.shelves.find((shelf) => shelf.shelf_name === shelfId);
         console.log('Right-clicked on shelf:', shelfData);
 
         // Check if shelf data was found
@@ -59,7 +59,7 @@ export class ContextMenu {
         };
         this.deleteShelfBtn.onclick = () => {
           console.log("delete shelf button clicked");
-          window.deleteShelfFromMap(shelfData.shelf_id);
+          window.deleteShelfFromMap(shelfData.shelf_name);
         };
         this.cloneShelfBtn.onclick = () => {
           console.log("clone shelf button clicked");
@@ -67,7 +67,7 @@ export class ContextMenu {
           const clonedShelfData = {
             ...shelfData,
             _id: undefined, // Remove the original _id
-            shelf_id: `${shelfData.shelf_id}_copy_${Date.now()}`, // Generate a unique shelf_id
+            shelf_name: `${shelfData.shelf_name}_copy_${Date.now()}`, // Generate a unique shelf_name
             placement_x: shelfData.placement_x + 1, // Offset the cloned shelf slightly
             placement_y: shelfData.placement_y + 1,
           };

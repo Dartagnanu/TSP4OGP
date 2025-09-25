@@ -35,8 +35,8 @@ export const getShelf = async (shelfId, store_number) => {
 // update shelf with shelf data and store_number
 export const updateShelf = async (shelfData, store_number) => {
   try {
-    console.log('Updating shelf:', shelfData.shelf_id, 'for store:', store_number);
-    const response = await fetch(`/shelf/${shelfData.shelf_id}/store/${store_number}`, {
+    console.log('Updating shelf:', shelfData.shelf_name, 'for store:', store_number);
+    const response = await fetch(`/shelf/${shelfData.shelf_name}/store/${store_number}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export const updateShelf = async (shelfData, store_number) => {
   }
 };
 
-// update shelf using MongoDB _id (preferred method for editing shelf_id)
+// update shelf using MongoDB _id (preferred method for editing shelf_name)
 export const updateShelfById = async (mongoId, shelfData) => {
   try {
     console.log('Updating shelf by _id:', mongoId, 'with data:', shelfData);
@@ -70,9 +70,9 @@ export const updateShelfById = async (mongoId, shelfData) => {
 };
 
 // delete shelf by ID and store ID
-export const deleteShelf = async (shelf_Id, store_number) => {
+export const deleteShelf = async (shelf_name, store_number) => {
   try {
-    const response = await fetch(`/shelf/${shelf_Id}/store/${store_number}`, {
+    const response = await fetch(`/shelf/${shelf_name}/store/${store_number}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
