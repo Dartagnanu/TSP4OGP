@@ -50,6 +50,25 @@ export const updateShelf = async (shelfData, store_number) => {
   }
 };
 
+// update shelf using old shelf name to find it, then update with new data
+export const updateShelfByOldName = async (oldShelfName, newShelfData, store_number) => {
+  try {
+    console.log('Updating shelf using old name:', oldShelfName, 'with new data:', newShelfData, 'for store:', store_number);
+    const response = await fetch(`/shelf/${oldShelfName}/store/${store_number}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ...newShelfData, store_number }), // Include store_number in the body
+    });
+    if (!response.ok) throw new Error('Failed to update shelf');
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 // update shelf using MongoDB _id (preferred method for editing shelf_name)
 export const updateShelfById = async (mongoId, shelfData) => {
   try {

@@ -1,4 +1,4 @@
-import { updateShelf, updateShelfById } from '../../dataUtils/shelfUtils.js';
+import { updateShelf } from '../../dataUtils/shelfUtils.js';
 import { drawShelf } from '../../konva/drawUtils.js';
 
 export class ShelfEditor {
@@ -101,8 +101,8 @@ export class ShelfEditor {
                 this.mapController.map.shelves[shelfIndex] = updatedShelf;
             }
 
-            // Use mapController's updateShelf method to handle the server update
-            await this.mapController.updateShelf(updatedShelf);
+            // Use mapController's updateShelf method with the OLD shelf name to find it
+            await this.mapController.updateShelf(oldShelfId, updatedShelf);
 
             // If shelf name changed, we need to update the visual element ID
             const shelfElement = this.mapController.layer.findOne(`#${oldShelfId}`);

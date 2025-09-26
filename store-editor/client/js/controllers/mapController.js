@@ -1,7 +1,7 @@
 import { createStage } from '../Konva/konvaSetup.js';
 import { drawStoreBoundary, drawShelf, loadShelves, drawStartingPoints } from '../Konva/drawUtils.js';
 import {getStore} from '../dataUtils/storeUtils.js';
-import {deleteShelf, getShelf, updateShelfById, getShelvesByStore} from '../dataUtils/shelfUtils.js';
+import {deleteShelf, getShelf, updateShelfByOldName, getShelvesByStore} from '../dataUtils/shelfUtils.js';
 import { ContextMenu} from './contextMenu/contextMenu.js';
 import { createShelf } from '../dataUtils/shelfUtils.js';
 import { GTSP_SERVER_URL } from '../../config.js';
@@ -132,18 +132,16 @@ export class mapController {
     this.layer.batchDraw();
   }
 
-  async updateShelf(shelfData) {
-    console.log('Updating shelf:', shelfData);
-    if (!shelfData._id) {
-      console.error('Shelf _id is required for update');
-      return null;
-    }
+  async updateShelf(oldShelfName, updatedShelfData) {
+    console.log('Updating shelf:', oldShelfName, 'with new data:', updatedShelfData);
+    
     try {
-      const updatedShelf = await updateShelfById(shelfData._id, shelfData);
+      // Use the shelf_name/store_number route with the OLD name to find the shelf
+      const updatedShelf = await updateShelfByOldName(oldShelfName, updatedShelfData, this.store_number);
       console.log('Shelf updated successfully:', updatedShelf);
       
-      // Update the shelf in the local map data using _id
-      const index = this.map.shelves.findIndex(s => s._id === shelfData._id);
+      // Update the shelf in the local map data using the old name to find it
+      const index = this.map.shelves.findIndex(s => s.shelf_name === oldShelfName);
       if (index !== -1) {
         console.log('Updating shelf in local map data at index:', index);
         console.log('Old shelf data:', this.map.shelves[index]);
@@ -152,6 +150,7 @@ export class mapController {
       } else {
         console.warn('Could not find shelf in local map data to update');
       }
+      
       // Redraw the layer to reflect changes
       this.layer.batchDraw();
 
