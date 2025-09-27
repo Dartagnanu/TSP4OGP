@@ -162,17 +162,18 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
         const snappedX = Math.round(pos.x / gridSize) * gridSize;
         const snappedY = Math.round(pos.y / gridSize) * gridSize;
         
-        //console.log('Dragging shelf:', shelfData, 'to position:', pos);
-
+        // Get current shelf data from the group (not the original shelfData)
+        const currentShelfData = shelfGroup.getAttr('shelfData');
+        
         // TODO: update shelfdata only when position snapped and changes
         shelfGroup.position({ x: snappedX, y: snappedY });
         // Update the tooltip position to follow the shape
         tooltip.position({ x: snappedX + 20, y: snappedY - 20 });
 
-        //console.log('Snapped position:', { x: snappedX, y: snappedY });
-        if (snappedX == shelfData.placement_x * scale_X && snappedY == shelfData.placement_y * scale_Y) {
+        // Compare against current shelf data, not original
+        if (snappedX == currentShelfData.placement_x * scale_X && snappedY == currentShelfData.placement_y * scale_Y) {
             // Position is snapped and unchanged
-
+            //console.log('Position unchanged after snapping, not emitting update.');
             return;
         }
         
@@ -181,27 +182,30 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
             shelf_name: shelfGroup.id(), // Use current ID instead of old shelfData
             x: snappedX / scale_X,
             y: snappedY / scale_Y,
-            rotation: shelfData.rotation,
-            store_number: shelfData.store_number,
+            rotation: currentShelfData.rotation,
+            store_number: currentShelfData.store_number,
         });
-        console.log('updated shelf', { id: shelfGroup.id(), // Use current ID
+        console.log('updated shelf', { 
+            id: shelfGroup.id(),
             x: snappedX / scale_X,
             y: snappedY / scale_Y,
-            rotation: shelfData.rotation,
-            store_number: shelfData.store_number,});
+            rotation: currentShelfData.rotation,
+            store_number: currentShelfData.store_number,
+        });
         
-        // Create updated shelf data with current name from the group ID and update position
-        const currentShelfData = {
-            ...shelfGroup.getAttr('shelfData'), // Get current data from the group
-            shelf_name: shelfGroup.id(), // Use current ID instead of old name
+        // Create updated shelf data with new position
+        const updatedShelfData = {
+            ...currentShelfData, // Use current data from the group
+            shelf_name: shelfGroup.id(), // Use current ID
             placement_x: snappedX / scale_X,
             placement_y: snappedY / scale_Y
         };
         
         // Update the shelf data stored on the group
-        shelfGroup.setAttr('shelfData', currentShelfData);
+        shelfGroup.setAttr('shelfData', updatedShelfData);
+        console.log('Updated shelf data stored on group:', updatedShelfData);
         
-        moveShelf(currentShelfData, snappedX / scale_X, snappedY / scale_Y);
+        moveShelf(updatedShelfData, snappedX / scale_X, snappedY / scale_Y);
         layer.batchDraw();
     });
 
