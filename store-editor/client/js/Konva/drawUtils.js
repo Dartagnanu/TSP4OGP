@@ -101,6 +101,8 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
         y: (shelfData.placement_y || 0) * scale_Y,
         rotation: shelfData.rotation || 0,
         draggable: true,
+        // Store the complete shelf data on the group
+        shelfData: shelfData
     });
 
     // Reset polygon position since it's now inside the group
@@ -176,18 +178,30 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
         
         // TODO: Finish auto update functionality
         socket.emit('updateShelf', {
-            shelf_name: shelfData.shelf_name,
+            shelf_name: shelfGroup.id(), // Use current ID instead of old shelfData
             x: snappedX / scale_X,
             y: snappedY / scale_Y,
             rotation: shelfData.rotation,
             store_number: shelfData.store_number,
         });
-        console.log('updated shelf', { id: shelfData.shelf_name,
+        console.log('updated shelf', { id: shelfGroup.id(), // Use current ID
             x: snappedX / scale_X,
             y: snappedY / scale_Y,
             rotation: shelfData.rotation,
             store_number: shelfData.store_number,});
-        moveShelf(shelfData, snappedX / scale_X, snappedY / scale_Y);
+        
+        // Create updated shelf data with current name from the group ID and update position
+        const currentShelfData = {
+            ...shelfGroup.getAttr('shelfData'), // Get current data from the group
+            shelf_name: shelfGroup.id(), // Use current ID instead of old name
+            placement_x: snappedX / scale_X,
+            placement_y: snappedY / scale_Y
+        };
+        
+        // Update the shelf data stored on the group
+        shelfGroup.setAttr('shelfData', currentShelfData);
+        
+        moveShelf(currentShelfData, snappedX / scale_X, snappedY / scale_Y);
         layer.batchDraw();
     });
 

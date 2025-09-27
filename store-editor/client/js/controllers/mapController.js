@@ -1,7 +1,7 @@
-import { createStage } from '../Konva/konvaSetup.js';
-import { drawStoreBoundary, drawShelf, loadShelves, drawStartingPoints } from '../Konva/drawUtils.js';
+import { createStage } from '../konva/konvaSetup.js';
+import { drawStoreBoundary, drawShelf, loadShelves, drawStartingPoints } from '../konva/drawUtils.js';
 import {getStore} from '../dataUtils/storeUtils.js';
-import {deleteShelf, getShelf, updateShelfByOldName, getShelvesByStore} from '../dataUtils/shelfUtils.js';
+import {deleteShelf, updateShelfByOldName, getShelvesByStore} from '../dataUtils/shelfUtils.js';
 import { ContextMenu} from './contextMenu/contextMenu.js';
 import { createShelf } from '../dataUtils/shelfUtils.js';
 import { GTSP_SERVER_URL } from '../../config.js';
@@ -111,22 +111,35 @@ export class mapController {
     this.layer.batchDraw();
   }
 
-  deleteShelfFromMap(shelf_name) {
-    console.log('Deleting shelf with ID:', shelf_name, this.store_number);
+  deleteShelfFromMap(shelfName) {
+    console.log('Deleting shelf with ID:', shelfName, this.store_number);
 
     // Call the deleteShelf function from the dataUtils
-    deleteShelf(shelf_name, this.store_number);
+    deleteShelf(shelfName, this.store_number);
 
     // Remove the shelf from the shelves array
-    this.map.shelves = this.map.shelves.filter((shelf) => shelf.shelf_name !== shelf_name);
-    // Remove the shelf from the layer
-    const shelf = this.layer.findOne(`#${shelf_name}`);
+    this.map.shelves = this.map.shelves.filter((shelf) => shelf.shelf_name !== shelfName);
+    
+    // Remove the shelf from the layer - try different approaches
+    let shelf = this.layer.findOne(`#${shelfName}`);
+    
     if (shelf) {
+      console.log('Destroying shelf:', shelf.id());
+      
       shelf.destroy();
+      
+      // Also clean up any associated elements (tooltips, etc.)
+      this.layer.find(node => {
+        return node.getAttr && node.getAttr('shelfId') === shelfName;
+      });
+      
+    
+    } else {
+      console.warn('Could not find shelf to delete:', shelfName);
     }
+    
     // TODO: fix Emit deleteShelf event
-    //this.socket.emit('deleteShelf', { shelf_name: shelfId });
-
+    //this.socket.emit('deleteShelf', { shelf_name: shelfName });
 
     // Redraw the layer
     this.layer.batchDraw();
@@ -136,20 +149,47 @@ export class mapController {
     console.log('Updating shelf:', oldShelfName, 'with new data:', updatedShelfData);
     
     try {
+      // First, find the shelf in local map data BEFORE making server request
+      const index = this.map.shelves.findIndex(s => s.shelf_name === oldShelfName);
+      console.log('Found shelf in local map data at index:', index);
+      
+      if (index === -1) {
+        console.warn('Could not find shelf in local map data:', oldShelfName);
+        console.log('Available shelves:', this.map.shelves.map(s => s.shelf_name));
+      }
+      
       // Use the shelf_name/store_number route with the OLD name to find the shelf
       const updatedShelf = await updateShelfByOldName(oldShelfName, updatedShelfData, this.store_number);
       console.log('Shelf updated successfully:', updatedShelf);
       
-      // Update the shelf in the local map data using the old name to find it
-      const index = this.map.shelves.findIndex(s => s.shelf_name === oldShelfName);
-      if (index !== -1) {
-        console.log('Updating shelf in local map data at index:', index);
-        console.log('Old shelf data:', this.map.shelves[index]);
-        console.log('New shelf data:', updatedShelf);
-        this.map.shelves[index] = updatedShelf;
-      } else {
-        console.warn('Could not find shelf in local map data to update');
-      }
+      // Remove the shelf from the shelves array
+    this.map.shelves = this.map.shelves.filter((shelf) => shelf.shelf_name !== oldShelfName);
+    
+    // Remove the shelf from the layer - try different approaches
+    let shelf = this.layer.findOne(`#${oldShelfName}`);
+
+    if (shelf) {
+      console.log('Destroying shelf:', shelf.id());
+      
+      shelf.destroy();
+      
+      // Also clean up any associated elements (tooltips, etc.)
+      this.layer.find(node => {
+        return node.getAttr && node.getAttr('shelfId') === oldShelfName;
+      });
+      
+    
+    } else {
+      console.warn('Could not find shelf to delete:', oldShelfName);
+    }
+      
+      // Add the updated shelf back to the array
+      this.map.shelves.push(updatedShelf);
+      //get template from the store data
+      const template = this.map.store.shelf_templates[updatedShelfData.template];
+
+      // Draw the updated shelf with the new name
+      drawShelf(this.layer, this.stage, updatedShelf, template, this.scale_X, this.scale_Y, this.socket);
       
       // Redraw the layer to reflect changes
       this.layer.batchDraw();

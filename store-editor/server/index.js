@@ -126,28 +126,7 @@ app.get('/shelf/:shelf_name', async (req, res) => {
   }
 });
 
-// Update shelf by MongoDB _id
-app.put('/shelf/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    console.log('Updating shelf with _id:', id);
-    console.log('Update data:', req.body);
-    
-    const shelf = await Shelf.findByIdAndUpdate(
-      id, // Use MongoDB _id
-      req.body,
-      { new: true }
-    );
-
-    if (!shelf) return res.status(404).send({ error: 'Shelf not found', id});
-    res.send(shelf);
-  } catch (err) {
-    console.error('Error updating shelf:', err.message);
-    res.status(500).send({ error: err.message });
-  }
-});
-
-// Update shelf by shelf_name and store_number (keep for backward compatibility)
+// Update shelf by shelf_name and store_number 
 app.put('/shelf/:shelf_name/store/:store_number', async (req, res) => {
   try {
     const { shelf_name, store_number } = req.params;

@@ -29,9 +29,26 @@ export class ContextMenu {
         this.contextMenu.style.left = e.evt.clientX + 'px';
         this.contextMenu.style.top = e.evt.clientY + 'px';
 
-        // Find the shelf data using the target's ID
+        // Find the shelf data using the target's ID - now get it from the group
         const shelfId = target.id();
-        const shelfData = this.mapController.map.shelves.find((shelf) => shelf.shelf_name === shelfId);
+        let shelfData = null;
+        
+        // If target is the group itself, get data directly
+        if (target.getAttr && target.getAttr('shelfData')) {
+          shelfData = target.getAttr('shelfData');
+        } 
+        // If target is a child of a group, get data from parent
+        else if (target.parent && target.parent.getAttr && target.parent.getAttr('shelfData')) {
+          shelfData = target.parent.getAttr('shelfData');
+        }
+        // Fallback: search for the shelf group by ID
+        else {
+          const shelfGroup = this.mapController.layer.findOne(`#${shelfId}`);
+          if (shelfGroup && shelfGroup.getAttr('shelfData')) {
+            shelfData = shelfGroup.getAttr('shelfData');
+          }
+        }
+        
         console.log('Right-clicked on shelf:', shelfData);
 
         // Check if shelf data was found
