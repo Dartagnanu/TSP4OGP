@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 // shelf and location schema for item index
 const shelfAndLocationSchema = new mongoose.Schema({
-    shelf_id: { type: mongoose.Schema.Types.ObjectId, ref: "Shelf", required: true },
+    shelf_name: { type: mongoose.Schema.Types.ObjectId, ref: "Shelf", required: true },
     location: { type: Number, default: null }, // position in modular on that shelf
 });
 

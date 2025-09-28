@@ -5,7 +5,7 @@ const pickwalkItemSchema = new mongoose.Schema({
     quantity: { type: Number, required: true },
     customer: { type: String, required: true, default: null },
     shelf: {
-        shelf_id: { type: String, required: false, default: null },
+        shelf_name: { type: String, required: false, default: null },
         location: { type: String, required: false, default: null },
         placement_x: { type: Number, required: false, default: null },
         placement_y: { type: Number, required: false, default: null }

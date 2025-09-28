@@ -1,7 +1,8 @@
 export class Sidebar {
-  constructor(stage, templates) {
+  constructor(stage, templates, store_number) {
     this.stage = stage;
     this.templates = templates;
+    this.store_number = store_number;
     this.sidebarEl = document.getElementById('sidebar');
     this.shelfTemplatesDiv = document.getElementById('shelfTemplates');
     this.toggleBtn = document.getElementById('toggleSidebar');
@@ -55,12 +56,23 @@ export class Sidebar {
       if (!template) return;
 
       const mousePos = this.stage.getPointerPosition();
+      
+      // Get scale factors from the mapController via global reference
+      const mapCtrl = window.mapController; // We'll need to set this global reference
+      if (!mapCtrl) {
+        console.error('Map controller not available');
+        return;
+      }
+      
       const newShelf = {
-        id: `shelf_${Date.now()}`,
-        placement: [Math.round(mousePos.x / window.scaleX), Math.round(mousePos.y / window.scaleY)],
+        shelf_name: `shelf_${Date.now()}`,
+        placement_x: Math.round(mousePos.x / mapCtrl.scale_X / 10) * 10, // Convert to original coords and snap to 10-unit grid
+        placement_y: Math.round(mousePos.y / mapCtrl.scale_Y / 10) * 10, // Convert to original coords and snap to 10-unit grid
+        rotation: 0,
         modulars: [],
         flex_items: [],
         template: templateId,
+        store_number: this.store_number,
       };
 
       window.createAndAddShelf(newShelf, template);

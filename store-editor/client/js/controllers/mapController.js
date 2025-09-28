@@ -1,7 +1,7 @@
-import { createStage } from '../Konva/konvaSetup.js';
-import { drawStoreBoundary, drawShelf, loadShelves, drawStartingPoints } from '../Konva/drawUtils.js';
+import { createStage } from '../konva/konvaSetup.js';
+import { drawStoreBoundary, drawShelf, loadShelves, drawStartingPoints } from '../konva/drawUtils.js';
 import {getStore} from '../dataUtils/storeUtils.js';
-import {deleteShelf, getShelf, getShelvesByStore} from '../dataUtils/shelfUtils.js';
+import {deleteShelf, updateShelfByOldName, getShelvesByStore} from '../dataUtils/shelfUtils.js';
 import { ContextMenu} from './contextMenu/contextMenu.js';
 import { createShelf } from '../dataUtils/shelfUtils.js';
 import { GTSP_SERVER_URL } from '../../config.js';
@@ -25,18 +25,18 @@ export class mapController {
    // Expose createAndAddShelf globally for use in the context menu
     window.createAndAddShelf = this.createAndAddShelf.bind(this);
     window.deleteShelfFromMap = this.deleteShelfFromMap.bind(this);
-
+    window.updateShelf = this.updateShelf.bind(this);
     // TODO: finish auto update functionality
     // Listen for updates from other clients
     /*this.socket.on('updateShelf', (data) => {
       // Ignore updates from the same client
       if (data.senderId === this.socket.id) {
-          console.log(`Ignoring self-emitted update for shelf ID ${data.id}`);
+          console.log(`Ignoring self-emitted update for shelf ID ${data._id}`);
           return;
       }
-      const shelf = this.layer.findOne(`#${data.shelf_id}`);
+      const shelf = this.layer.findOne(`#${data.shelf_name}`);
       if (shelf) {
-        shelfData = this.map.shelves[data.shelf_id];
+        shelfData = this.map.shelves[data.shelf_name];
         moveShelf(shelfData, data.x, data.y);
         this.layer.draw();
       } else {
@@ -69,6 +69,15 @@ export class mapController {
     this.scale_Y = scale_Y;
     console.log('Scale factors:', this.scale_X, this.scale_Y);
 
+    // Ensure all shelves have store_number property
+    map.shelves.forEach(shelf => {
+      if (!shelf.store_number) {
+        // throw an error and alert user about broken shelf data
+        console.error('Shelf missing store_number:', shelf);
+        alert(`Error: Shelf with ID ${shelf.shelf_name} is missing store_number. Please fix the shelf data.`);
+      }
+    });
+
     // load shelves from map
 
     loadShelves(layer, stage, map.shelves, map.store.shelf_templates, this.scale_X, this.scale_Y, this.socket);
@@ -88,35 +97,108 @@ export class mapController {
     // Add the new shelf to the shelves array
     this.map.shelves.push(shelfData);
 
-    createShelf(shelfData);
+    // Create shelf on server (async, don't block UI)
+    createShelf(shelfData).catch(error => {
+      console.error('Failed to save shelf to server:', error);
+      // Could show user notification here
+    });
 
-    // Draw the new shelf on the canvas
-    console.log('Drawing new shelf with data:', shelfData, " using scale factors:", this.stage.scale_X, this.stage.scale_Y);
+    // Draw the new shelf on the canvas immediately
+    console.log('Drawing new shelf with data:', shelfData, " using scale factors:", this.scale_X, this.scale_Y);
     drawShelf(this.layer, this.stage, shelfData, template, this.scale_X, this.scale_Y, this.socket);
 
     // Redraw the layer
     this.layer.batchDraw();
   }
 
-  deleteShelfFromMap(shelf_id) {
-    console.log('Deleting shelf with ID:', shelf_id, this.store_number);
+  deleteShelfFromMap(shelfName) {
+    console.log('Deleting shelf with ID:', shelfName, this.store_number);
 
     // Call the deleteShelf function from the dataUtils
-    deleteShelf(shelf_id, this.store_number);
+    deleteShelf(shelfName, this.store_number);
 
     // Remove the shelf from the shelves array
-    this.map.shelves = this.map.shelves.filter((shelf) => shelf.shelf_id !== shelf_id);
-    // Remove the shelf from the layer
-    const shelf = this.layer.findOne(`#${shelf_id}`);
+    this.map.shelves = this.map.shelves.filter((shelf) => shelf.shelf_name !== shelfName);
+    
+    // Remove the shelf from the layer - try different approaches
+    let shelf = this.layer.findOne(`#${shelfName}`);
+    
     if (shelf) {
+      console.log('Destroying shelf:', shelf.id());
+      
       shelf.destroy();
+      
+      // Also clean up any associated elements (tooltips, etc.)
+      this.layer.find(node => {
+        return node.getAttr && node.getAttr('shelfId') === shelfName;
+      });
+      
+    
+    } else {
+      console.warn('Could not find shelf to delete:', shelfName);
     }
+    
     // TODO: fix Emit deleteShelf event
-    //this.socket.emit('deleteShelf', { shelf_id: shelfId });
-
+    //this.socket.emit('deleteShelf', { shelf_name: shelfName });
 
     // Redraw the layer
     this.layer.batchDraw();
+  }
+
+  async updateShelf(oldShelfName, updatedShelfData) {
+    console.log('Updating shelf:', oldShelfName, 'with new data:', updatedShelfData);
+    
+    try {
+      // First, find the shelf in local map data BEFORE making server request
+      const index = this.map.shelves.findIndex(s => s.shelf_name === oldShelfName);
+      console.log('Found shelf in local map data at index:', index);
+      
+      if (index === -1) {
+        console.warn('Could not find shelf in local map data:', oldShelfName);
+        console.log('Available shelves:', this.map.shelves.map(s => s.shelf_name));
+      }
+      
+      // Use the shelf_name/store_number route with the OLD name to find the shelf
+      const updatedShelf = await updateShelfByOldName(oldShelfName, updatedShelfData, this.store_number);
+      console.log('Shelf updated successfully:', updatedShelf);
+      
+      // Remove the shelf from the shelves array
+    this.map.shelves = this.map.shelves.filter((shelf) => shelf.shelf_name !== oldShelfName);
+    
+    // Remove the shelf from the layer - try different approaches
+    let shelf = this.layer.findOne(`#${oldShelfName}`);
+
+    if (shelf) {
+      console.log('Destroying shelf:', shelf.id());
+      
+      shelf.destroy();
+      
+      // Also clean up any associated elements (tooltips, etc.)
+      this.layer.find(node => {
+        return node.getAttr && node.getAttr('shelfId') === oldShelfName;
+      });
+      
+    
+    } else {
+      console.warn('Could not find shelf to delete:', oldShelfName);
+    }
+      
+      // Add the updated shelf back to the array
+      this.map.shelves.push(updatedShelf);
+      //get template from the store data
+      const template = this.map.store.shelf_templates[updatedShelfData.template];
+
+      // Draw the updated shelf with the new name
+      drawShelf(this.layer, this.stage, updatedShelf, template, this.scale_X, this.scale_Y, this.socket);
+      
+      // Redraw the layer to reflect changes
+      this.layer.batchDraw();
+
+      return updatedShelf;
+    } catch (error) {
+      console.error('Error updating shelf:', error);
+      throw error;
+    }
   }
 
  async testWalks() {

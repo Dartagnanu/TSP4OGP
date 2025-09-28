@@ -36,11 +36,11 @@ class Pathfinder:
         for upc, item_index in upc_to_item_index.items():
             locations = []
             for loc in item_index.get('locations', []):
-                shelf_data = self.db.shelves.find_one({'_id': loc['shelf_id']})
+                shelf_data = self.db.shelves.find_one({'_id': loc['shelf_name']})
                 if shelf_data:
                     # Save all required info as a dict
                     locations.append({
-                        'shelf_id': shelf_data['shelf_id'],
+                        'shelf_name': shelf_data['shelf_name'],
                         'location': loc['location'],  # position in modular on shelf
                         'placement_x': shelf_data['placement_x'],
                         'placement_y': shelf_data['placement_y']

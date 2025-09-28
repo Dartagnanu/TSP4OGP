@@ -75,7 +75,7 @@ async function populateTestDataFromSeed() {
       const modulars = (shelf.modulars || []).map((id) => modularIdMap[id]);
   
       const shelfDoc = await Shelf.findOneAndUpdate(
-        { shelf_id: shelf.shelf_id, store_number: shelf.store_number },
+        { shelf_name: shelf.shelf_name, store_number: shelf.store_number },
         {
           ...shelf,
           store: store._id,
@@ -83,7 +83,7 @@ async function populateTestDataFromSeed() {
         },
         { upsert: true, new: true }
       );
-      shelfIdMap[shelf.shelf_id] = shelfDoc._id;
+      shelfIdMap[shelf.shelf_name] = shelfDoc._id;
     }
 
     // Create Items
@@ -110,7 +110,7 @@ async function populateTestDataFromSeed() {
           if ((shelf.modulars || []).includes(modular.modular_id)) {
             if (!itemLocationMap[modItem.item_number]) itemLocationMap[modItem.item_number] = [];
             itemLocationMap[modItem.item_number].push({
-              shelf_id: shelfIdMap[shelf.shelf_id],
+              shelf_name: shelfIdMap[shelf.shelf_name],
               location: modItem.location,
             });
           }

@@ -114,11 +114,11 @@ app.post('/shelf', async (req, res) => {
 });
 
 // Get shelf by ID
-app.get('/shelf/:shelf_id', async (req, res) => {
+app.get('/shelf/:shelf_name', async (req, res) => {
   // TODO: fix search shelf by ID only
   throw new Error('search shelf by ID only Not implemented');
   try {
-    const shelf = await Shelf.findOne({ shelf_id: req.params.shelf_id });
+    const shelf = await Shelf.findOne({ shelf_name: req.params.shelf_name });
     if (!shelf) return res.status(404).send({ error: 'Shelf not found' });
     res.send(shelf);
   } catch (err) {
@@ -126,12 +126,12 @@ app.get('/shelf/:shelf_id', async (req, res) => {
   }
 });
 
-// Update shelf by shelf_id and store_number
-app.put('/shelf/:shelf_id/store/:store_number', async (req, res) => {
+// Update shelf by shelf_name and store_number 
+app.put('/shelf/:shelf_name/store/:store_number', async (req, res) => {
   try {
-    const { shelf_id, store_number } = req.params;
-    console.log(req.params.shelf_id, req.params.store_number);
-    // Ensure both shelf_id and store_number are provided
+    const { shelf_name, store_number } = req.params;
+    console.log(req.params.shelf_name, req.params.store_number);
+    // Ensure both shelf_name and store_number are provided
     if (!store_number) {
       return res.status(400).send({ error: 'store_number is required'});
     }
@@ -141,35 +141,35 @@ app.put('/shelf/:shelf_id/store/:store_number', async (req, res) => {
     }
     console.log(req.body);
     const shelf = await Shelf.findOneAndUpdate(
-      { shelf_id, store_number: store_number }, // Match both shelf_id and store_number
+      { shelf_name, store_number: store_number }, // Match both shelf_name and store_number
       req.body,
       { new: true }
     );
 
-    if (!shelf) return res.status(404).send({ error: 'Shelf not found', shelf_id, store_number});
+    if (!shelf) return res.status(404).send({ error: 'Shelf not found', shelf_name, store_number});
     res.send(shelf);
   } catch (err) {
     res.status(500).send({ error: err.message });
   }
 });
 
-// Delete shelf by shelf_id and store_number
-app.delete('/shelf/:shelf_id/store/:store_number', async (req, res) => {
+// Delete shelf by shelf_name and store_number
+app.delete('/shelf/:shelf_name/store/:store_number', async (req, res) => {
     try {
-        console.log('Delete request received for shelf_id:', req.params.shelf_id, 'store_number:', req.params.store_number);
+        console.log('Delete request received for shelf_name:', req.params.shelf_name, 'store_number:', req.params.store_number);
 
         if (!req.params.store_number) {
             return res.status(400).send({ error: 'store_number is required' });
         }
         const shelf = await Shelf.findOneAndDelete({
-            shelf_id: req.params.shelf_id,
+            shelf_name: req.params.shelf_name,
             store_number: Number(req.params.store_number),
         });
         if (!shelf) {
-            console.log('Shelf not found:', req.params.shelf_id, req.params.store_number);
+            console.log('Shelf not found:', req.params.shelf_name, req.params.store_number);
             return res.status(404).send({
                 error: 'Shelf not found',
-                shelf_id: req.params.shelf_id,
+                shelf_name: req.params.shelf_name,
                 store_number: req.params.store_number,
             });
         }
@@ -183,9 +183,9 @@ app.delete('/shelf/:shelf_id/store/:store_number', async (req, res) => {
 // Get all shelves by store number
 app.get('/shelves', async (req, res) => {
   try {
-    req.query.store = Number(req.query.store);
-    console.log('Query for shelves of store number:', req.query.store);
-    const shelves = await Shelf.find({ store: req.query.store_number });
+    const store_number = Number(req.query.store);
+    console.log('Query for shelves of store number:', store_number);
+    const shelves = await Shelf.find({ store_number: store_number });
     res.send(shelves);
   } catch (err) {
     res.status(500).send({ error: err.message });
@@ -513,9 +513,13 @@ app.post('/request-pickwalk', async (req, res) => {
 // -------------------- End of GTSP Routes --------------------
 
 // For graceful shutdown
-process.on('SIGINT', () => {
-  mongoose.connection.close(() => {
+process.on('SIGINT', async () => {
+  try {
+    await mongoose.connection.close();
     console.log('MongoDB connection closed');
     process.exit(0);
-  });
+  } catch (err) {
+    console.error('Error closing MongoDB connection:', err);
+    process.exit(1);
+  }
 });

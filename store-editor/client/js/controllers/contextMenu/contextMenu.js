@@ -1,3 +1,5 @@
+import { ShelfEditor } from './shelfEditor.js';
+
 export class ContextMenu {
   constructor(mapController) {
     this.mapController = mapController; // store instance of mapController
@@ -8,6 +10,9 @@ export class ContextMenu {
     this.editShelfBtn = document.getElementById('editShelfBtn');
     this.currentShelfNode = null;
     this.isDraggingMap = false; // Track if the map is being dragged
+    
+    // Initialize the shelf editor
+    this.shelfEditor = new ShelfEditor(mapController);
   }
 
   init() {
@@ -24,10 +29,34 @@ export class ContextMenu {
         this.contextMenu.style.left = e.evt.clientX + 'px';
         this.contextMenu.style.top = e.evt.clientY + 'px';
 
-        // Find the shelf data using the target's ID
+        // Find the shelf data using the target's ID - now get it from the group
         const shelfId = target.id();
-        const shelfData = this.mapController.map.shelves.find((shelf) => shelf.shelf_id === shelfId);
+        let shelfData = null;
+        
+        // If target is the group itself, get data directly
+        if (target.getAttr && target.getAttr('shelfData')) {
+          shelfData = target.getAttr('shelfData');
+        } 
+        // If target is a child of a group, get data from parent
+        else if (target.parent && target.parent.getAttr && target.parent.getAttr('shelfData')) {
+          shelfData = target.parent.getAttr('shelfData');
+        }
+        // Fallback: search for the shelf group by ID
+        else {
+          const shelfGroup = this.mapController.layer.findOne(`#${shelfId}`);
+          if (shelfGroup && shelfGroup.getAttr('shelfData')) {
+            shelfData = shelfGroup.getAttr('shelfData');
+          }
+        }
+        
         console.log('Right-clicked on shelf:', shelfData);
+
+        // Check if shelf data was found
+        if (!shelfData) {
+          console.warn('Could not find shelf data for ID:', shelfId);
+          this.contextMenu.style.display = 'none';
+          return;
+        }
 
         // Show shelf actions, hide add
         this.addShelfBtn.style.display = 'none';
@@ -38,11 +67,7 @@ export class ContextMenu {
         // Edit shelf name
         this.editShelfBtn.onclick = () => {
           console.log("edit shelf button clicked");
-          const newName = prompt("Enter new shelf name:", target.attrs.name);
-          if (newName) {
-            target.setAttrs({ name: newName });
-            this.mapController.layer.draw();
-          }
+          this.shelfEditor.openEditor(shelfData);
           this.contextMenu.style.display = 'none';
         };
 
@@ -51,7 +76,7 @@ export class ContextMenu {
         };
         this.deleteShelfBtn.onclick = () => {
           console.log("delete shelf button clicked");
-          window.deleteShelfFromMap(shelfData.shelf_id);
+          window.deleteShelfFromMap(shelfData.shelf_name);
         };
         this.cloneShelfBtn.onclick = () => {
           console.log("clone shelf button clicked");
@@ -59,7 +84,7 @@ export class ContextMenu {
           const clonedShelfData = {
             ...shelfData,
             _id: undefined, // Remove the original _id
-            shelf_id: `${shelfData.shelf_id}_copy_${Date.now()}`, // Generate a unique shelf_id
+            shelf_name: `${shelfData.shelf_name}_copy_${Date.now()}`, // Generate a unique shelf_name
             placement_x: shelfData.placement_x + 1, // Offset the cloned shelf slightly
             placement_y: shelfData.placement_y + 1,
           };
