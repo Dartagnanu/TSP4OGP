@@ -47,12 +47,35 @@ def find_path():
     store = data['store']
     upcs = data['upcs']
     # check for optional start and end points
+<<<<<<< Updated upstream
     if 'start' in data and 'end' in data:
         start = tuple(data['start'])
         end = tuple(data['end'])
         return jsonify(pathfinder.find_path_with_endpoints(store, upcs, start, end))
 
     return jsonify(pathfinder.find_path(store, upcs))
+=======
+    try:
+        if 'start' in data and 'end' in data:
+            start = tuple(data['start'])
+            end = tuple(data['end'])
+            print(f"Using custom start/end points: {start} -> {end}", flush=True)
+            result = pathfinder.find_path_with_endpoints(store, upcs, start, end)
+        else:
+            print("Using default start/end points from store", flush=True)
+            result = pathfinder.find_path(store, upcs)
+
+        print(f"Pathfinding result: {len(result) if result else 0} items", flush=True)
+        return jsonify(result)
+
+    except Exception as e:
+        print(f"Error in find-path: {e}", flush=True)
+        return jsonify({
+            'error': 'find-path failed',
+            'message': str(e),
+            'details': 'Check GPU availability and DB item/shelf data'
+        }), 500
+>>>>>>> Stashed changes
 
 
 

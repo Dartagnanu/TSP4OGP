@@ -9,3 +9,4 @@ Thumbs.db
 server/maps/*.json
 package-lock.json
 *.log
+gtsp-server/venv
