@@ -1,234 +1,234 @@
-import networkx as nx
-from collections import deque
-from networkx.readwrite import json_graph
+"""Picking path heuristics: grid BFS, optional shelf matrix, 2-opt."""
+from __future__ import annotations
+
+from typing import Dict, List, Optional, Tuple
+
 import numpy as np
+
+from distance_cache import build_shelf_matrix, matrix_distance, two_opt_improve
+from pathfinder_config import GPU_MATRIX_PRECOMPUTE, should_build_matrix as cfg_should_build_matrix
+from pathfinder_config import should_run_two_opt
+from store_cache import StoreCache, StoreContext
+from walkability import Coord, WalkabilityGrid
+
 try:
-    import cudf  # type: ignore
     import cugraph  # type: ignore
-    import cupy as cp  # type: ignore
-    GPU_AVAILABLE = True
+    GPU_LIBS = True
 except ImportError:
-    GPU_AVAILABLE = False
+    GPU_LIBS = False
+
+INF = float("inf")
 
 
 class Heuristics:
-    """
-    Picking path heuristics for store pathfinding.
-    Provides modular strategies for finding optimal pick sequences.
-    """
-    
-    def __init__(self, db, graph_builder, gpu_available=None):
+    def __init__(self, db, store_cache: StoreCache, gpu_available: bool = False):
         self.db = db
-        self.graph_builder = graph_builder
-        if gpu_available is None:
-            gpu_available = GPU_AVAILABLE
-        self.gpu_available = bool(gpu_available) and GPU_AVAILABLE
-        
+        self.store_cache = store_cache
+        self.gpu_available = bool(gpu_available) and GPU_LIBS
+        self._sssp_count = 0
+
         if not self.gpu_available:
-            print("WARNING: GPU acceleration not available - using slower CPU-based heuristics")
-        
-        # Cache for converted graphs
-        self._cugraph_cache = {}
-    
-    def _get_cugraph(self, store_number, nx_graph):
-        """Get or create cuGraph version of NetworkX graph (or NetworkX if GPU unavailable)"""
-        if store_number not in self._cugraph_cache:
-            if self.gpu_available:
-                print(f"Converting NetworkX graph to cuGraph for store {store_number}...")
-                cugraph_graph, _ = self._networkx_to_cugraph(nx_graph)
-                print(f"Graph conversion complete - {len(nx_graph.nodes)} nodes, {len(nx_graph.edges)} edges")
-                self._cugraph_cache[store_number] = cugraph_graph
-            else:
-                print(f"Caching NetworkX graph for store {store_number} (CPU mode)...")
-                self._cugraph_cache[store_number] = nx_graph
-                print(f"Graph cached - {len(nx_graph.nodes)} nodes, {len(nx_graph.edges)} edges")
-        
-        return self._cugraph_cache[store_number]
-    
-    def _networkx_to_cugraph(self, nx_graph):
-        """Convert NetworkX graph to cuGraph format"""
-        # Get edge list from NetworkX graph
-        edges = list(nx_graph.edges(data=True))
-        
-        # Create edge list with weights (default to 1 if no weight)
-        edge_data = []
-        for u, v, data in edges:
-            weight = data.get('weight', 1.0)
-            # Convert tuple coordinates to node IDs
-            u_id = self._coord_to_node_id(u)
-            v_id = self._coord_to_node_id(v)
-            edge_data.append([u_id, v_id, weight])
-        
-        # Create cuDF DataFrame
-        if edge_data:
-            df = cudf.DataFrame(edge_data, columns=['src', 'dst', 'weight'])
-        else:
-            df = cudf.DataFrame(columns=['src', 'dst', 'weight'])
-        
-        # Create cuGraph
-        G = cugraph.Graph()
-        if len(df) > 0:
-            G.from_cudf_edgelist(df, source='src', destination='dst', edge_attr='weight')
-        
-        return G, df
-    
-    def _coord_to_node_id(self, coord):
-        """Convert (x, y) coordinate to unique node ID"""
-        return coord[0] * 10000 + coord[1]
-    
-    def _gpu_distance(self, graph, start_coord, end_coord):
-        """Compute shortest path distance (GPU-accelerated if available, CPU fallback if not)"""
-        if self.gpu_available:
-            return self._gpu_distance_cuda(graph, start_coord, end_coord)
-        else:
-            return self._cpu_distance(graph, start_coord, end_coord)
-    
-    def _gpu_distance_cuda(self, cugraph_graph, start_coord, end_coord):
-        """Compute shortest path distance using GPU"""
+            print(
+                "Pathfinding uses CPU grid BFS (GPU reserved for optional matrix batch)",
+                flush=True,
+            )
+
+    def clear_graph_cache(self, store_number: int) -> None:
+        self.store_cache.invalidate(store_number)
+
+    def _ensure_matrix(self, ctx: StoreContext) -> None:
+        if ctx.distance_matrix is not None or ctx.matrix_building:
+            return
+        if not cfg_should_build_matrix(ctx.tier, ctx.n_shelves):
+            return
+
+        ctx.matrix_building = True
         try:
-            start_id = self._coord_to_node_id(start_coord)
-            end_id = self._coord_to_node_id(end_coord)
-            
-            # Use cuGraph's SSSP algorithm
-            distances = cugraph.sssp(cugraph_graph, start_id)
-            
-            # Get distance to target
-            target_row = distances[distances['vertex'] == end_id]
-            if len(target_row) == 0:
-                return float('inf')
-            
-            return target_row['distance'].iloc[0]
-        except Exception as e:
-            print(f"GPU distance calculation failed: {e}")
-            return float('inf')
-    
-    def _cpu_distance(self, nx_graph, start_coord, end_coord):
-        """Compute shortest path distance using NetworkX (CPU)"""
-        try:
-            # Try to find shortest path using Dijkstra's algorithm
-            path_length = nx.shortest_path_length(nx_graph, start_coord, end_coord, weight='weight')
-            return path_length
-        except (nx.NetworkXNoPath, nx.NodeNotFound):
-            return float('inf')
-        except Exception as e:
-            print(f"CPU distance calculation failed: {e}")
-            return float('inf')
-    
-    def find_pick_path_bfs(self, store_number, upcs, start_point):
-        """
-        Find picking path using GPU-accelerated BFS heuristic.
-        
-        Starts from start_point and greedily visits nearest unvisited item locations
-        using GPU-accelerated shortest path calculations.
-        
-        Args:
-            store_number (int): Store identifier
-            upcs (list): List of UPC codes to pick
-            start_point (tuple): Starting location (x, y)
-        
-        Returns:
-            list: Ordered picks formatted as:
-                [
-                    {'upc': '0020001000011', 'item_name': 'Item A', 'shelf': 'A21', 'location': (15, 20)},
-                    {'upc': '0010001000001', 'item_name': 'Item B', 'shelf': 'A20', 'location': (20, 15)},
-                    ...
-                ]
-            
-            Failed/unreachable items are included with 'unreachable': True flag.
-        """
-        # 1. Fetch store and build/get graph
-        store = self.db.stores.find_one({'store_number': store_number})
-        if not store:
-            raise ValueError(f"Store {store_number} not found")
-        
-        nx_graph = self.graph_builder.prompt_for_graph(store_number)
-        if isinstance(nx_graph, dict):
-            nx_graph = json_graph.node_link_graph(nx_graph)
-        
-        # Get GPU-accelerated graph
-        cugraph_graph = self._get_cugraph(store_number, nx_graph)
-        
-        # 2. Map UPCs to item data and shelf locations
-        upc_to_data = self._fetch_upc_locations(upcs)
-        
-        # 3. GPU-accelerated BFS from start point to find nearest items in order
-        pick_list = self._gpu_pick_sequence(cugraph_graph, start_point, upc_to_data, upcs)
-        
+            print(
+                f"Building shelf distance matrix for store {ctx.store_number} "
+                f"({ctx.n_shelves} shelves, tier {ctx.tier})",
+                flush=True,
+            )
+            use_gpu = self.gpu_available and GPU_MATRIX_PRECOMPUTE
+            ctx.distance_matrix = build_shelf_matrix(
+                ctx.grid, ctx.shelf_coords, gpu_available=use_gpu
+            )
+        finally:
+            ctx.matrix_building = False
+
+    def _distance(
+        self,
+        ctx: StoreContext,
+        dist_field: Optional[np.ndarray],
+        start: Coord,
+        end: Coord,
+    ) -> float:
+        if ctx.distance_matrix is not None:
+            return matrix_distance(
+                ctx.distance_matrix,
+                ctx.coord_to_shelf_index,
+                start,
+                end,
+            )
+        if dist_field is not None:
+            ex, ey = int(end[0]), int(end[1])
+            if 0 <= ey < ctx.grid.height and 0 <= ex < ctx.grid.width:
+                d = int(dist_field[ey, ex])
+                return float(d) if d >= 0 else INF
+            return INF
+        return ctx.grid.distance_between(start, end)
+
+    def _distance_field(self, ctx: StoreContext, start: Coord) -> np.ndarray:
+        self._sssp_count += 1
+        return ctx.grid.bfs_distance_field(start)
+
+    def find_pick_path_bfs(
+        self,
+        store_number: int,
+        upcs: List[str],
+        start_point: Coord,
+        end_point: Optional[Coord] = None,
+    ) -> List[dict]:
+        self._sssp_count = 0
+        ctx = self.store_cache.get_context(store_number)
+        self._ensure_matrix(ctx)
+
+        upc_to_data = self._fetch_upc_locations(store_number, upcs)
+        pick_list, last_dist_field, current_location = self._greedy_pick_sequence(
+            ctx, start_point, upc_to_data, upcs
+        )
+
+        if should_run_two_opt(ctx.tier, len(upcs)) and ctx.distance_matrix is not None:
+            pick_list = self._apply_two_opt(ctx, pick_list, start_point)
+
+        if end_point is not None:
+            for entry in pick_list:
+                if entry.get("location") is not None:
+                    current_location = entry["location"]
+            if end_point != current_location:
+                if last_dist_field is not None and int(end_point[0]) < ctx.grid.width:
+                    return_distance = self._distance(
+                        ctx, last_dist_field, current_location, end_point
+                    )
+                else:
+                    return_distance = self._distance(
+                        ctx, None, current_location, end_point
+                    )
+                    self._sssp_count += 1
+                pick_list.append(
+                    {
+                        "type": "return",
+                        "location": end_point,
+                        "distance_from_previous": return_distance,
+                    }
+                )
+
+        print(
+            f"find-path store {store_number}: tier={ctx.tier} "
+            f"bfs_count={self._sssp_count} matrix={ctx.distance_matrix is not None}",
+            flush=True,
+        )
         return pick_list
-    
-    def _fetch_upc_locations(self, upcs):
-        """
-        Fetch item and shelf location data for all UPCs.
-        
-        Returns:
-            dict: {upc: {'item_name': str, 'locations': [{'shelf': {...}, 'location': (x,y)}, ...]}}
-        """
-        upc_to_data = {}
-        
-        for upc in upcs:
-            # Find item index for this UPC
-            item_index = self.db.itemindexes.find_one({'upcs': {'$in': [upc]}})
-            if not item_index:
-                upc_to_data[upc] = {'item_name': 'Unknown', 'locations': []}
+
+    def _fetch_upc_locations(self, store_number: int, upcs: List[str]) -> dict:
+        upc_to_data = {upc: {"item_name": "Unknown", "locations": []} for upc in upcs}
+        if not upcs:
+            return upc_to_data
+
+        indexes = list(
+            self.db.itemindexes.find(
+                {"store_number": store_number, "upcs": {"$in": list(upcs)}}
+            )
+        )
+        shelf_ids = set()
+        for doc in indexes:
+            for loc in doc.get("locations", []):
+                shelf_ids.add(loc["shelf_name"])
+
+        shelf_by_id = {}
+        if shelf_ids:
+            for shelf in self.db.shelves.find({"_id": {"$in": list(shelf_ids)}}):
+                shelf_by_id[shelf["_id"]] = shelf
+
+        for doc in indexes:
+            matched_upcs = [u for u in doc.get("upcs", []) if u in upc_to_data]
+            if not matched_upcs:
                 continue
-            
-            item_name = item_index.get('name', 'Unknown')
+            item_name = doc.get("name", "Unknown")
             locations = []
-            
-            # Fetch shelf data for each location
-            for loc in item_index.get('locations', []):
-                shelf_object_id = loc['shelf_name']
-                shelf_data = self.db.shelves.find_one({'_id': shelf_object_id})
-                
+            for loc in doc.get("locations", []):
+                shelf_data = shelf_by_id.get(loc["shelf_name"])
                 if shelf_data:
-                    locations.append({
-                        'shelf': shelf_data,
-                        'shelf_name': shelf_data.get('shelf_name', str(shelf_data['_id'])),
-                        'location': (shelf_data['placement_x'], shelf_data['placement_y']),
-                        'modular_location': loc.get('location', None)
-                    })
-            
-            upc_to_data[upc] = {
-                'item_name': item_name,
-                'locations': locations
-            }
-        
+                    locations.append(
+                        {
+                            "shelf": shelf_data,
+                            "shelf_name": shelf_data.get(
+                                "shelf_name", str(shelf_data["_id"])
+                            ),
+                            "location": (
+                                shelf_data["placement_x"],
+                                shelf_data["placement_y"],
+                            ),
+                            "modular_location": loc.get("location"),
+                        }
+                    )
+            for upc in matched_upcs:
+                upc_to_data[upc] = {"item_name": item_name, "locations": locations}
+
         return upc_to_data
-    
-    def _gpu_pick_sequence(self, cugraph_graph, start_point, upc_to_data, upcs):
-        """
-        Greedy nearest-neighbor picking using GPU-accelerated distance calculations.
-        
-        From current location, always pick the closest unvisited item using GPU SSSP.
-        """
-        pick_list = []
+
+    def _greedy_pick_sequence(
+        self,
+        ctx: StoreContext,
+        start_point: Coord,
+        upc_to_data: dict,
+        upcs: List[str],
+    ) -> Tuple[List[dict], Optional[np.ndarray], Coord]:
+        pick_list: List[dict] = []
         visited_upcs = set()
         current_location = start_point
-        
-        unreachable_items = []
+        unreachable_items: List[str] = []
+        last_dist_field: Optional[np.ndarray] = None
+
         for _ in range(len(upcs)):
             closest_upc = None
-            closest_distance = float('inf')
+            closest_distance = INF
             closest_shelf = None
             closest_location = None
-            
-            # Search for nearest unvisited item using GPU acceleration
+
+            current_in_matrix = (
+                ctx.distance_matrix is not None
+                and current_location in ctx.coord_to_shelf_index
+            )
+            dist_field = None
+            if not current_in_matrix:
+                dist_field = self._distance_field(ctx, current_location)
+                last_dist_field = dist_field
+
             for upc in upcs:
                 if upc in visited_upcs:
                     continue
-
-                locations = upc_to_data[upc]['locations']
-
-                # If no locations, collect unreachable item now and skip
+                locations = upc_to_data[upc]["locations"]
                 if not locations:
                     if upc not in unreachable_items:
                         unreachable_items.append(upc)
                     continue
 
-                # Find closest shelf location for this item using GPU distance
                 for loc_data in locations:
-                    shelf_location = loc_data['location']
-                    distance = self._gpu_distance(cugraph_graph, current_location, shelf_location)
+                    shelf_location = loc_data["location"]
+                    if current_in_matrix:
+                        distance = matrix_distance(
+                            ctx.distance_matrix,
+                            ctx.coord_to_shelf_index,
+                            current_location,
+                            shelf_location,
+                        )
+                        if current_location == shelf_location:
+                            distance = 0.0
+                    else:
+                        ex, ey = int(shelf_location[0]), int(shelf_location[1])
+                        d = int(dist_field[ey, ex])  # type: ignore
+                        distance = float(d) if d >= 0 else INF
 
                     if distance < closest_distance:
                         closest_distance = distance
@@ -236,50 +236,77 @@ class Heuristics:
                         closest_shelf = loc_data
                         closest_location = shelf_location
 
-            # Add the closest item to pick list
             if closest_upc:
-                # Build JSON-safe shelf payload
-                shelf_data = closest_shelf.get('shelf', {})
-                shelf_json = {
-                    'shelf_name': closest_shelf.get('shelf_name'),
-                    'placement_x': shelf_data.get('placement_x'),
-                    'placement_y': shelf_data.get('placement_y'),
-                    'template': shelf_data.get('template'),
-                    'department': shelf_data.get('department'),
-                    'modulars': shelf_data.get('modulars'),
-                }
-
-                pick_list.append({
-                    'upc': closest_upc,
-                    'item_name': upc_to_data[closest_upc]['item_name'],
-                    'shelf': closest_shelf['shelf_name'],
-                    'shelf_data': shelf_json,
-                    'modular_location': closest_shelf.get('modular_location'),
-                    'location': closest_location,
-                    'distance_from_previous': closest_distance
-                })
+                shelf_data = closest_shelf.get("shelf", {})
+                pick_list.append(
+                    {
+                        "upc": closest_upc,
+                        "item_name": upc_to_data[closest_upc]["item_name"],
+                        "shelf": closest_shelf["shelf_name"],
+                        "shelf_data": {
+                            "shelf_name": closest_shelf.get("shelf_name"),
+                            "placement_x": shelf_data.get("placement_x"),
+                            "placement_y": shelf_data.get("placement_y"),
+                            "template": shelf_data.get("template"),
+                            "department": shelf_data.get("department"),
+                            "modulars": shelf_data.get("modulars"),
+                        },
+                        "modular_location": closest_shelf.get("modular_location"),
+                        "location": closest_location,
+                        "distance_from_previous": closest_distance,
+                    }
+                )
                 visited_upcs.add(closest_upc)
                 current_location = closest_location
             else:
-                # No more reachable items; add remaining as unreachable
                 for upc in upcs:
                     if upc not in visited_upcs and upc not in unreachable_items:
                         unreachable_items.append(upc)
                 break
 
-        # append unreachable items at end with shelf='unknown'
         for upc in unreachable_items:
             if upc in visited_upcs:
                 continue
-            pick_list.append({
-                'upc': upc,
-                'item_name': upc_to_data[upc]['item_name'],
-                'shelf': 'unknown',
-                'shelf_data': None,
-                'modular_location': None,
-                'location': None,
-                'unreachable': True
-            })
+            pick_list.append(
+                {
+                    "upc": upc,
+                    "item_name": upc_to_data[upc]["item_name"],
+                    "shelf": "unknown",
+                    "shelf_data": None,
+                    "modular_location": None,
+                    "location": None,
+                    "unreachable": True,
+                }
+            )
             visited_upcs.add(upc)
 
-        return pick_list
+        return pick_list, last_dist_field, current_location
+
+    def _apply_two_opt(
+        self, ctx: StoreContext, pick_list: List[dict], start_point: Coord
+    ) -> List[dict]:
+        picks = [p for p in pick_list if p.get("location") and not p.get("unreachable")]
+        if len(picks) < 4:
+            return pick_list
+
+        coords = [tuple(p["location"]) for p in picks]
+        indices = []
+        for c in coords:
+            idx = ctx.coord_to_shelf_index.get(c)
+            if idx is None:
+                return pick_list
+            indices.append(idx)
+
+        start_idx = ctx.coord_to_shelf_index.get(start_point)
+        if start_idx is not None and start_idx in indices:
+            indices.remove(start_idx)
+            indices.insert(0, start_idx)
+        elif start_idx is None:
+            pass
+
+        improved = two_opt_improve(indices, ctx.distance_matrix)
+        coord_order = [ctx.shelf_coords[i] for i in improved]
+        pick_by_coord = {tuple(p["location"]): p for p in picks}
+        reordered = [pick_by_coord[c] for c in coord_order if c in pick_by_coord]
+        unreachable = [p for p in pick_list if p.get("unreachable")]
+        return reordered + unreachable

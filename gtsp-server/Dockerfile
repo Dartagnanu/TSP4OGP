@@ -1,5 +1,6 @@
 # GPU pathfinding: RAPIDS base includes cuGraph, cuDF, and CuPy.
-FROM rapidsai/rapidsai-core:24.10-cuda12.0-py3.11
+# Tag format: https://hub.docker.com/r/rapidsai/base/tags
+FROM rapidsai/base:25.10-cuda12-py3.11
 WORKDIR /app
 
 RUN /opt/conda/envs/rapids/bin/python -m pip install --no-cache-dir \

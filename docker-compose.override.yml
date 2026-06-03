@@ -6,4 +6,5 @@ services:
       - ./gtsp-server:/app
     environment:
       - FLASK_DEBUG=1
+      - FLASK_USE_RELOADER=0
     command: ["/opt/conda/envs/rapids/bin/python", "-u", "app.py"]

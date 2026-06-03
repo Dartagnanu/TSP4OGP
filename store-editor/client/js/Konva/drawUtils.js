@@ -32,7 +32,7 @@ export function drawStoreBoundary(layer, store, stageWidth, stageHeight) {
 
     const boundary = new Konva.Line({
         points: scaledPoints,
-        stroke: 'blue',
+        stroke: '#64748b',
         strokeWidth: 2,
         closed: true,
         name: 'store-boundary',
@@ -52,7 +52,7 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
     const polygon = new Konva.Line({
         points,
         fill: template.color || '#828282ff',
-        stroke: '#000',
+        stroke: '#334155',
         strokeWidth: 1,
         closed: true,
         draggable: true,

@@ -48,8 +48,19 @@ def ping():
 # Build graph from store layout and shelves
 @app.route('/graph/<int:store_number>', methods=['GET'])
 def get_graph(store_number):
-    graph = builder.prompt_for_graph(store_number)
-    return jsonify((graph))
+    try:
+        graph = builder.export_graph_json(store_number)
+        return jsonify(graph)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/cache-stats', methods=['GET'])
+def cache_stats():
+    pf = get_pathfinder()
+    if pf is None:
+        return jsonify({'error': 'Pathfinder unavailable'}), 500
+    return jsonify(pf.cache_stats())
 
     
 # Find shortest path given store, list of upcs, start and end points
@@ -113,4 +124,6 @@ def get_shelves():
 
 if __name__ == '__main__':
     debug = os.environ.get('FLASK_DEBUG', '').lower() in ('1', 'true', 'yes')
-    app.run(host='0.0.0.0', port=5000, debug=debug, use_reloader=debug)
+    # Reloader watches bind-mounted files and restarts the whole process (disrupts /find-path).
+    use_reloader = os.environ.get('FLASK_USE_RELOADER', '').lower() in ('1', 'true', 'yes')
+    app.run(host='0.0.0.0', port=5000, debug=debug, use_reloader=use_reloader)

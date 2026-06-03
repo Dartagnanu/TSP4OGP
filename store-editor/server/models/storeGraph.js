@@ -2,7 +2,13 @@ import mongoose from "mongoose";
 
 const storeGraphSchema = new mongoose.Schema({
     store_number: { type: Number, required: true, unique: true, index: true },
-    graph: { type: Object, required: true },
+    format: { type: String, default: 'walkability_v1' },
+    width: { type: Number },
+    height: { type: Number },
+    walkable: { type: Buffer },
+    shelf_nodes: { type: Array, default: [] },
+    shelves_hash: { type: String },
+    graph: { type: Object }, // legacy node_link; deprecated
     last_updated: { type: Date, required: true, default: Date.now }
 });
 

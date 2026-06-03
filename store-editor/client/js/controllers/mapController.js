@@ -209,6 +209,7 @@ export class mapController {
       this.walkFinder.init();
     }
     const pickwalk = {
+      starting_point: { id: 'Main_Entrance', point: [10, 50] },
       itemList: [
         { upc: '0020001000011', quantity: 1 },
         { upc: '0030001000022', quantity: 2 },

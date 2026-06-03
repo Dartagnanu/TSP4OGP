@@ -23,11 +23,8 @@ export class Sidebar {
     this.shelfTemplatesDiv.innerHTML = '';
     Object.entries(this.templates).forEach(([id, template]) => {
       const div = document.createElement('div');
+      div.className = 'template-card';
       div.textContent = template.name || id;
-      div.style.padding = '5px';
-      div.style.border = '1px solid #999';
-      div.style.marginBottom = '5px';
-      div.style.cursor = 'grab';
       div.draggable = true;
 
       div.addEventListener('dragstart', (e) => {

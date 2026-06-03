@@ -66,7 +66,7 @@ app.post('/store', async (req, res) => {
 // Get store by store number
 app.get('/store/:number', async (req, res) => {
   try {
-    const store = await Store.findOne({ store_number: req.params.number });
+    const store = await Store.findOne({ store_number: Number(req.params.number) });
     if (!store) return res.status(404).send({ error: 'Store not found' });
     res.send(store);
   } catch (err) {

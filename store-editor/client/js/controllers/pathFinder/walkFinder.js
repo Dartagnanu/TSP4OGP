@@ -10,12 +10,23 @@ export class walkFinder {
     async findPath(store_number, pickwalk) {
         const upcs = pickwalk.itemList.map(item => item.upc);
         console.log('Finding path for pickwalk with UPCs:', upcs);
+
+        const body = { store: store_number, upcs };
+        const startPoint = pickwalk.starting_point?.point
+            ?? (Array.isArray(pickwalk.starting_point) ? pickwalk.starting_point[0]?.point : null);
+        if (startPoint) {
+            body.start = startPoint;
+            const endPoint = pickwalk.end_point?.point
+                ?? (Array.isArray(pickwalk.end_point) ? pickwalk.end_point[0]?.point : null);
+            body.end = endPoint ?? startPoint;
+        }
+
         fetch(`${this.GTSP_SERVER_URL}/find-path`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ store: store_number, upcs: upcs })
+            body: JSON.stringify(body)
         })
         .then(response => response.json())
         .then(data => {

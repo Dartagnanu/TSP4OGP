@@ -23,7 +23,8 @@ async function initApp() {
   window.mapController = mapCtrl;
 
   // Initialize sidebar after mapController is ready (to get templates)
-  const sidebar = new Sidebar(mapCtrl.stage, mapCtrl.map.store.shelf_templates, STORE_NUMBER);
+  const templates = mapCtrl.map?.store?.shelf_templates ?? {};
+  const sidebar = new Sidebar(mapCtrl.stage, templates, STORE_NUMBER);
 
   // test walks button
   document.getElementById('testWalksBtn').addEventListener('click', () => {

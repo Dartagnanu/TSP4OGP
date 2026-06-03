@@ -49,7 +49,7 @@ services:
       - mongo
     environment:
       - MONGO_URL=mongodb://mongo:27017/storemaps
-    command: node server/models/seed.js
+    command: node store-editor/server/models/seed.js
     volumes:
       - .:/usr/src/app
 

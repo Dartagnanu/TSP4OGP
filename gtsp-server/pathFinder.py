@@ -1,81 +1,61 @@
-import networkx as nx
-from networkx.readwrite import json_graph
 from heuristics import Heuristics
+from store_cache import StoreCache
 
 try:
-    import cudf  # type: ignore
-    import cugraph  # type: ignore
     import cupy as cp  # type: ignore
     CUPY_AVAILABLE = True
     CUGRAPH_AVAILABLE = True
 except ImportError:
-    import numpy as cp  # Use numpy as fallback
     CUPY_AVAILABLE = False
     CUGRAPH_AVAILABLE = False
+
 
 class Pathfinder:
     def __init__(self, db, graph_builder):
         self.db = db
         self.graph_builder = graph_builder
-        print("Initializing Pathfinder...")
+        print("Initializing Pathfinder...", flush=True)
         self.gpu_available = self._check_gpu_availability()
-        
-        # Initialize heuristics module for picking strategy
+
+        self.store_cache = StoreCache(graph_builder)
         print("Pathfinder: initializing heuristics...", flush=True)
-        self.heuristics = Heuristics(db, graph_builder, self.gpu_available)
+        self.heuristics = Heuristics(db, self.store_cache, self.gpu_available)
+        graph_builder.on_graph_rebuild = self.heuristics.clear_graph_cache
         print("Pathfinder: heuristics initialized", flush=True)
-        
+
         if self.gpu_available:
-            print("GPU acceleration ENABLED - cuGraph and CuPy ready!", flush=True)
+            print("GPU available for optional matrix precompute", flush=True)
         else:
-            print("Running in CPU mode - GPU acceleration not available", flush=True)
-    
+            print("Running CPU grid pathfinding", flush=True)
+
     def _check_gpu_availability(self):
-        """Check if GPU and cuGraph are available"""
-        print("Checking GPU availability...")
+        print("Checking GPU availability...", flush=True)
         if not (CUPY_AVAILABLE and CUGRAPH_AVAILABLE):
-            print(f"GPU libraries missing - CuPy: {CUPY_AVAILABLE}, cuGraph: {CUGRAPH_AVAILABLE}")
-            print("Falling back to CPU-based pathfinding (slower but functional)")
+            print("GPU libraries missing — CPU grid BFS only", flush=True)
             return False
-        
         try:
-            # Test GPU availability when imports succeed
             device = cp.cuda.Device(0)
-            compute_cap = device.compute_capability
-            print(f"GPU Device 0 found - Compute capability: {compute_cap}")
-
-            # Basic operation to ensure CUDA context is ready
-            # No host copy is required here to avoid potential device/transfer issues
+            print(f"GPU Device 0 — compute capability {device.compute_capability}", flush=True)
             _ = cp.asarray([1, 2, 3], dtype=cp.int32)
-
-            print("GPU checks passed - cuPy and device initialized")
             return True
         except Exception as e:
-            print(f"GPU test failed: {e}")
-            print("Falling back to CPU-based pathfinding")
+            print(f"GPU test failed: {e}", flush=True)
             return False
 
     def find_path(self, store_number, upcs):
-        store = self.db.stores.find_one({'store_number': store_number})
-        print(store)
-        # Use the first starting point, or handle empty list
-        if store.get('starting_points'):
-            start = tuple(store['starting_points'][0]['point'])
-            end = tuple(store['starting_points'][0]['point'])  # assuming round trip
+        store = self.db.stores.find_one({"store_number": store_number})
+        if not store:
+            raise ValueError(f"Store {store_number} not found")
+        if store.get("starting_points"):
+            start = tuple(store["starting_points"][0]["point"])
+            end = tuple(store["starting_points"][0]["point"])
         else:
             raise ValueError("No starting_points defined for store")
         return self.find_path_with_endpoints(store_number, upcs, start, end)
-    
+
     def find_path_with_endpoints(self, store_number, upcs, start, end):
-        """Use the modular Heuristics class to find the picking path"""
-        print(f"Finding path for {len(upcs)} UPCs in store {store_number}")
-        
-        if not self.gpu_available:
-            print("Running in CPU fallback pathfinding mode (GPU acceleration not available)", flush=True)
+        print(f"Finding path for {len(upcs)} UPCs in store {store_number}", flush=True)
+        return self.heuristics.find_pick_path_bfs(store_number, upcs, start, end)
 
-        # Use the heuristics module to find the pick path via BFS
-        pick_list = self.heuristics.find_pick_path_bfs(store_number, upcs, start)
-        return pick_list
-
-
-
+    def cache_stats(self):
+        return self.store_cache.cache_stats()
