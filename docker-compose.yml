@@ -1,4 +1,5 @@
-
+# gtsp-only debug: docker compose up mongo gtsp-server
+# (avoid --build during iteration; override mounts ./gtsp-server for reload)
 services:
   mongo:
     image: mongo:7
@@ -27,8 +28,21 @@ services:
     ports:
       - "5000:5000"   # Flask/FastAPI default port
     restart: always
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONUNBUFFERED=1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    depends_on:
+      - mongo
 
   seed:
+    profiles: [seed]
     build: ./store-editor
     container_name: store-seed
     depends_on:

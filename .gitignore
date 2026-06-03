@@ -10,3 +10,4 @@ server/maps/*.json
 package-lock.json
 *.log
 gtsp-server/venv
+/gtsp-server/__pycache__

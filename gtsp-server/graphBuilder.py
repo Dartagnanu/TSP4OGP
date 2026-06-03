@@ -21,6 +21,7 @@ class GraphBuilder:
         height = store['map_size']['height']
         G = nx.grid_2d_graph(width, height)
         obstacles = set()
+        shelf_access_points = set()
 
         for shelf in shelves:
             template = store['shelf_templates'][shelf['template']]
@@ -29,18 +30,23 @@ class GraphBuilder:
             placement_x = shelf['placement_x']
             placement_y = shelf['placement_y']
 
-            rotated_shape = [self.rotate(x, y, rotation) for x, y in shape]
-            translated_shape = [(int(round(placement_x + x)), int(round(placement_y + y))) for x, y in rotated_shape]
+            # Keep placement point itself as an access node
+            shelf_access_points.add((placement_x, placement_y))
 
-            min_x = min(x for x, y in translated_shape)
-            max_x = max(x for x, y in translated_shape)
-            min_y = min(y for x, y in translated_shape)
-            max_y = max(y for x, y in translated_shape)
-            for x in range(min_x, max_x + 1):
-                for y in range(min_y, max_y + 1):
+            rotated_shape = [self.rotate(x, y, rotation) for x, y in shape]
+            translated_shape = [
+                (int(round(placement_x + x)), int(round(placement_y + y)))
+                for x, y in rotated_shape
+            ]
+
+            # Mark all shelf cells as obstacles
+            for x, y in translated_shape:
+                if 0 <= x < width and 0 <= y < height:
                     obstacles.add((x, y))
 
-        G.remove_nodes_from(obstacles)
+        # Remove obstacle nodes but keep shelf access points (so pick path can reach shelves)
+        nodes_to_remove = obstacles - shelf_access_points
+        G.remove_nodes_from(nodes_to_remove)
         return G
 
     def prompt_for_graph(self, store_number):

@@ -1,4 +1,7 @@
+# App Python deps are installed in the GPU Dockerfile via pip into the RAPIDS conda env.
+# cuGraph, cuDF, and CuPy come from the rapidsai/rapidsai-core base image.
 flask
 networkx
 flask_cors
 pymongo
+numpy

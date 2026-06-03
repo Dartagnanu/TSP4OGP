@@ -1,0 +1,9 @@
+# Dev overrides (auto-loaded by docker compose). Speeds gtsp-server iteration:
+# bind-mount source + Flask reload — no rebuild after Python edits.
+services:
+  gtsp-server:
+    volumes:
+      - ./gtsp-server:/app
+    environment:
+      - FLASK_DEBUG=1
+    command: ["/opt/conda/envs/rapids/bin/python", "-u", "app.py"]

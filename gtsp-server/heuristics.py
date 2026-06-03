@@ -1,6 +1,14 @@
 import networkx as nx
 from collections import deque
 from networkx.readwrite import json_graph
+import numpy as np
+try:
+    import cudf  # type: ignore
+    import cugraph  # type: ignore
+    import cupy as cp  # type: ignore
+    GPU_AVAILABLE = True
+except ImportError:
+    GPU_AVAILABLE = False
 
 
 class Heuristics:
@@ -9,16 +17,109 @@ class Heuristics:
     Provides modular strategies for finding optimal pick sequences.
     """
     
-    def __init__(self, db, graph_builder):
+    def __init__(self, db, graph_builder, gpu_available=None):
         self.db = db
         self.graph_builder = graph_builder
+        if gpu_available is None:
+            gpu_available = GPU_AVAILABLE
+        self.gpu_available = bool(gpu_available) and GPU_AVAILABLE
+        
+        if not self.gpu_available:
+            print("WARNING: GPU acceleration not available - using slower CPU-based heuristics")
+        
+        # Cache for converted graphs
+        self._cugraph_cache = {}
+    
+    def _get_cugraph(self, store_number, nx_graph):
+        """Get or create cuGraph version of NetworkX graph (or NetworkX if GPU unavailable)"""
+        if store_number not in self._cugraph_cache:
+            if self.gpu_available:
+                print(f"Converting NetworkX graph to cuGraph for store {store_number}...")
+                cugraph_graph, _ = self._networkx_to_cugraph(nx_graph)
+                print(f"Graph conversion complete - {len(nx_graph.nodes)} nodes, {len(nx_graph.edges)} edges")
+                self._cugraph_cache[store_number] = cugraph_graph
+            else:
+                print(f"Caching NetworkX graph for store {store_number} (CPU mode)...")
+                self._cugraph_cache[store_number] = nx_graph
+                print(f"Graph cached - {len(nx_graph.nodes)} nodes, {len(nx_graph.edges)} edges")
+        
+        return self._cugraph_cache[store_number]
+    
+    def _networkx_to_cugraph(self, nx_graph):
+        """Convert NetworkX graph to cuGraph format"""
+        # Get edge list from NetworkX graph
+        edges = list(nx_graph.edges(data=True))
+        
+        # Create edge list with weights (default to 1 if no weight)
+        edge_data = []
+        for u, v, data in edges:
+            weight = data.get('weight', 1.0)
+            # Convert tuple coordinates to node IDs
+            u_id = self._coord_to_node_id(u)
+            v_id = self._coord_to_node_id(v)
+            edge_data.append([u_id, v_id, weight])
+        
+        # Create cuDF DataFrame
+        if edge_data:
+            df = cudf.DataFrame(edge_data, columns=['src', 'dst', 'weight'])
+        else:
+            df = cudf.DataFrame(columns=['src', 'dst', 'weight'])
+        
+        # Create cuGraph
+        G = cugraph.Graph()
+        if len(df) > 0:
+            G.from_cudf_edgelist(df, source='src', destination='dst', edge_attr='weight')
+        
+        return G, df
+    
+    def _coord_to_node_id(self, coord):
+        """Convert (x, y) coordinate to unique node ID"""
+        return coord[0] * 10000 + coord[1]
+    
+    def _gpu_distance(self, graph, start_coord, end_coord):
+        """Compute shortest path distance (GPU-accelerated if available, CPU fallback if not)"""
+        if self.gpu_available:
+            return self._gpu_distance_cuda(graph, start_coord, end_coord)
+        else:
+            return self._cpu_distance(graph, start_coord, end_coord)
+    
+    def _gpu_distance_cuda(self, cugraph_graph, start_coord, end_coord):
+        """Compute shortest path distance using GPU"""
+        try:
+            start_id = self._coord_to_node_id(start_coord)
+            end_id = self._coord_to_node_id(end_coord)
+            
+            # Use cuGraph's SSSP algorithm
+            distances = cugraph.sssp(cugraph_graph, start_id)
+            
+            # Get distance to target
+            target_row = distances[distances['vertex'] == end_id]
+            if len(target_row) == 0:
+                return float('inf')
+            
+            return target_row['distance'].iloc[0]
+        except Exception as e:
+            print(f"GPU distance calculation failed: {e}")
+            return float('inf')
+    
+    def _cpu_distance(self, nx_graph, start_coord, end_coord):
+        """Compute shortest path distance using NetworkX (CPU)"""
+        try:
+            # Try to find shortest path using Dijkstra's algorithm
+            path_length = nx.shortest_path_length(nx_graph, start_coord, end_coord, weight='weight')
+            return path_length
+        except (nx.NetworkXNoPath, nx.NodeNotFound):
+            return float('inf')
+        except Exception as e:
+            print(f"CPU distance calculation failed: {e}")
+            return float('inf')
     
     def find_pick_path_bfs(self, store_number, upcs, start_point):
         """
-        Find picking path using BFS (Breadth-First Search) heuristic.
+        Find picking path using GPU-accelerated BFS heuristic.
         
         Starts from start_point and greedily visits nearest unvisited item locations
-        in order of distance via BFS.
+        using GPU-accelerated shortest path calculations.
         
         Args:
             store_number (int): Store identifier
@@ -44,11 +145,14 @@ class Heuristics:
         if isinstance(nx_graph, dict):
             nx_graph = json_graph.node_link_graph(nx_graph)
         
+        # Get GPU-accelerated graph
+        cugraph_graph = self._get_cugraph(store_number, nx_graph)
+        
         # 2. Map UPCs to item data and shelf locations
         upc_to_data = self._fetch_upc_locations(upcs)
         
-        # 3. BFS from start point to find nearest items in order
-        pick_list = self._bfs_pick_sequence(nx_graph, start_point, upc_to_data, upcs)
+        # 3. GPU-accelerated BFS from start point to find nearest items in order
+        pick_list = self._gpu_pick_sequence(cugraph_graph, start_point, upc_to_data, upcs)
         
         return pick_list
     
@@ -91,21 +195,11 @@ class Heuristics:
         
         return upc_to_data
     
-    def _bfs_distance(self, graph, start, end):
+    def _gpu_pick_sequence(self, cugraph_graph, start_point, upc_to_data, upcs):
         """
-        Compute shortest path distance using BFS.
-        Returns: distance (int), or float('inf') if no path exists.
-        """
-        try:
-            return nx.shortest_path_length(graph, start, end)
-        except (nx.NetworkXNoPath, nx.NodeNotFound):
-            return float('inf')
-    
-    def _bfs_pick_sequence(self, graph, start_point, upc_to_data, upcs):
-        """
-        Greedy nearest-neighbor picking using BFS distances.
+        Greedy nearest-neighbor picking using GPU-accelerated distance calculations.
         
-        From current location, always pick the closest unvisited item.
+        From current location, always pick the closest unvisited item using GPU SSSP.
         """
         pick_list = []
         visited_upcs = set()
@@ -118,7 +212,7 @@ class Heuristics:
             closest_shelf = None
             closest_location = None
             
-            # Search for nearest unvisited item
+            # Search for nearest unvisited item using GPU acceleration
             for upc in upcs:
                 if upc in visited_upcs:
                     continue
@@ -131,10 +225,10 @@ class Heuristics:
                         unreachable_items.append(upc)
                     continue
 
-                # Find closest shelf location for this item
+                # Find closest shelf location for this item using GPU distance
                 for loc_data in locations:
                     shelf_location = loc_data['location']
-                    distance = self._bfs_distance(graph, current_location, shelf_location)
+                    distance = self._gpu_distance(cugraph_graph, current_location, shelf_location)
 
                     if distance < closest_distance:
                         closest_distance = distance
@@ -188,6 +282,4 @@ class Heuristics:
             })
             visited_upcs.add(upc)
 
-        return pick_list
-        
         return pick_list

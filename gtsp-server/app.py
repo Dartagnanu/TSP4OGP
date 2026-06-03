@@ -18,14 +18,32 @@ db = client[db_name]
 
 #init GraphBuilder
 builder = GraphBuilder(db)
+pathfinder = None
 
-# Initialize Pathfinder
-pathfinder = Pathfinder(db, builder)
+def get_pathfinder():
+    global pathfinder
+    if pathfinder is None:
+        try:
+            print('Initializing Pathfinder lazily...', flush=True)
+            pathfinder = Pathfinder(db, builder)
+            print(f'Pathfinder initialized (gpu_available={pathfinder.gpu_available})', flush=True)
+        except Exception as e:
+            print(f'Pathfinder initialization failed: {e}', flush=True)
+            pathfinder = None
+    return pathfinder
 
 # Test if server is running
 @app.route('/ping', methods=['GET'])
 def ping():
-    return jsonify({'message': 'pong'})
+    pf = get_pathfinder()
+    status = 'ready' if pf is not None else 'initializing'
+    response = {
+        'message': 'pong',
+        'pathfinder': status,
+        'app': 'gtsp-server'
+    }
+    print('Ping:', response, flush=True)
+    return jsonify(response)
 
 # Build graph from store layout and shelves
 @app.route('/graph/<int:store_number>', methods=['GET'])
@@ -44,26 +62,23 @@ def find_path():
     for field in required_fields:
         if field not in data:
             return jsonify({'error': f'Missing "{field}" in request'}), 400
+
+    pf = get_pathfinder()
+    if pf is None:
+        return jsonify({'error': 'Pathfinder unavailable, check server logs'}), 500
+
     store = data['store']
     upcs = data['upcs']
     # check for optional start and end points
-<<<<<<< Updated upstream
-    if 'start' in data and 'end' in data:
-        start = tuple(data['start'])
-        end = tuple(data['end'])
-        return jsonify(pathfinder.find_path_with_endpoints(store, upcs, start, end))
-
-    return jsonify(pathfinder.find_path(store, upcs))
-=======
     try:
         if 'start' in data and 'end' in data:
             start = tuple(data['start'])
             end = tuple(data['end'])
             print(f"Using custom start/end points: {start} -> {end}", flush=True)
-            result = pathfinder.find_path_with_endpoints(store, upcs, start, end)
+            result = pf.find_path_with_endpoints(store, upcs, start, end)
         else:
             print("Using default start/end points from store", flush=True)
-            result = pathfinder.find_path(store, upcs)
+            result = pf.find_path(store, upcs)
 
         print(f"Pathfinding result: {len(result) if result else 0} items", flush=True)
         return jsonify(result)
@@ -75,7 +90,6 @@ def find_path():
             'message': str(e),
             'details': 'Check GPU availability and DB item/shelf data'
         }), 500
->>>>>>> Stashed changes
 
 
 
@@ -98,4 +112,5 @@ def get_shelves():
     return jsonify(shelves)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    debug = os.environ.get('FLASK_DEBUG', '').lower() in ('1', 'true', 'yes')
+    app.run(host='0.0.0.0', port=5000, debug=debug, use_reloader=debug)
