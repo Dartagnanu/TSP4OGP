@@ -17,6 +17,8 @@ GPU_MATRIX_PRECOMPUTE = os.environ.get("PATHFINDER_GPU_MATRIX_PRECOMPUTE", "1").
     "true",
     "yes",
 )
+GPU_PROBE = os.environ.get("PATHFINDER_GPU_PROBE", "1").lower() in ("1", "true", "yes")
+GPU_PROBE_TIMEOUT_SEC = float(os.environ.get("PATHFINDER_GPU_PROBE_TIMEOUT_SEC", "5"))
 
 
 def tier_for_walkable_count(walkable_count: int) -> str:

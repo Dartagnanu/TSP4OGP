@@ -1,30 +1,26 @@
 import { Sidebar } from './js/controllers/sidebar/sidebar.js';
 import { mapController } from './js/controllers/mapController.js';
-import { ContextMenu } from './js/controllers/contextMenu/contextMenu.js';
+import { KonvaPalette } from './js/konva/konvaPalette.js';
 import { GTSP_SERVER_URL } from './config.js';
 
 
 // Initialize socket.io
 const socket = io();
 
-// Stage setup
-const stageWidth = 1000;
-const stageHeight = 600;
-
 const STORE_NUMBER = Number(3260); // Replace with dynamic value later
 
 // Initialize the app
 async function initApp() {
-  // Initialize the mapController and stage map
-  const mapCtrl = new mapController(STORE_NUMBER, stageWidth, stageHeight, socket);
+  // Stage pixel size is computed from store map_size + #container after fetch
+  const mapCtrl = new mapController(STORE_NUMBER, null, null, socket);
   await mapCtrl.init();
 
-  // Make mapController available globally for sidebar
   window.mapController = mapCtrl;
 
-  // Initialize sidebar after mapController is ready (to get templates)
-  const templates = mapCtrl.map?.store?.shelf_templates ?? {};
-  const sidebar = new Sidebar(mapCtrl.stage, templates, STORE_NUMBER);
+  new Sidebar();
+  const palette = new KonvaPalette(mapCtrl);
+  palette.init();
+  mapCtrl.palette = palette;
 
   // test walks button
   document.getElementById('testWalksBtn').addEventListener('click', () => {

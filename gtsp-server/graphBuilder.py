@@ -24,6 +24,10 @@ class GraphBuilder:
             x * math.sin(rad) + y * math.cos(rad),
         )
 
+    def shelves_hash_for_store(self, store_number: int) -> str:
+        shelves = list(self.db.shelves.find({"store_number": store_number}))
+        return self.compute_shelves_hash(shelves)
+
     @staticmethod
     def compute_shelves_hash(shelves: list) -> str:
         parts = []

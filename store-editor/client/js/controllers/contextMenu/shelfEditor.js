@@ -1,5 +1,17 @@
 import { drawShelf } from '../../konva/drawUtils.js';
 
+function formatModularRef(ref) {
+    if (ref == null || ref === '') return '';
+    if (typeof ref === 'string') return ref.trim();
+    if (typeof ref === 'object') {
+        if (ref.modular_id != null) return String(ref.modular_id);
+        if (ref.$oid) return String(ref.$oid);
+        if (ref._id != null) return String(ref._id);
+    }
+    const s = String(ref);
+    return s === '[object Object]' ? '' : s;
+}
+
 export class ShelfEditor {
     constructor(mapController) {
         this.mapController = mapController;
@@ -62,7 +74,10 @@ export class ShelfEditor {
         this.elements.shelfId.value = shelfData.shelf_name || '';
         this.elements.template.value = shelfData.template || '';
         this.elements.rotation.value = shelfData.rotation || 0;
-        this.elements.modulars.value = (shelfData.modulars || []).join(', ');
+        const modularDisplay = (shelfData.modulars || [])
+            .map(formatModularRef)
+            .filter(Boolean);
+        this.elements.modulars.value = modularDisplay.join(', ');
         this.elements.department.value = shelfData.department || '';
         
         // Show popup
@@ -96,6 +111,13 @@ export class ShelfEditor {
         try {
             // Use mapController's updateShelf method with the OLD shelf name to find it
             const updatedShelfFromServer = await this.mapController.updateShelf(oldShelfId, updatedShelf);
+
+            const sync = updatedShelfFromServer?.itemIndexesSynced;
+            if (sync?.modularsMissing?.length) {
+                alert(
+                    `Shelf saved but these modular refs could not be resolved (pathfinder may use old locations): ${sync.modularsMissing.join(', ')}`
+                );
+            }
 
             this.closePopup();
 

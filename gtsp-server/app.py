@@ -1,3 +1,5 @@
+import time
+
 from flask import Flask, request, jsonify
 import networkx as nx
 from pathFinder import Pathfinder
@@ -25,8 +27,14 @@ def get_pathfinder():
     if pathfinder is None:
         try:
             print('Initializing Pathfinder lazily...', flush=True)
+            t0 = time.perf_counter()
             pathfinder = Pathfinder(db, builder)
-            print(f'Pathfinder initialized (gpu_available={pathfinder.gpu_available})', flush=True)
+            elapsed = time.perf_counter() - t0
+            print(
+                f'Pathfinder initialized in {elapsed:.2f}s '
+                f'(gpu_available={pathfinder.gpu_available})',
+                flush=True,
+            )
         except Exception as e:
             print(f'Pathfinder initialization failed: {e}', flush=True)
             pathfinder = None

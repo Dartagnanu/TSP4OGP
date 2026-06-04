@@ -1,6 +1,7 @@
 """LRU per-pod cache of store walkability grids and optional distance matrices."""
 from __future__ import annotations
 
+import time
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
@@ -9,7 +10,6 @@ import numpy as np
 
 from pathfinder_config import MAX_CACHE_MB, MAX_CACHED_STORES, tier_for_walkable_count
 from walkability import Coord, WalkabilityGrid
-
 if TYPE_CHECKING:
     from graphBuilder import GraphBuilder
 
@@ -45,14 +45,30 @@ class StoreCache:
         self._entries.pop(store_number, None)
 
     def get_context(self, store_number: int) -> StoreContext:
+        current_hash = self.graph_builder.shelves_hash_for_store(store_number)
+
         if store_number in self._entries:
-            self._entries.move_to_end(store_number)
-            self._stats["hits"] += 1
-            return self._entries[store_number]
+            ctx = self._entries[store_number]
+            if ctx.shelves_hash == current_hash:
+                self._entries.move_to_end(store_number)
+                self._stats["hits"] += 1
+                return ctx
+            print(
+                f"StoreCache: shelves changed for store {store_number}, invalidating",
+                flush=True,
+            )
+            self.invalidate(store_number)
 
         self._stats["misses"] += 1
+        t0 = time.perf_counter()
         grid, shelf_nodes, shelves_hash = self.graph_builder.load_or_build_walkability(
             store_number
+        )
+        elapsed = time.perf_counter() - t0
+        print(
+            f"StoreCache: loaded walkability for store {store_number} in {elapsed:.2f}s "
+            f"({len(shelf_nodes)} shelf nodes)",
+            flush=True,
         )
         shelf_coords = [
             (int(n["x"]), int(n["y"])) for n in shelf_nodes

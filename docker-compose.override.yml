@@ -1,6 +1,9 @@
 # Dev overrides (auto-loaded by docker compose). Speeds gtsp-server iteration:
 # bind-mount source + Flask reload — no rebuild after Python edits.
 services:
+  app:
+    volumes:
+      - ./store-editor:/usr/src/app/store-editor
   gtsp-server:
     volumes:
       - ./gtsp-server:/app

@@ -10,7 +10,6 @@ from pathfinder_config import GPU_MATRIX_PRECOMPUTE, should_build_matrix as cfg_
 from pathfinder_config import should_run_two_opt
 from store_cache import StoreCache, StoreContext
 from walkability import Coord, WalkabilityGrid
-
 try:
     import cugraph  # type: ignore
     GPU_LIBS = True
@@ -18,6 +17,30 @@ except ImportError:
     GPU_LIBS = False
 
 INF = float("inf")
+
+
+def _dedupe_locations_by_placement(locations: List[dict]) -> List[dict]:
+    """One candidate per shelf access cell; stable tie-break by shelf_name."""
+    by_cell: Dict[tuple, dict] = {}
+    for loc in locations:
+        key = tuple(loc.get("location") or ())
+        name = str(loc.get("shelf_name") or "")
+        prev = by_cell.get(key)
+        if prev is None or name < str(prev.get("shelf_name") or ""):
+            by_cell[key] = loc
+    return list(by_cell.values())
+
+
+def _resolve_shelf_doc(shelf_by_id: dict, ref) -> Optional[dict]:
+    if ref is None:
+        return None
+    if ref in shelf_by_id:
+        return shelf_by_id[ref]
+    ref_str = str(ref)
+    for key, doc in shelf_by_id.items():
+        if str(key) == ref_str:
+            return doc
+    return None
 
 
 class Heuristics:
@@ -157,24 +180,36 @@ class Heuristics:
             item_name = doc.get("name", "Unknown")
             locations = []
             for loc in doc.get("locations", []):
-                shelf_data = shelf_by_id.get(loc["shelf_name"])
-                if shelf_data:
-                    locations.append(
-                        {
-                            "shelf": shelf_data,
-                            "shelf_name": shelf_data.get(
-                                "shelf_name", str(shelf_data["_id"])
-                            ),
-                            "location": (
-                                shelf_data["placement_x"],
-                                shelf_data["placement_y"],
-                            ),
-                            "modular_location": loc.get("location"),
-                        }
-                    )
+                shelf_data = _resolve_shelf_doc(shelf_by_id, loc.get("shelf_name"))
+                if not shelf_data:
+                    continue
+                locations.append(
+                    {
+                        "shelf": shelf_data,
+                        "shelf_name": shelf_data.get(
+                            "shelf_name", str(shelf_data["_id"])
+                        ),
+                        "location": (
+                            shelf_data["placement_x"],
+                            shelf_data["placement_y"],
+                        ),
+                        "modular_location": loc.get("location"),
+                    }
+                )
+            deduped = _dedupe_locations_by_placement(locations)
             for upc in matched_upcs:
-                upc_to_data[upc] = {"item_name": item_name, "locations": locations}
+                upc_to_data[upc] = {"item_name": item_name, "locations": deduped}
 
+        per_upc = {}
+        for upc in upcs:
+            locs = upc_to_data.get(upc, {}).get("locations", [])
+            per_upc[upc] = [
+                {
+                    "shelf_name": loc.get("shelf_name"),
+                    "placement": list(loc.get("location") or []),
+                }
+                for loc in locs
+            ]
         return upc_to_data
 
     def _greedy_pick_sequence(
@@ -195,7 +230,6 @@ class Heuristics:
             closest_distance = INF
             closest_shelf = None
             closest_location = None
-
             current_in_matrix = (
                 ctx.distance_matrix is not None
                 and current_location in ctx.coord_to_shelf_index
@@ -230,13 +264,46 @@ class Heuristics:
                         d = int(dist_field[ey, ex])  # type: ignore
                         distance = float(d) if d >= 0 else INF
 
-                    if distance < closest_distance:
+                    shelf_name = str(loc_data.get("shelf_name") or "")
+                    closest_name = str(
+                        (closest_shelf or {}).get("shelf_name") or ""
+                    )
+                    if distance < closest_distance or (
+                        distance == closest_distance
+                        and closest_shelf is not None
+                        and shelf_name < closest_name
+                    ):
                         closest_distance = distance
                         closest_upc = upc
                         closest_shelf = loc_data
                         closest_location = shelf_location
 
             if closest_upc:
+                candidates = []
+                for upc in upcs:
+                    if upc in visited_upcs:
+                        continue
+                    for loc_data in upc_to_data[upc].get("locations", []):
+                        shelf_location = loc_data["location"]
+                        if current_in_matrix:
+                            distance = matrix_distance(
+                                ctx.distance_matrix,
+                                ctx.coord_to_shelf_index,
+                                current_location,
+                                shelf_location,
+                            )
+                            if current_location == shelf_location:
+                                distance = 0.0
+                        else:
+                            ex, ey = int(shelf_location[0]), int(shelf_location[1])
+                            d = int(dist_field[ey, ex])  # type: ignore
+                            distance = float(d) if d >= 0 else INF
+                        candidates.append({
+                            "upc": upc,
+                            "shelf_name": loc_data.get("shelf_name"),
+                            "location": list(shelf_location),
+                            "distance": float(distance),
+                        })
                 shelf_data = closest_shelf.get("shelf", {})
                 pick_list.append(
                     {

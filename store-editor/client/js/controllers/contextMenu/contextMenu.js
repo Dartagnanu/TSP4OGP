@@ -1,4 +1,8 @@
 import { ShelfEditor } from './shelfEditor.js';
+import {
+  placementFromStage,
+  clampPlacementOrigin,
+} from '../../konva/mapUnits.js';
 
 export class ContextMenu {
   constructor(mapController) {
@@ -78,21 +82,35 @@ export class ContextMenu {
           console.log("delete shelf button clicked");
           window.deleteShelfFromMap(shelfData.shelf_name);
         };
-        this.cloneShelfBtn.onclick = () => {
-          console.log("clone shelf button clicked");
+        this.cloneShelfBtn.onclick = async () => {
+          console.log('clone shelf button clicked');
 
           const clonedShelfData = {
-            ...shelfData,
-            _id: undefined, // Remove the original _id
-            shelf_name: `${shelfData.shelf_name}_copy_${Date.now()}`, // Generate a unique shelf_name
-            placement_x: shelfData.placement_x + 1, // Offset the cloned shelf slightly
-            placement_y: shelfData.placement_y + 1,
+            store_number: shelfData.store_number ?? this.mapController.store_number,
+            shelf_name: `${shelfData.shelf_name}_copy_${Date.now()}`,
+            template: shelfData.template,
+            placement_x: shelfData.placement_x + 10,
+            placement_y: shelfData.placement_y + 10,
+            rotation: shelfData.rotation ?? 0,
+            modulars: shelfData.modulars ?? [],
+            flex_items: shelfData.flex_items ?? [],
+            department: shelfData.department ?? '',
           };
 
-          console.log('Cloned shelf data:', clonedShelfData);
-
-          const template = this.mapController.map.store.shelf_templates[clonedShelfData.template] || Object.values(this.mapController.store.shelf_templates)[0];
-          window.createAndAddShelf(clonedShelfData, template);
+          try {
+            const created = await this.mapController.cloneAndAddShelf(
+              shelfData.shelf_name,
+              clonedShelfData
+            );
+            console.log(
+              'Clone complete:',
+              created.shelf_name,
+              '— pathfinder picks the nearest shelf with shared modulars (see itemIndexesSynced in Network tab).'
+            );
+          } catch (err) {
+            console.error('Failed to clone shelf:', err);
+            alert(err.message || 'Failed to clone shelf');
+          }
 
           this.contextMenu.style.display = 'none';
         };
@@ -104,8 +122,10 @@ export class ContextMenu {
     this.mapController.stage.on('contentContextmenu', (e) => {
       if (this.isDraggingMap) return; // Prevent context menu if dragging the map
 
-      const pointer = this.mapController.stage.getPointerPosition();
-      const shape = this.mapController.stage.getIntersection(pointer);
+      const pointer = this.mapController.stage.getRelativePointerPosition();
+      const shape = pointer
+        ? this.mapController.stage.getIntersection(pointer)
+        : null;
       if (!shape) {
         e.evt.preventDefault();
         this.contextMenu.style.display = 'block';
@@ -119,20 +139,36 @@ export class ContextMenu {
         this.currentShelfNode = null;
 
         this.addShelfBtn.onclick = () => {
-          // Pick a default template
-          const templateKey = Object.keys(this.mapController.templates)[0];
-          const template = this.mapController.templates[templateKey];
+          const templates = this.mapController.map.store.shelf_templates;
+          const templateKey = Object.keys(templates)[0];
+          const clickPointer = this.mapController.stage.getRelativePointerPosition();
+          if (!clickPointer) {
+            console.error('Could not resolve click position on stage');
+            return;
+          }
+          const { scale_X, scale_Y } = this.mapController;
+          let { placement_x, placement_y } = placementFromStage(
+            clickPointer,
+            scale_X,
+            scale_Y
+          );
+          ({ placement_x, placement_y } = clampPlacementOrigin(
+            placement_x,
+            placement_y,
+            this.mapController.map?.store?.map_size
+          ));
           const shelfData = {
-            id: `shelf_${Date.now()}`,
+            shelf_name: `shelf_${Date.now()}`,
             template: templateKey,
-            placement_x: Math.round(pointer.x / 20), // Adjust grid size as needed
-            placement_y: Math.round(pointer.y / 20),
+            placement_x,
+            placement_y,
             rotation: 0,
             modulars: [],
             flex_items: [],
             department: '',
+            store_number: this.mapController.store_number,
           };
-          window.createAndAddShelf(shelfData, template);
+          window.createAndAddShelf(shelfData);
           this.contextMenu.style.display = 'none';
         };
       }

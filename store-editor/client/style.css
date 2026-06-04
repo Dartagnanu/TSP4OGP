@@ -145,6 +145,9 @@ textarea {
 /* ── Canvas container ──────────────────────────────────────────── */
 #container {
   margin-top: var(--topbar-height);
+  width: 100%;
+  height: calc(100vh - var(--topbar-height));
+  overflow: hidden;
   position: relative;
   z-index: 1;
 }
@@ -182,34 +185,18 @@ textarea {
   color: var(--color-text-muted);
 }
 
-#shelfTemplates {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.template-card {
-  padding: var(--space-1) var(--space-2);
+#palette-container {
+  width: 100%;
+  min-height: 400px;
+  flex: 1;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: grab;
-  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
-  user-select: none;
-}
-
-.template-card:hover {
   background: var(--color-surface-muted);
-  border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
-.template-card:active {
-  cursor: grabbing;
-  background: var(--color-border);
+#palette-container canvas {
+  display: block;
 }
 
 /* ── Context menu ──────────────────────────────────────────────── */
@@ -318,6 +305,126 @@ textarea {
   justify-content: flex-end;
   gap: var(--space-1);
   margin-top: var(--space-3);
+}
+
+#pathResultsPopup.path-results-panel {
+  display: none;
+  position: fixed;
+  z-index: 3500;
+  flex-direction: column;
+  width: min(380px, calc(100vw - var(--space-4)));
+  max-height: calc(100vh - var(--topbar-height) - 2 * var(--space-2));
+  padding: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+#pathResultsPopup.path-results-panel--docked {
+  top: calc(var(--topbar-height) + var(--space-2));
+  right: var(--space-2);
+  left: auto;
+  transform: none;
+}
+
+.path-results-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-2) var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.path-results-header:active {
+  cursor: grabbing;
+}
+
+.path-results-grip {
+  flex-shrink: 0;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--color-text-muted);
+  letter-spacing: -2px;
+}
+
+.path-results-header h3 {
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
+  min-width: 0;
+}
+
+.path-results-close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.path-results-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-3) var(--space-3);
+}
+
+.path-results-upcs {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+  word-break: break-all;
+}
+
+.path-results-steps {
+  margin: 0;
+  padding-left: var(--space-3);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.path-results-steps li {
+  margin-bottom: var(--space-1);
+}
+
+.path-step-start strong {
+  color: var(--color-primary);
+}
+
+.path-step-pick strong {
+  color: #0f766e;
+}
+
+.path-step-end strong {
+  color: #7c3aed;
+}
+
+.path-step-unreachable {
+  color: var(--color-danger);
+}
+
+.path-step-return {
+  color: var(--color-text-muted);
+}
+
+.path-step-error {
+  color: var(--color-danger);
+  list-style: none;
+  margin-left: calc(-1 * var(--space-3));
+}
+
+.path-results-steps .path-step-pick,
+.path-results-steps .path-step-start,
+.path-results-steps .path-step-end {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
 }
 
 /* ── Debug (hidden by default) ───────────────────────────────────── */

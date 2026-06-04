@@ -31,6 +31,9 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - PYTHONUNBUFFERED=1
+      - PATHFINDER_GPU_PROBE=0
+    volumes:
+      - ./gtsp-server:/app
     deploy:
       resources:
         reservations:

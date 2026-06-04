@@ -19,6 +19,94 @@ import StoreGraph from './models/storeGraph.js';
 // Resolve __dirname in ES Modules
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/** Shelves may store modulars as modular_id strings ("202") or Mongo ObjectIds from seed. */
+async function resolveModularRef(ref) {
+  if (ref == null || ref === '') return null;
+  if (typeof ref === 'object') {
+    if (ref.modular_id != null) ref = ref.modular_id;
+    else if (ref._id != null) ref = ref._id;
+  }
+  const asString = String(ref);
+  let modular = await Modular.findOne({ modular_id: asString });
+  if (modular) return modular;
+  if (mongoose.Types.ObjectId.isValid(asString)) {
+    modular = await Modular.findById(asString);
+    if (modular) return modular;
+  }
+  return null;
+}
+
+function modularRefsFromPayload(payload, sourceShelf) {
+  const fromPayload = payload?.modulars;
+  if (Array.isArray(fromPayload) && fromPayload.length > 0) {
+    return fromPayload;
+  }
+  return sourceShelf?.modulars || [];
+}
+
+/** Resolve shelf modular refs to modular_id strings for API clients (seed may store ObjectIds). */
+async function modularIdsForClient(refs) {
+  const out = [];
+  for (const ref of refs || []) {
+    const modular = await resolveModularRef(ref);
+    out.push(modular ? modular.modular_id : String(ref));
+  }
+  return out;
+}
+
+async function shelfToClientJson(shelf) {
+  const obj = shelf.toObject ? shelf.toObject() : { ...shelf };
+  obj.modulars = await modularIdsForClient(shelf.modulars);
+  return obj;
+}
+
+/** Rebuild itemindex locations for one shelf from its modulars (pathfinder reads itemindexes, not shelf.modulars). */
+async function syncItemIndexForShelf(shelf, storeNumber) {
+  const shelfId = shelf._id;
+  const modularRefs = (shelf.modulars || []).filter(Boolean);
+
+  await ItemIndex.updateMany(
+    { store_number: storeNumber },
+    { $pull: { locations: { shelf_name: shelfId } } }
+  );
+
+  let indexesUpdated = 0;
+  const modularsResolved = [];
+  const modularsMissing = [];
+
+  for (const modularRef of modularRefs) {
+    const modular = await resolveModularRef(modularRef);
+    if (!modular) {
+      modularsMissing.push(String(modularRef));
+      continue;
+    }
+    modularsResolved.push(modular.modular_id);
+
+    for (const modItem of modular.items || []) {
+      // Do not remove other shelves' locations here — pathfinder picks the nearest
+      // candidate among all itemindex entries. Clearing modulars on a shelf and syncing
+      // removes that shelf's rows via the $pull at the start of this function.
+
+      const docs = await ItemIndex.find({
+        store_number: storeNumber,
+        item_number: modItem.item_number,
+      });
+      for (const doc of docs) {
+        const exists = doc.locations.some(
+          (loc) => loc.shelf_name.equals(shelfId) && loc.location === modItem.location
+        );
+        if (!exists) {
+          doc.locations.push({ shelf_name: shelfId, location: modItem.location });
+          await doc.save();
+          indexesUpdated += 1;
+        }
+      }
+    }
+  }
+
+  return { indexesUpdated, modularsResolved, modularsMissing };
+}
+
 const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/storemaps';
 
 mongoose.connect(mongoUrl)
@@ -107,8 +195,76 @@ app.post('/shelf', async (req, res) => {
   try {
     const shelf = new Shelf(req.body);
     await shelf.save();
-    res.status(201).send(shelf);
+    const storeNum = Number(shelf.store_number);
+    const syncResult = await syncItemIndexForShelf(shelf, storeNum);
+    res.status(201).send({
+      ...(await shelfToClientJson(shelf)),
+      itemIndexesSynced: syncResult,
+    });
   } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// Clone shelf and duplicate itemindex locations from source shelf
+app.post('/shelf/:source_shelf_name/clone', async (req, res) => {
+  try {
+    const sourceName = req.params.source_shelf_name;
+    const store_number = Number(req.body.store_number);
+    if (!store_number || Number.isNaN(store_number)) {
+      return res.status(400).send({ error: 'store_number is required' });
+    }
+
+    const sourceShelf = await Shelf.findOne({ shelf_name: sourceName, store_number });
+    if (!sourceShelf) {
+      return res.status(404).send({ error: 'Source shelf not found', shelf_name: sourceName });
+    }
+
+    const payload = req.body;
+    const newShelf = new Shelf({
+      store_number,
+      shelf_name: payload.shelf_name,
+      template: payload.template ?? sourceShelf.template,
+      placement_x: payload.placement_x ?? sourceShelf.placement_x + 1,
+      placement_y: payload.placement_y ?? sourceShelf.placement_y + 1,
+      rotation: payload.rotation ?? sourceShelf.rotation,
+      modulars: modularRefsFromPayload(payload, sourceShelf),
+      flex_items: payload.flex_items ?? sourceShelf.flex_items,
+      department: payload.department ?? sourceShelf.department,
+    });
+    await newShelf.save();
+
+    const sourceId = sourceShelf._id;
+    const newId = newShelf._id;
+    const indexes = await ItemIndex.find({
+      store_number,
+      'locations.shelf_name': sourceId,
+    });
+
+    let itemIndexesUpdated = 0;
+    for (const doc of indexes) {
+      const additions = [];
+      for (const loc of doc.locations) {
+        if (loc.shelf_name.equals(sourceId)) {
+          additions.push({ shelf_name: newId, location: loc.location });
+        }
+      }
+      if (additions.length > 0) {
+        doc.locations.push(...additions);
+        await doc.save();
+        itemIndexesUpdated += 1;
+      }
+    }
+
+    const syncResult = await syncItemIndexForShelf(newShelf, store_number);
+
+    res.status(201).send({
+      shelf: await shelfToClientJson(newShelf),
+      itemIndexesUpdated,
+      itemIndexesSynced: syncResult,
+    });
+  } catch (err) {
+    console.error('Error cloning shelf:', err);
     res.status(500).send({ error: err.message });
   }
 });
@@ -141,13 +297,15 @@ app.put('/shelf/:shelf_name/store/:store_number', async (req, res) => {
     }
     console.log(req.body);
     const shelf = await Shelf.findOneAndUpdate(
-      { shelf_name, store_number: store_number }, // Match both shelf_name and store_number
+      { shelf_name, store_number: Number(store_number) },
       req.body,
       { new: true }
     );
 
     if (!shelf) return res.status(404).send({ error: 'Shelf not found', shelf_name, store_number});
-    res.send(shelf);
+    const storeNum = Number(store_number);
+    const syncResult = await syncItemIndexForShelf(shelf, storeNum);
+    res.send({ ...(await shelfToClientJson(shelf)), itemIndexesSynced: syncResult });
   } catch (err) {
     res.status(500).send({ error: err.message });
   }
@@ -173,6 +331,10 @@ app.delete('/shelf/:shelf_name/store/:store_number', async (req, res) => {
                 store_number: req.params.store_number,
             });
         }
+        await ItemIndex.updateMany(
+            { store_number: Number(req.params.store_number) },
+            { $pull: { locations: { shelf_name: shelf._id } } }
+        );
         res.send(shelf);
     } catch (err) {
         console.error('Error deleting shelf:', err.message);
@@ -186,7 +348,11 @@ app.get('/shelves', async (req, res) => {
     const store_number = Number(req.query.store);
     console.log('Query for shelves of store number:', store_number);
     const shelves = await Shelf.find({ store_number: store_number });
-    res.send(shelves);
+    const out = [];
+    for (const shelf of shelves) {
+      out.push(await shelfToClientJson(shelf));
+    }
+    res.send(out);
   } catch (err) {
     res.status(500).send({ error: err.message });
   }

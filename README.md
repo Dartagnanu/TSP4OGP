@@ -103,6 +103,10 @@ The client sends `start` / `end` when a pickwalk defines `starting_point` (and o
 - [`store-editor/client/js/controllers/pathFinder/walkFinder.js`](store-editor/client/js/controllers/pathFinder/walkFinder.js) → `POST` to `GTSP_SERVER_URL/find-path`
 - Configure API URL in [`store-editor/client/config.js`](store-editor/client/config.js) (default `http://localhost:5000`)
 
+**Map editor coordinates:** Shelf templates define arbitrary foot polygons in `shelf_templates.shape` (e.g. 4×2 ft rectangles). The canvas scales from each store’s `map_size`; placement snaps to a **1-foot** grid. Very large maps skip drawing every 1 ft line for performance.
+
+**Shelf edits and routing:** UPC locations come from Mongo `itemindexes` (not shelf `modulars` alone). Saving or cloning a shelf runs itemindex sync from its modulars (supports both `modular_id` strings like `202` and ObjectIds stored on seeded shelves). Sync adds/updates that shelf’s index rows only; the pathfinder picks the **nearest** shelf among all `itemindexes` candidates. Clear modulars on a shelf and save to remove its index entries. Moving a shelf updates Mongo placement; gtsp-server reloads walkability when the per-store shelves hash changes (in-memory cache invalidation).
+
 ### Other gtsp-server endpoints
 
 | Method | Path | Purpose |

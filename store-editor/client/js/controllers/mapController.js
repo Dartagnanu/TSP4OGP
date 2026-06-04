@@ -1,11 +1,22 @@
 import { createStage } from '../konva/konvaSetup.js';
-import { drawStoreBoundary, drawShelf, loadShelves, drawStartingPoints } from '../konva/drawUtils.js';
+import {
+  computeMapScale,
+  computeStagePixelSize,
+  drawStoreEdge,
+  drawShelf,
+  loadShelves,
+  drawStartingPoints,
+  drawFootGrid,
+  clearMapShelfLayer,
+} from '../konva/drawUtils.js';
 import {getStore} from '../dataUtils/storeUtils.js';
 import {deleteShelf, updateShelfByOldName, getShelvesByStore} from '../dataUtils/shelfUtils.js';
 import { ContextMenu} from './contextMenu/contextMenu.js';
-import { createShelf } from '../dataUtils/shelfUtils.js';
+import { createShelf, cloneShelf } from '../dataUtils/shelfUtils.js';
 import { GTSP_SERVER_URL } from '../../config.js';
 import { walkFinder } from './pathFinder/walkFinder.js';
+import { PathOverlay } from './pathFinder/pathOverlay.js';
+import { PathResultsPopup } from './pathFinder/pathResultsPopup.js';
 
 export class mapController {
   constructor(store_number, stage_width, stage_height, socket) {
@@ -13,6 +24,7 @@ export class mapController {
     this.stage_width = stage_width;
     this.stage_height = stage_height;
     this.socket = socket;
+    this.palette = null;
   }
 
   
@@ -24,8 +36,10 @@ export class mapController {
     this.map = map; // Store the map data for later use
    // Expose createAndAddShelf globally for use in the context menu
     window.createAndAddShelf = this.createAndAddShelf.bind(this);
+    window.cloneAndAddShelf = this.cloneAndAddShelf.bind(this);
     window.deleteShelfFromMap = this.deleteShelfFromMap.bind(this);
     window.updateShelf = this.updateShelf.bind(this);
+    this._bindResizeObserver();
     // TODO: finish auto update functionality
     // Listen for updates from other clients
     /*this.socket.on('updateShelf', (data) => {
@@ -55,59 +69,213 @@ export class mapController {
     return { store, shelves };
   }
 
-  // stageMap
-  async stageMap() {
+  _getContainerMaxSize() {
+    const el = document.getElementById('container');
+    const rect = el?.getBoundingClientRect();
+    const topbar =
+      parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue('--topbar-height'),
+        10
+      ) || 48;
+    return {
+      maxWidth: Math.max(200, Math.floor(rect?.width || window.innerWidth)),
+      maxHeight: Math.max(
+        200,
+        Math.floor(rect?.height || window.innerHeight - topbar)
+      ),
+    };
+  }
 
-    const { stage, layer } = createStage('container', this.stage_width, this.stage_height);
-    this.stage = stage;
-    this.layer = layer;
-    const map = await this.fetchMap(this.store_number);
-    this.map = map;
-    console.log('Fetched map');
-    const {scale_X, scale_Y} = drawStoreBoundary(layer, map.store, this.stage_width, this.stage_height);
+  _applyStagePixelSize(store) {
+    const { maxWidth, maxHeight } = this._getContainerMaxSize();
+    const { width, height } = computeStagePixelSize(
+      store.map_size,
+      maxWidth,
+      maxHeight
+    );
+    this.stage_width = width;
+    this.stage_height = height;
+    if (this.stage) {
+      this.stage.width(width);
+      this.stage.height(height);
+    }
+    return { width, height };
+  }
+
+  redrawMapLayout() {
+    if (!this.stage || !this.map?.store) return;
+
+    this._applyStagePixelSize(this.map.store);
+    const { scale_X, scale_Y } = computeMapScale(
+      this.map.store,
+      this.stage_width,
+      this.stage_height
+    );
     this.scale_X = scale_X;
     this.scale_Y = scale_Y;
-    console.log('Scale factors:', this.scale_X, this.scale_Y);
 
-    // Ensure all shelves have store_number property
-    map.shelves.forEach(shelf => {
+    const spacingFt = this.map.store.grid_spacing_ft ?? 100;
+    if (this.gridLayer) {
+      drawFootGrid(this.gridLayer, this.map.store, scale_X, scale_Y, spacingFt);
+    }
+    if (this.boundaryLayer) {
+      drawStoreEdge(this.boundaryLayer, this.map.store, scale_X, scale_Y);
+    }
+    clearMapShelfLayer(this.layer);
+    loadShelves(
+      this.layer,
+      this.stage,
+      this.map.shelves,
+      this.map.store.shelf_templates,
+      scale_X,
+      scale_Y,
+      this.socket
+    );
+    drawStartingPoints(
+      this.layer,
+      this.map.store.starting_points || [],
+      scale_X,
+      scale_Y
+    );
+    if (this.palette) {
+      this.palette.updateScales(scale_X, scale_Y);
+    }
+    this.stage.batchDraw();
+  }
+
+  _bindResizeObserver() {
+    const container = document.getElementById('container');
+    if (!container || typeof ResizeObserver === 'undefined') return;
+
+    let resizeTimer;
+    this._resizeObserver = new ResizeObserver(() => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => this.redrawMapLayout(), 150);
+    });
+    this._resizeObserver.observe(container);
+  }
+
+  // stageMap
+  async stageMap() {
+    const map = await this.fetchMap(this.store_number);
+    this.map = map;
+    this.templates = map.store.shelf_templates;
+
+    const { maxWidth, maxHeight } = this._getContainerMaxSize();
+    const { width, height } = computeStagePixelSize(
+      map.store.map_size,
+      maxWidth,
+      maxHeight
+    );
+    this.stage_width = width;
+    this.stage_height = height;
+
+    const { stage, layer } = createStage('container', width, height);
+    this.stage = stage;
+    this.layer = layer;
+
+    const gridLayer = new Konva.Layer({ name: 'foot-grid' });
+    stage.add(gridLayer);
+    gridLayer.moveToBottom();
+
+    const boundaryLayer = new Konva.Layer({ name: 'store-edge' });
+    stage.add(boundaryLayer);
+    boundaryLayer.moveUp();
+
+    const { scale_X, scale_Y } = computeMapScale(
+      map.store,
+      this.stage_width,
+      this.stage_height
+    );
+    this.scale_X = scale_X;
+    this.scale_Y = scale_Y;
+
+    const spacingFt = map.store.grid_spacing_ft ?? 100;
+    drawFootGrid(gridLayer, map.store, scale_X, scale_Y, spacingFt);
+    this.gridLayer = gridLayer;
+
+    drawStoreEdge(boundaryLayer, map.store, scale_X, scale_Y);
+    this.boundaryLayer = boundaryLayer;
+    layer.moveToTop();
+
+    map.shelves.forEach((shelf) => {
       if (!shelf.store_number) {
-        // throw an error and alert user about broken shelf data
         console.error('Shelf missing store_number:', shelf);
-        alert(`Error: Shelf with ID ${shelf.shelf_name} is missing store_number. Please fix the shelf data.`);
+        alert(
+          `Error: Shelf with ID ${shelf.shelf_name} is missing store_number. Please fix the shelf data.`
+        );
       }
     });
 
-    // load shelves from map
-
-    loadShelves(layer, stage, map.shelves, map.store.shelf_templates, this.scale_X, this.scale_Y, this.socket);
-    drawStartingPoints(layer, map.store.starting_points, this.scale_X, this.scale_Y);
+    loadShelves(
+      layer,
+      stage,
+      map.shelves,
+      map.store.shelf_templates,
+      this.scale_X,
+      this.scale_Y,
+      this.socket
+    );
+    drawStartingPoints(layer, map.store.starting_points || [], scale_X, scale_Y);
     // 
     // Initialize the context menu
     const contextMenu = new ContextMenu(this);
     contextMenu.init();
 
+    this.pathOverlay = new PathOverlay(stage);
+    this.pathResultsPopup = new PathResultsPopup(() => this.pathOverlay.clear());
+    this.walkFinder = new walkFinder(GTSP_SERVER_URL);
+
     return { contextMenu, layer, map, stage};
   }
 
-  createAndAddShelf(shelfData) {
+  async createAndAddShelf(shelfData) {
     console.log('Creating and adding shelf:', shelfData);
+    const saved = await createShelf(shelfData);
+    Object.assign(shelfData, saved);
+    this._drawShelfOnMap(shelfData);
+    return shelfData;
+  }
+
+  async cloneAndAddShelf(sourceShelfName, clonedShelfData) {
+    console.log('Cloning shelf from', sourceShelfName, clonedShelfData);
+    const { shelf, itemIndexesUpdated, itemIndexesSynced } = await cloneShelf(
+      sourceShelfName,
+      clonedShelfData
+    );
+    const shelfData = shelf.toObject ? shelf.toObject() : shelf;
+    this._drawShelfOnMap(shelfData);
+    const synced = itemIndexesSynced?.indexesUpdated ?? itemIndexesSynced;
+    console.log(
+      `Cloned shelf ${shelfData.shelf_name}; itemindexes: duplicated=${itemIndexesUpdated}, synced=${JSON.stringify(itemIndexesSynced)}`
+    );
+    if (itemIndexesSynced?.modularsMissing?.length) {
+      console.warn('Some modulars on shelf could not be resolved:', itemIndexesSynced.modularsMissing);
+      alert(
+        `Clone created but modular refs could not sync to itemindexes: ${itemIndexesSynced.modularsMissing.join(', ')}. Edit shelf modulars using modular_id (e.g. 203) and save again.`
+      );
+    } else if (itemIndexesSynced?.modularsResolved?.length) {
+      console.log(
+        `Itemindex sync OK (${itemIndexesSynced.modularsResolved.join(', ')}). Test Walks routes to the nearest shelf with those modulars—move the clone or clear modulars on the original to change picks.`
+      );
+    }
+    return shelfData;
+  }
+
+  _drawShelfOnMap(shelfData) {
     const template = this.map.store.shelf_templates[shelfData.template];
-
-    // Add the new shelf to the shelves array
-    this.map.shelves.push(shelfData);
-
-    // Create shelf on server (async, don't block UI)
-    createShelf(shelfData).catch(error => {
-      console.error('Failed to save shelf to server:', error);
-      // Could show user notification here
-    });
-
-    // Draw the new shelf on the canvas immediately
-    console.log('Drawing new shelf with data:', shelfData, " using scale factors:", this.scale_X, this.scale_Y);
-    drawShelf(this.layer, this.stage, shelfData, template, this.scale_X, this.scale_Y, this.socket);
-
-    // Redraw the layer
+    if (!this.map.shelves.includes(shelfData)) {
+      this.map.shelves.push(shelfData);
+    }
+    drawShelf(
+      this.layer,
+      this.stage,
+      shelfData,
+      template,
+      this.scale_X,
+      this.scale_Y,
+      this.socket
+    );
     this.layer.batchDraw();
   }
 
@@ -201,13 +369,11 @@ export class mapController {
     }
   }
 
- async testWalks() {
-    // Implement test walks functionality
+  async testWalks() {
+    const btn = document.getElementById('testWalksBtn');
+    const originalLabel = btn.textContent;
     console.log('Testing walks...');
-    if (!this.walkFinder) {
-      this.walkFinder = new walkFinder(this.map, GTSP_SERVER_URL);
-      this.walkFinder.init();
-    }
+
     const pickwalk = {
       starting_point: { id: 'Main_Entrance', point: [10, 50] },
       itemList: [
@@ -216,7 +382,28 @@ export class mapController {
       ],
     };
     console.log('Finding path for pickwalk:', pickwalk);
-    this.walkFinder.findPath(this.store_number, pickwalk);
+
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Finding path…';
+      this.pathOverlay.clear();
+
+      const { result, startPoint, endPoint } = await this.walkFinder.findPath(
+        this.store_number,
+        pickwalk
+      );
+
+      this.pathOverlay.drawRoute(this.scale_X, this.scale_Y, startPoint, result);
+      this.pathResultsPopup.showSuccess(pickwalk, result, startPoint, endPoint);
+    } catch (error) {
+      console.error('Error finding path:', error);
+      this.pathResultsPopup.showError(
+        error.message || 'Failed to find path. Is gtsp-server running?'
+      );
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
   }
 }
 

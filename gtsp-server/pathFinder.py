@@ -1,4 +1,7 @@
+import concurrent.futures
+
 from heuristics import Heuristics
+from pathfinder_config import GPU_PROBE, GPU_PROBE_TIMEOUT_SEC
 from store_cache import StoreCache
 
 try:
@@ -8,6 +11,12 @@ try:
 except ImportError:
     CUPY_AVAILABLE = False
     CUGRAPH_AVAILABLE = False
+
+
+def _cupy_smoke_test():
+    device = cp.cuda.Device(0)
+    print(f"GPU Device 0 — compute capability {device.compute_capability}", flush=True)
+    _ = cp.asarray([1, 2, 3], dtype=cp.int32)
 
 
 class Pathfinder:
@@ -30,14 +39,23 @@ class Pathfinder:
 
     def _check_gpu_availability(self):
         print("Checking GPU availability...", flush=True)
+        if not GPU_PROBE:
+            print("GPU probe skipped (PATHFINDER_GPU_PROBE=0) — CPU grid BFS only", flush=True)
+            return False
         if not (CUPY_AVAILABLE and CUGRAPH_AVAILABLE):
             print("GPU libraries missing — CPU grid BFS only", flush=True)
             return False
         try:
-            device = cp.cuda.Device(0)
-            print(f"GPU Device 0 — compute capability {device.compute_capability}", flush=True)
-            _ = cp.asarray([1, 2, 3], dtype=cp.int32)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                future = pool.submit(_cupy_smoke_test)
+                future.result(timeout=GPU_PROBE_TIMEOUT_SEC)
             return True
+        except concurrent.futures.TimeoutError:
+            print(
+                f"GPU probe timed out after {GPU_PROBE_TIMEOUT_SEC}s — using CPU",
+                flush=True,
+            )
+            return False
         except Exception as e:
             print(f"GPU test failed: {e}", flush=True)
             return False

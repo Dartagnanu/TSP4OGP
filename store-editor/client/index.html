@@ -18,7 +18,7 @@
     <!-- Sidebar -->
     <div id="sidebar" class="collapsed">
         <h2 class="sidebar-section-header">Shelf templates</h2>
-        <div id="shelfTemplates"></div>
+        <div id="palette-container"></div>
     </div>
 
     <!-- Right-click menu -->
@@ -55,6 +55,19 @@
         <div class="modal-actions">
             <button id="cancelEditShelf" class="btn">Cancel</button>
             <button id="saveEditShelf" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+
+    <!-- Path results panel (docked, draggable; no overlay) -->
+    <div id="pathResultsPopup" class="path-results-panel path-results-panel--docked" role="dialog" aria-labelledby="pathResultsTitle" aria-modal="false">
+        <div id="pathResultsDragHandle" class="path-results-header" title="Drag to move">
+            <span class="path-results-grip" aria-hidden="true">⋮⋮</span>
+            <h3 id="pathResultsTitle">Pick path</h3>
+            <button type="button" id="closePathResults" class="btn btn-ghost path-results-close" aria-label="Close pick path">×</button>
+        </div>
+        <div class="path-results-body">
+            <p id="pathResultsUpcs" class="path-results-upcs"></p>
+            <ol id="pathResultsSteps" class="path-results-steps"></ol>
         </div>
     </div>
 

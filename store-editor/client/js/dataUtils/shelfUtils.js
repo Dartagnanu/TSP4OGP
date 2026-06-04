@@ -1,18 +1,33 @@
 // create shelf
 export const createShelf = async (shelfData) => {
-  try {
-    const response = await fetch('/shelf', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(shelfData),
-    });
-    if (!response.ok) throw new Error('Failed to create shelf');
-    return await response.json();
-  } catch (error) {
-    console.error(error);
+  const response = await fetch('/shelf', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(shelfData),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to create shelf');
   }
+  return await response.json();
+};
+
+// clone shelf and duplicate itemindex locations from source
+export const cloneShelf = async (sourceShelfName, newShelfData) => {
+  const response = await fetch(`/shelf/${encodeURIComponent(sourceShelfName)}/clone`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(newShelfData),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to clone shelf');
+  }
+  return await response.json();
 };
 
 // get shelf by ID and store ID
@@ -47,6 +62,7 @@ export const updateShelf = async (shelfData, store_number) => {
     return await response.json();
   } catch (error) {
     console.error(error);
+    throw error;
   }
 };
 

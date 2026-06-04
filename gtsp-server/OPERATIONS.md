@@ -26,6 +26,8 @@
 | `PATHFINDER_MAX_MAP_WIDTH` | 2000 | Reject wider maps |
 | `PATHFINDER_MAX_MAP_HEIGHT` | 2500 | Reject taller maps |
 | `PATHFINDER_GPU_MATRIX_PRECOMPUTE` | 1 | GPU for matrix build (still CPU BFS today) |
+| `PATHFINDER_GPU_PROBE` | 1 | CuPy smoke test on init; set `0` in Docker if GPU probe hangs |
+| `PATHFINDER_GPU_PROBE_TIMEOUT_SEC` | 5 | Max seconds for GPU probe before falling back to CPU |
 
 ## Endpoints
 
