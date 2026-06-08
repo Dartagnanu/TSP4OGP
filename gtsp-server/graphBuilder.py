@@ -8,7 +8,9 @@ import numpy as np
 from bson import Binary
 from networkx.readwrite import json_graph
 
-from pathfinder_config import MAX_MAP_HEIGHT, MAX_MAP_WIDTH
+from pathfinder_config import MAX_MAP_HEIGHT, MAX_MAP_WIDTH, WALKABILITY_FORMAT
+from polygon_grid import get_covered_cells, rotate_point, translated_rotated_shape
+from shelf_access import build_shelf_node
 from walkability import WalkabilityGrid
 
 
@@ -18,11 +20,7 @@ class GraphBuilder:
         self.on_graph_rebuild = on_graph_rebuild
 
     def rotate(self, x, y, angle):
-        rad = math.radians(angle)
-        return (
-            x * math.cos(rad) - y * math.sin(rad),
-            x * math.sin(rad) + y * math.cos(rad),
-        )
+        return rotate_point(x, y, angle)
 
     def shelves_hash_for_store(self, store_number: int) -> str:
         shelves = list(self.db.shelves.find({"store_number": store_number}))
@@ -63,26 +61,22 @@ class GraphBuilder:
             placement_x = int(shelf["placement_x"])
             placement_y = int(shelf["placement_y"])
 
-            walkable[placement_y, placement_x] = True
-            shelf_nodes.append(
-                {
-                    "shelf_name": shelf.get("shelf_name", ""),
-                    "x": placement_x,
-                    "y": placement_y,
-                    "shelf_id": str(shelf.get("_id", "")),
-                }
-            )
-
-            rotated_shape = [self.rotate(x, y, rotation) for x, y in shape]
-            for x, y in rotated_shape:
-                tx = int(round(placement_x + x))
-                ty = int(round(placement_y + y))
+            world_poly = translated_rotated_shape(shape, placement_x, placement_y, rotation)
+            for wx, wy in get_covered_cells(world_poly):
+                tx, ty = int(round(wx)), int(round(wy))
                 if 0 <= tx < width and 0 <= ty < height:
                     walkable[ty, tx] = False
 
-            walkable[placement_y, placement_x] = True
-
         grid = WalkabilityGrid(width, height, walkable)
+
+        for shelf in shelves:
+            template_name = shelf["template"]
+            template = templates.get(template_name)
+            if not template:
+                continue
+            node = build_shelf_node(shelf, template, grid)
+            shelf_nodes.append(node)
+
         return grid, shelf_nodes
 
     def _legacy_graph_to_walkability(self, graph_doc: dict) -> Tuple[WalkabilityGrid, list]:
@@ -113,7 +107,7 @@ class GraphBuilder:
 
         graph_doc = self.db.store_graphs.find_one({"store_number": store_number})
 
-        if graph_doc and graph_doc.get("format") == "walkability_v1":
+        if graph_doc and graph_doc.get("format") == WALKABILITY_FORMAT:
             doc_hash = graph_doc.get("shelves_hash")
             graph_last = graph_doc.get("last_updated")
             fresh = doc_hash == shelves_hash
@@ -128,13 +122,6 @@ class GraphBuilder:
                 walkable = WalkabilityGrid.unpack_bits(data, w, h)
                 grid = WalkabilityGrid(w, h, walkable)
                 return grid, graph_doc.get("shelf_nodes", []), shelves_hash
-
-        if graph_doc and graph_doc.get("graph") and graph_doc.get("format") != "walkability_v1":
-            if self.on_graph_rebuild:
-                self.on_graph_rebuild(store_number)
-            grid, shelf_nodes = self.build_walkability(store, shelves)
-            self._persist_walkability(store_number, grid, shelf_nodes, shelves_hash)
-            return grid, shelf_nodes, shelves_hash
 
         if self.on_graph_rebuild:
             self.on_graph_rebuild(store_number)
@@ -155,7 +142,7 @@ class GraphBuilder:
             {"store_number": store_number},
             {
                 "$set": {
-                    "format": "walkability_v1",
+                    "format": WALKABILITY_FORMAT,
                     "width": grid.width,
                     "height": grid.height,
                     "walkable": packed,
@@ -196,7 +183,6 @@ class GraphBuilder:
             "message": "Graph too large for full node_link export",
         }
 
-    # Backward compatibility for code expecting prompt_for_graph
     def prompt_for_graph(self, store_number: int):
         grid, shelf_nodes, _ = self.load_or_build_walkability(store_number)
         return self.export_graph_json(store_number)

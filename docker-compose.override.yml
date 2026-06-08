@@ -3,11 +3,13 @@
 services:
   app:
     volumes:
+      - .:/usr/src/app
       - ./store-editor:/usr/src/app/store-editor
+      - app_server_node_modules:/usr/src/app/store-editor/server/node_modules
   gtsp-server:
     volumes:
       - ./gtsp-server:/app
     environment:
       - FLASK_DEBUG=1
       - FLASK_USE_RELOADER=0
-    command: ["/opt/conda/envs/rapids/bin/python", "-u", "app.py"]
+    command: ["/opt/conda/bin/python", "-u", "app.py"]

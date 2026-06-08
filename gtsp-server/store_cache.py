@@ -4,11 +4,12 @@ from __future__ import annotations
 import time
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from typing import Dict, List, Optional, TYPE_CHECKING
 
 import numpy as np
 
 from pathfinder_config import MAX_CACHE_MB, MAX_CACHED_STORES, tier_for_walkable_count
+from shelf_access import shelf_node_lookup
 from walkability import Coord, WalkabilityGrid
 if TYPE_CHECKING:
     from graphBuilder import GraphBuilder
@@ -25,6 +26,7 @@ class StoreContext:
     n_shelves: int
     shelf_coords: List[Coord] = field(default_factory=list)
     coord_to_shelf_index: Dict[Coord, int] = field(default_factory=dict)
+    shelf_node_by_name: Dict[str, dict] = field(default_factory=dict)
     distance_matrix: Optional[np.ndarray] = None
     matrix_building: bool = False
 
@@ -70,9 +72,16 @@ class StoreCache:
             f"({len(shelf_nodes)} shelf nodes)",
             flush=True,
         )
-        shelf_coords = [
-            (int(n["x"]), int(n["y"])) for n in shelf_nodes
-        ]
+        shelf_coords: List[Coord] = []
+        for n in shelf_nodes:
+            if not n.get("accessible", True):
+                continue
+            if n.get("primary_access"):
+                shelf_coords.append(
+                    (int(n["primary_access"][0]), int(n["primary_access"][1]))
+                )
+            else:
+                shelf_coords.append((int(n["x"]), int(n["y"])))
         coord_to_idx = {c: i for i, c in enumerate(shelf_coords)}
         walkable_count = grid.walkable_count
         tier = tier_for_walkable_count(walkable_count)
@@ -86,6 +95,7 @@ class StoreCache:
             n_shelves=len(shelf_nodes),
             shelf_coords=shelf_coords,
             coord_to_shelf_index=coord_to_idx,
+            shelf_node_by_name=shelf_node_lookup(shelf_nodes),
         )
         self._entries[store_number] = ctx
         self._evict_if_needed()

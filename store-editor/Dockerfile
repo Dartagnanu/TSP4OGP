@@ -1,20 +1,17 @@
 # Use official Node.js LTS image
 FROM node:20
 
-# Set working directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Install server dependencies (express, mongoose, bcrypt, socket.io, etc.)
+COPY server/package.json server/package-lock.json* ./server/
+RUN cd server && npm install --omit=dev
 
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the app
+# Copy store-editor app (client + server source)
+COPY docker-entrypoint.sh /docker-entrypoint.sh
 COPY . .
+RUN sed -i 's/\r$//' /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh
 
-# Expose the port your app runs on
 EXPOSE 42069
 
-# Start the app
-CMD ["node", "store-editor/server/index.js"]
+ENTRYPOINT ["/docker-entrypoint.sh"]

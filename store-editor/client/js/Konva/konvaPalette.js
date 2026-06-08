@@ -83,7 +83,7 @@ export class KonvaPalette {
     this.paletteLayer = new Konva.Layer();
     this.paletteStage.add(this.paletteLayer);
 
-    this.overlayLayer = new Konva.Layer({ name: 'palette-overlay' });
+    this.overlayLayer = new Konva.Layer({ name: 'palette-overlay', listening: false });
     this.mapStage.add(this.overlayLayer);
     this.overlayLayer.moveToTop();
 

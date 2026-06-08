@@ -6,11 +6,36 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="loginOverlay" class="login-overlay">
+        <form id="loginForm" class="login-card">
+            <h1>Store Map Editor</h1>
+            <p class="login-subtitle">Sign in with your manager account</p>
+            <div class="form-field">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername" name="username" autocomplete="username" required>
+            </div>
+            <div class="form-field">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
+            </div>
+            <div class="form-field">
+                <label for="loginStoreNumber">Store number</label>
+                <input type="number" id="loginStoreNumber" name="store_number" value="3260" required>
+            </div>
+            <p id="loginError" class="login-error" role="alert"></p>
+            <button type="submit" class="btn btn-primary login-submit">Log in</button>
+            <p class="login-hint muted">Dev: manager / manager / 3260</p>
+        </form>
+    </div>
+
+    <div id="appShell" class="app-shell hidden">
     <div id="topBar">
         <div class="topbar-left">
             <button id="toggleSidebar" class="btn btn-ghost" title="Show or hide shelf templates">☰ Templates</button>
+            <span id="sessionInfo" class="session-info"></span>
         </div>
         <div class="topbar-right">
+            <button id="logoutBtn" type="button" class="btn btn-ghost">Logout</button>
             <button id="testWalksBtn" class="btn btn-primary">Test Walks</button>
         </div>
     </div>
@@ -19,14 +44,40 @@
     <div id="sidebar" class="collapsed">
         <h2 class="sidebar-section-header">Shelf templates</h2>
         <div id="palette-container"></div>
+        <details class="activity-panel">
+            <summary>My recent activity</summary>
+            <ul id="myActivityList" class="activity-list"></ul>
+        </details>
+        <details class="activity-panel">
+            <summary>Store access</summary>
+            <button type="button" id="refreshActivityBtn" class="btn btn-ghost btn-sm">Refresh</button>
+            <ul id="storeAccessList" class="activity-list"></ul>
+        </details>
     </div>
 
-    <!-- Right-click menu -->
-    <div id="contextMenu">
+    <!-- Right-click menu (single shelf / empty map) -->
+    <div id="contextMenu" class="context-menu">
         <button id="addShelfBtn">Add Shelf</button>
+        <button id="pasteShelfBtn">Paste</button>
+        <button id="copyShelfBtn">Copy Shelf</button>
         <button id="deleteShelfBtn">Delete Shelf</button>
-        <button id="cloneShelfBtn">Clone Shelf</button>
         <button id="editShelfBtn">Edit Shelf</button>
+    </div>
+
+    <!-- Right-click menu (multi-shelf selection) -->
+    <div id="multiShelfContextMenu" class="context-menu">
+        <button id="copyShelvesBtn">Copy Shelves</button>
+        <button id="deleteShelvesBtn">Delete Shelves</button>
+    </div>
+
+    <div id="pasteOptionsModal" class="modal-card">
+        <h3>Paste shelves</h3>
+        <p id="pasteOptionsMessage"></p>
+        <div class="modal-actions">
+            <button type="button" id="pasteKeepItemsCancel" class="btn">Cancel</button>
+            <button type="button" id="pasteKeepItemsNo" class="btn">Layout only</button>
+            <button type="button" id="pasteKeepItemsYes" class="btn btn-primary">Keep items</button>
+        </div>
     </div>
 
     <!-- Shelf Edit Popup -->
@@ -85,6 +136,8 @@
     </script>
     <script type="module" src="app.js"></script>
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+    </div><!-- #appShell -->
 
     <!-- Debug: pathfinding grid & graph viz (unused in normal flow) -->
     <div id="debugSection">

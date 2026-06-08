@@ -13,8 +13,12 @@ import Modular from './models/modular.js';
 import ItemIndex from './models/itemIndex.js';
 import Pickwalk from './models/pickwalk.js';
 import StoreGraph from './models/storeGraph.js';
-
-
+import authRouter from './routes/auth.js';
+import { requireAuth, requireSessionStore, setupSocketAuth } from './middleware/auth.js';
+import { recordAccess } from './services/accessHistory.js';
+import { ensureDefaultManagers } from './services/ensureManagers.js';
+import { syncManagerStoreAccess } from './services/syncManagerStoreAccess.js';
+import { debugLog } from './lib/debugLog.js';
 
 // Resolve __dirname in ES Modules
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -109,17 +113,10 @@ async function syncItemIndexForShelf(shelf, storeNumber) {
 
 const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/storemaps';
 
-mongoose.connect(mongoUrl)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
-  });
-
 mongoose.connection.on('connected', () => {
   console.log(`Mongoose connected to ${mongoUrl}`);
 });
-mongoose.connection.on('error', err => {
+mongoose.connection.on('error', (err) => {
   console.log('Mongoose connection error:', err);
 });
 mongoose.connection.on('disconnected', () => {
@@ -129,6 +126,7 @@ mongoose.connection.on('disconnected', () => {
 const app = express();
 const server = http.createServer(app);
 const io = new SocketIo(server);
+setupSocketAuth(io);
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../client')));
@@ -138,10 +136,25 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
+app.use('/auth', authRouter);
+
+app.get('/gtsp-status', async (req, res) => {
+  try {
+    const response = await axios.get('http://gtsp-server:5000/ping');
+    res.send({ status: 'up', data: response.data });
+  } catch (err) {
+    res.status(503).send({ status: 'down', error: err.message });
+  }
+});
+
+const api = express.Router();
+api.use(requireAuth);
+api.use(requireSessionStore);
+
 // -------------------- Store Routes --------------------
 
 // Create a new store
-app.post('/store', async (req, res) => {
+api.post('/store', async (req, res) => {
   try {
     const store = new Store(req.body);
     await store.save();
@@ -152,7 +165,7 @@ app.post('/store', async (req, res) => {
 });
 
 // Get store by store number
-app.get('/store/:number', async (req, res) => {
+api.get('/store/:number', async (req, res) => {
   try {
     const store = await Store.findOne({ store_number: Number(req.params.number) });
     if (!store) return res.status(404).send({ error: 'Store not found' });
@@ -163,7 +176,7 @@ app.get('/store/:number', async (req, res) => {
 });
 
 // Update store by store number
-app.put('/store/:number', async (req, res) => {
+api.put('/store/:number', async (req, res) => {
   try {
     const store = await Store.findOneAndUpdate(
       { store_number: Number(req.params.number) },
@@ -171,6 +184,13 @@ app.put('/store/:number', async (req, res) => {
       { new: true }
     );
     if (!store) return res.status(404).send({ error: 'Store not found' });
+    await recordAccess({
+      username: req.auth.username,
+      store_number: req.auth.store_number,
+      action: 'store_update',
+      summary: `Updated store ${req.params.number} layout`,
+      metadata: { store_number: Number(req.params.number) },
+    });
     res.send(store);
   } catch (err) {
     res.status(500).send({ error: err.message });
@@ -178,7 +198,7 @@ app.put('/store/:number', async (req, res) => {
 });
 
 // Delete store by store number
-app.delete('/store/:number', async (req, res) => {
+api.delete('/store/:number', async (req, res) => {
   try {
     const store = await Store.findOneAndDelete({ store_number: Number(req.params.number) });
     if (!store) return res.status(404).send({ error: 'Store not found' });
@@ -191,12 +211,19 @@ app.delete('/store/:number', async (req, res) => {
 // -------------------- Shelf Routes --------------------
 
 // Create a new shelf
-app.post('/shelf', async (req, res) => {
+api.post('/shelf', async (req, res) => {
   try {
     const shelf = new Shelf(req.body);
     await shelf.save();
     const storeNum = Number(shelf.store_number);
     const syncResult = await syncItemIndexForShelf(shelf, storeNum);
+    await recordAccess({
+      username: req.auth.username,
+      store_number: req.auth.store_number,
+      action: 'shelf_create',
+      summary: `Created shelf ${shelf.shelf_name}`,
+      metadata: { shelf_name: shelf.shelf_name },
+    });
     res.status(201).send({
       ...(await shelfToClientJson(shelf)),
       itemIndexesSynced: syncResult,
@@ -207,7 +234,7 @@ app.post('/shelf', async (req, res) => {
 });
 
 // Clone shelf and duplicate itemindex locations from source shelf
-app.post('/shelf/:source_shelf_name/clone', async (req, res) => {
+api.post('/shelf/:source_shelf_name/clone', async (req, res) => {
   try {
     const sourceName = req.params.source_shelf_name;
     const store_number = Number(req.body.store_number);
@@ -258,6 +285,14 @@ app.post('/shelf/:source_shelf_name/clone', async (req, res) => {
 
     const syncResult = await syncItemIndexForShelf(newShelf, store_number);
 
+    await recordAccess({
+      username: req.auth.username,
+      store_number: req.auth.store_number,
+      action: 'shelf_clone',
+      summary: `Cloned shelf ${sourceName} to ${newShelf.shelf_name}`,
+      metadata: { source: sourceName, shelf_name: newShelf.shelf_name },
+    });
+
     res.status(201).send({
       shelf: await shelfToClientJson(newShelf),
       itemIndexesUpdated,
@@ -270,7 +305,7 @@ app.post('/shelf/:source_shelf_name/clone', async (req, res) => {
 });
 
 // Get shelf by ID
-app.get('/shelf/:shelf_name', async (req, res) => {
+api.get('/shelf/:shelf_name', async (req, res) => {
   // TODO: fix search shelf by ID only
   throw new Error('search shelf by ID only Not implemented');
   try {
@@ -283,7 +318,7 @@ app.get('/shelf/:shelf_name', async (req, res) => {
 });
 
 // Update shelf by shelf_name and store_number 
-app.put('/shelf/:shelf_name/store/:store_number', async (req, res) => {
+api.put('/shelf/:shelf_name/store/:store_number', async (req, res) => {
   try {
     const { shelf_name, store_number } = req.params;
     console.log(req.params.shelf_name, req.params.store_number);
@@ -305,6 +340,13 @@ app.put('/shelf/:shelf_name/store/:store_number', async (req, res) => {
     if (!shelf) return res.status(404).send({ error: 'Shelf not found', shelf_name, store_number});
     const storeNum = Number(store_number);
     const syncResult = await syncItemIndexForShelf(shelf, storeNum);
+    await recordAccess({
+      username: req.auth.username,
+      store_number: req.auth.store_number,
+      action: 'shelf_update',
+      summary: `Updated shelf ${shelf_name}`,
+      metadata: { shelf_name },
+    });
     res.send({ ...(await shelfToClientJson(shelf)), itemIndexesSynced: syncResult });
   } catch (err) {
     res.status(500).send({ error: err.message });
@@ -312,7 +354,7 @@ app.put('/shelf/:shelf_name/store/:store_number', async (req, res) => {
 });
 
 // Delete shelf by shelf_name and store_number
-app.delete('/shelf/:shelf_name/store/:store_number', async (req, res) => {
+api.delete('/shelf/:shelf_name/store/:store_number', async (req, res) => {
     try {
         console.log('Delete request received for shelf_name:', req.params.shelf_name, 'store_number:', req.params.store_number);
 
@@ -335,6 +377,13 @@ app.delete('/shelf/:shelf_name/store/:store_number', async (req, res) => {
             { store_number: Number(req.params.store_number) },
             { $pull: { locations: { shelf_name: shelf._id } } }
         );
+        await recordAccess({
+          username: req.auth.username,
+          store_number: req.auth.store_number,
+          action: 'shelf_delete',
+          summary: `Deleted shelf ${req.params.shelf_name}`,
+          metadata: { shelf_name: req.params.shelf_name },
+        });
         res.send(shelf);
     } catch (err) {
         console.error('Error deleting shelf:', err.message);
@@ -343,7 +392,7 @@ app.delete('/shelf/:shelf_name/store/:store_number', async (req, res) => {
 });
 
 // Get all shelves by store number
-app.get('/shelves', async (req, res) => {
+api.get('/shelves', async (req, res) => {
   try {
     const store_number = Number(req.query.store);
     console.log('Query for shelves of store number:', store_number);
@@ -362,7 +411,7 @@ app.get('/shelves', async (req, res) => {
 // -------------------- Modular Routes --------------------
 
 // Create a new modular
-app.post('/modular', async (req, res) => {
+api.post('/modular', async (req, res) => {
   try {
     const modular = new Modular(req.body);
     await modular.save();
@@ -373,7 +422,7 @@ app.post('/modular', async (req, res) => {
 });
 
 // Get modular by modular_id
-app.get('/modular/:modular_id', async (req, res) => {
+api.get('/modular/:modular_id', async (req, res) => {
   try {
     const modular = await Modular.findOne({ modular_id: req.params.modular_id });
     if (!modular) return res.status(404).send({ error: 'Modular not found' });
@@ -384,7 +433,7 @@ app.get('/modular/:modular_id', async (req, res) => {
 });
 
 // Update modular by modular_id
-app.put('/modular/:modular_id', async (req, res) => {
+api.put('/modular/:modular_id', async (req, res) => {
   try {
     const modular = await Modular.findOneAndUpdate({ modular_id: req.params.modular_id }, req.body, { new: true });
     if (!modular) return res.status(404).send({ error: 'Modular not found' });
@@ -394,7 +443,7 @@ app.put('/modular/:modular_id', async (req, res) => {
   }
 });
 // Delete modular by modular_id
-app.delete('/modular/:modular_id', async (req, res) => {
+api.delete('/modular/:modular_id', async (req, res) => {
   try {
     const modular = await Modular.findOneAndDelete({ modular_id: req.params.modular_id });
     if (!modular) return res.status(404).send({ error: 'Modular not found' });
@@ -408,7 +457,7 @@ app.delete('/modular/:modular_id', async (req, res) => {
 
 
 // Create item by item number
-app.post('/item', async (req, res) => {
+api.post('/item', async (req, res) => {
   try {
     const item = new Item(req.body);
     await item.save();
@@ -419,7 +468,7 @@ app.post('/item', async (req, res) => {
 });
 
 // Get item by number
-app.get('/item/:item_number', async (req, res) => {
+api.get('/item/:item_number', async (req, res) => {
   try {
     const item = await Item.findOne({ item_number: req.params.item_number });
     if (!item) return res.status(404).send({ error: 'Item not found' });
@@ -430,7 +479,7 @@ app.get('/item/:item_number', async (req, res) => {
 });
 
 // Update item by number
-app.put('/item/:item_number', async (req, res) => {
+api.put('/item/:item_number', async (req, res) => {
   try {
     const item = await Item.findOneAndUpdate({ item_number: req.params.item_number }, req.body, { new: true });
     if (!item) return res.status(404).send({ error: 'Item not found' });
@@ -441,7 +490,7 @@ app.put('/item/:item_number', async (req, res) => {
 });
 
 // Delete item by number
-app.delete('/item/:item_number', async (req, res) => {
+api.delete('/item/:item_number', async (req, res) => {
   try {
     const item = await Item.findOneAndDelete({ item_number: req.params.item_number });
     if (!item) return res.status(404).send({ error: 'Item not found' });
@@ -457,7 +506,7 @@ app.delete('/item/:item_number', async (req, res) => {
 
 
 // Create a new item index 
-app.post('/itemindex', async (req, res) => {
+api.post('/itemindex', async (req, res) => {
   try {
     const itemIndex = new ItemIndex(req.body);
     await itemIndex.save();
@@ -468,7 +517,7 @@ app.post('/itemindex', async (req, res) => {
 });
 
 // Get itemIndex by upc and store ID
-app.get('/itemindex/upc/:upc/store/:storeId', async (req, res) => {
+api.get('/itemindex/upc/:upc/store/:storeId', async (req, res) => {
   try {
     const itemIndexes = await ItemIndex.find({ upcs: req.params.upc, store: req.params.storeId });
     res.send(itemIndexes);
@@ -478,7 +527,7 @@ app.get('/itemindex/upc/:upc/store/:storeId', async (req, res) => {
 });
 
 // update item index individually 
-app.put('/itemindex', async (req, res) => {
+api.put('/itemindex', async (req, res) => {
   try {
     const { store, upcs } = req.body;
     // Use the first UPC as the unique key, or adapt for the schema
@@ -495,7 +544,7 @@ app.put('/itemindex', async (req, res) => {
 });
 
 // Update item index by upc and store number
-app.put('/itemindex/upc/:upc/store/:store_number', async (req, res) => {
+api.put('/itemindex/upc/:upc/store/:store_number', async (req, res) => {
   try {
     const itemIndex = await ItemIndex.findOneAndUpdate({ upc: req.params.upc, store_number: req.params.store_number }, req.body, { new: true });
     if (!itemIndex) return res.status(404).send({ error: 'ItemIndex not found' });
@@ -506,7 +555,7 @@ app.put('/itemindex/upc/:upc/store/:store_number', async (req, res) => {
 });
 
 // Delete item index by upc and store ID
-app.delete('/itemindex/upc/:upc', async (req, res) => {
+api.delete('/itemindex/upc/:upc', async (req, res) => {
   try {
     const itemIndex = await ItemIndex.findOneAndDelete({ upc: req.params.upc, store: req.body.store });
     if (!itemIndex) return res.status(404).send({ error: 'ItemIndex not found' });
@@ -517,7 +566,7 @@ app.delete('/itemindex/upc/:upc', async (req, res) => {
 });
 
 // generate item index for a store
-app.post('/generate-itemindex/:storeId', async (req, res) => {
+api.post('/generate-itemindex/:storeId', async (req, res) => {
   try {
     const storeId = Number(req.params.storeId);
     const store = await Store.findOneAndUpdate({ id: storeId }).populate('shelves modulars items');
@@ -556,7 +605,7 @@ app.post('/generate-itemindex/:storeId', async (req, res) => {
 // -------------------- Pickwalk Routes --------------------
 
 // create a new pickwalk
-app.post('/pickwalk', async (req, res) => {
+api.post('/pickwalk', async (req, res) => {
   try {
     const pickwalk = new Pickwalk(req.body);
     await pickwalk.save();
@@ -567,7 +616,7 @@ app.post('/pickwalk', async (req, res) => {
 });
 
 //Get a pickwalk by pickwalk_id and store_id
-app.get('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
+api.get('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
   try {
     const pickwalk = await Pickwalk.findById(req.params.pickwalk_id);
     if (!pickwalk) return res.status(404).send({ error: 'Pickwalk not found' });
@@ -581,7 +630,7 @@ app.get('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
 });
 
 // Update pickwalk by pickwalk_id and store_id
-app.put('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
+api.put('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
   try {
     const pickwalk = await Pickwalk.findById(req.params.pickwalk_id);
     if (!pickwalk) return res.status(404).send({ error: 'Pickwalk not found' });
@@ -597,7 +646,7 @@ app.put('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
 });
 
 // delete pickwalk by pickwalk_id and store_id
-app.delete('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
+api.delete('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
   try {
     const pickwalk = await Pickwalk.findById(req.params.pickwalk_id);
     if (!pickwalk) return res.status(404).send({ error: 'Pickwalk not found' });
@@ -612,7 +661,7 @@ app.delete('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
 });
 
 // get all pickwalks by store_id
-app.get('/pickwalks/store/:store_id', async (req, res) => {
+api.get('/pickwalks/store/:store_id', async (req, res) => {
   try {
     const pickwalks = await Pickwalk.find({ store_id: req.params.store_id });
     res.send(pickwalks);
@@ -620,7 +669,31 @@ app.get('/pickwalks/store/:store_id', async (req, res) => {
     res.status(500).send(err);
   }
 });
-// -------------------- End of Store Routes --------------------
+
+api.post('/request-pickwalk', async (req, res) => {
+  try {
+    const { store_number, upcs } = req.body;
+    if (!store_number || !upcs || !Array.isArray(upcs)) {
+      return res.status(400).send({ error: 'store_number and upcs array are required' });
+    }
+    const response = await axios.post('http://gtsp-server:5000/compute-pickwalk', {
+      store_number,
+      upcs,
+    });
+    await recordAccess({
+      username: req.auth.username,
+      store_number: req.auth.store_number,
+      action: 'pickwalk_request',
+      summary: `Requested pickwalk with ${upcs.length} UPCs`,
+      metadata: { upc_count: upcs.length },
+    });
+    res.send({ status: 'ok', pickwalk: response.data });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+app.use(api);
 
 // -------------------- WebSocket Connection --------------------
 
@@ -641,42 +714,27 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 42069;
-server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
 
-
-// -------------------- GTSP Routes --------------------
-
-// Endpoint to check GTSP server status
-app.get('/gtsp-status', async (req, res) => {
+async function start() {
   try {
-    const response = await axios.get('http://gtsp-server:5000/ping');
-    res.send({ status: 'up', data: response.data });
-  } catch (err) {
-    res.status(503).send({ status: 'down', error: err.message });
-  }
-});
-
-// endpoint to request a pickwalk from GTSP server
-// using store number and list of upcs
-app.post('/request-pickwalk', async (req, res) => {
-  try {
-    const { store_number, upcs } = req.body;
-    if (!store_number || !upcs || !Array.isArray(upcs)) {
-      return res.status(400).send({ error: 'store_number and upcs array are required' });
-    }
-    const response = await axios.post('http://gtsp-server:5000/compute-pickwalk', {
-      store_number,
-      upcs
+    await mongoose.connect(mongoUrl);
+    console.log('Connected to MongoDB');
+    debugLog('index.js:start', 'mongo connected', {}, 'B');
+    const mgr = await ensureDefaultManagers();
+    await syncManagerStoreAccess();
+    debugLog('index.js:start', 'managers ensured', { created: mgr?.created }, 'A');
+    server.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+      debugLog('index.js:start', 'server listening', { port: PORT }, 'B');
     });
-    res.send({ status: 'ok', pickwalk: response.data });
   } catch (err) {
-    res.status(500).send({ error: err.message });
+    console.error('Failed to start server:', err);
+    debugLog('index.js:start', 'start failed', { err: err.message, code: err.code }, 'C');
+    process.exit(1);
   }
-});
+}
 
-// -------------------- End of GTSP Routes --------------------
+start();
 
 // For graceful shutdown
 process.on('SIGINT', async () => {

@@ -61,3 +61,58 @@ export function clampPlacementOrigin(placement_x, placement_y, mapSize) {
     placement_y: Math.min(Math.max(0, placement_y), Math.max(0, h - 1)),
   };
 }
+
+export function clampPx(value, min, max) {
+  if (!Number.isFinite(value)) return min;
+  return Math.min(max, Math.max(min, value));
+}
+
+/** Smaller map scale axis — pixels per foot on stage. */
+export function pixelsPerFoot(scaleX, scaleY) {
+  return Math.min(scaleX, scaleY);
+}
+
+export function strokeWidthForMap(ppf, { min = 1, max = 2, factor = 1 } = {}) {
+  return clampPx(ppf * factor, min, max);
+}
+
+/** Stage-pixel width/height of a template shape at current map scale. */
+export function shapeStageBounds(shape, scaleX, scaleY) {
+  if (!Array.isArray(shape) || shape.length < 1) {
+    return { width: 0, height: 0 };
+  }
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+  for (const [x, y] of shape) {
+    const sx = x * scaleX;
+    const sy = y * scaleY;
+    minX = Math.min(minX, sx);
+    maxX = Math.max(maxX, sx);
+    minY = Math.min(minY, sy);
+    maxY = Math.max(maxY, sy);
+  }
+  return { width: maxX - minX, height: maxY - minY };
+}
+
+const SHELF_ARROW_TEMPLATE = [0, -10, 0, 10, -5, 5, 0, 10, 5, 5];
+const SHELF_ARROW_SPAN_PX = 20;
+
+/** Direction arrow polyline scaled to total length arrowLengthPx (tip-to-tip). */
+export function buildShelfArrowPoints(arrowLengthPx) {
+  const scale = Math.max(3, arrowLengthPx) / SHELF_ARROW_SPAN_PX;
+  return SHELF_ARROW_TEMPLATE.map((v) => v * scale);
+}
+
+/** Current Konva stage zoom (wheel scale); 1 when unset. */
+export function getStageZoom(stage) {
+  const z = stage?.scaleX?.();
+  return Number.isFinite(z) && z > 0 ? z : 1;
+}
+
+/** Keep on-screen size constant while the stage is zoomed. */
+export function compensateForStageZoom(basePx, stageScale) {
+  const zoom = Number.isFinite(stageScale) && stageScale > 0 ? stageScale : 1;
+  return basePx / zoom;
+}

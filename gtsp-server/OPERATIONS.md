@@ -3,7 +3,7 @@
 ## Stateless API
 
 - Any pod can serve any `store_number`; no sticky sessions.
-- **Mongo `store_graphs`** is the source of truth (`format: walkability_v1`).
+- **Mongo `store_graphs`** is the source of truth (`format: walkability_v2`).
 - In-process **LRU cache** is per-pod only.
 
 ## Mongo
@@ -22,7 +22,10 @@
 | `PATHFINDER_MATRIX_MAX_SHELVES` | 500 | Skip n×n matrix above this |
 | `PATHFINDER_MATRIX_MAX_ENTRIES` | 250000 | Skip matrix if n² exceeds |
 | `PATHFINDER_TIER_M_MATRIX_SHELVES` | 300 | Matrix allowed in tier M |
-| `PATHFINDER_TWO_OPT_MAX_K` | 80 | Skip 2-opt above this pick count |
+| `PATHFINDER_TWO_OPT_MAX_K` | 150 | Skip 2-opt above this pick count |
+| `PATHFINDER_GTSP_EXACT_MAX_K` | 12 | Exact GTSP DP up to this pick count |
+| `PATHFINDER_COLLATION_WEIGHT` | 2 | Same-shelf routing priority bonus (grid cells) |
+| `PATHFINDER_RELOCATE_MAX_OUTLIERS` | 3 | Multi-location outlier re-checks per pass |
 | `PATHFINDER_MAX_MAP_WIDTH` | 2000 | Reject wider maps |
 | `PATHFINDER_MAX_MAP_HEIGHT` | 2500 | Reject taller maps |
 | `PATHFINDER_GPU_MATRIX_PRECOMPUTE` | 1 | GPU for matrix build (still CPU BFS today) |

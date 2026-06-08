@@ -8,6 +8,7 @@ import {
   drawStartingPoints,
   drawFootGrid,
   clearMapShelfLayer,
+  refreshZoomCompensatedLabels,
 } from '../konva/drawUtils.js';
 import {getStore} from '../dataUtils/storeUtils.js';
 import {deleteShelf, updateShelfByOldName, getShelvesByStore} from '../dataUtils/shelfUtils.js';
@@ -17,6 +18,7 @@ import { GTSP_SERVER_URL } from '../../config.js';
 import { walkFinder } from './pathFinder/walkFinder.js';
 import { PathOverlay } from './pathFinder/pathOverlay.js';
 import { PathResultsPopup } from './pathFinder/pathResultsPopup.js';
+import { SelectionManager } from './selection/selectionManager.js';
 
 export class mapController {
   constructor(store_number, stage_width, stage_height, socket) {
@@ -129,14 +131,17 @@ export class mapController {
       this.map.store.shelf_templates,
       scale_X,
       scale_Y,
-      this.socket
+      this.socket,
+      this.selectionManager
     );
+    this.selectionManager?.applySelectionStyles();
     drawStartingPoints(
       this.layer,
       this.map.store.starting_points || [],
       scale_X,
       scale_Y
     );
+    refreshZoomCompensatedLabels(this.stage);
     if (this.palette) {
       this.palette.updateScales(scale_X, scale_Y);
     }
@@ -207,6 +212,8 @@ export class mapController {
       }
     });
 
+    this.selectionManager = new SelectionManager(this);
+
     loadShelves(
       layer,
       stage,
@@ -214,17 +221,24 @@ export class mapController {
       map.store.shelf_templates,
       this.scale_X,
       this.scale_Y,
-      this.socket
+      this.socket,
+      this.selectionManager
     );
     drawStartingPoints(layer, map.store.starting_points || [], scale_X, scale_Y);
-    // 
-    // Initialize the context menu
+    refreshZoomCompensatedLabels(stage);
+
     const contextMenu = new ContextMenu(this);
     contextMenu.init();
+    this.selectionManager.init();
 
     this.pathOverlay = new PathOverlay(stage);
     this.pathResultsPopup = new PathResultsPopup(() => this.pathOverlay.clear());
     this.walkFinder = new walkFinder(GTSP_SERVER_URL);
+
+    stage.on('zoomChange', () => {
+      refreshZoomCompensatedLabels(stage);
+      this.pathOverlay.applyZoomCompensation();
+    });
 
     return { contextMenu, layer, map, stage};
   }
@@ -274,7 +288,8 @@ export class mapController {
       template,
       this.scale_X,
       this.scale_Y,
-      this.socket
+      this.socket,
+      this.selectionManager
     );
     this.layer.batchDraw();
   }
@@ -309,7 +324,7 @@ export class mapController {
     // TODO: fix Emit deleteShelf event
     //this.socket.emit('deleteShelf', { shelf_name: shelfName });
 
-    // Redraw the layer
+    this.selectionManager?.removeFromSelection(shelfName);
     this.layer.batchDraw();
   }
 
@@ -357,7 +372,16 @@ export class mapController {
       const template = this.map.store.shelf_templates[updatedShelfData.template];
 
       // Draw the updated shelf with the new name
-      drawShelf(this.layer, this.stage, updatedShelf, template, this.scale_X, this.scale_Y, this.socket);
+      drawShelf(
+        this.layer,
+        this.stage,
+        updatedShelf,
+        template,
+        this.scale_X,
+        this.scale_Y,
+        this.socket,
+        this.selectionManager
+      );
       
       // Redraw the layer to reflect changes
       this.layer.batchDraw();

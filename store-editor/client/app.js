@@ -2,84 +2,101 @@ import { Sidebar } from './js/controllers/sidebar/sidebar.js';
 import { mapController } from './js/controllers/mapController.js';
 import { KonvaPalette } from './js/konva/konvaPalette.js';
 import { GTSP_SERVER_URL } from './config.js';
+import { getToken } from './js/auth/session.js';
+import {
+  bindLoginForm,
+  showLogin,
+  validateSession,
+  setLoginSuccessHandler,
+  updateSessionDisplay,
+  loadActivityPanels,
+} from './js/auth/login.js';
 
+let socket = null;
+let mapCtrlInstance = null;
 
-// Initialize socket.io
-const socket = io();
+async function initApp(storeNumber) {
+  if (socket) {
+    socket.disconnect();
+  }
 
-const STORE_NUMBER = Number(3260); // Replace with dynamic value later
+  socket = io({
+    auth: { token: getToken() },
+  });
 
-// Initialize the app
-async function initApp() {
-  // Stage pixel size is computed from store map_size + #container after fetch
-  const mapCtrl = new mapController(STORE_NUMBER, null, null, socket);
+  const mapCtrl = new mapController(storeNumber, null, null, socket);
   await mapCtrl.init();
 
   window.mapController = mapCtrl;
+  mapCtrlInstance = mapCtrl;
 
   new Sidebar();
   const palette = new KonvaPalette(mapCtrl);
   palette.init();
   mapCtrl.palette = palette;
 
-  // test walks button
-  document.getElementById('testWalksBtn').addEventListener('click', () => {
+  document.getElementById('testWalksBtn')?.addEventListener('click', () => {
     mapCtrl.testWalks();
   });
 
-  // Disable the default browser context menu
-  document.getElementById('container').addEventListener('contextmenu', (e) => {
+  document.getElementById('container')?.addEventListener('contextmenu', (e) => {
     e.preventDefault();
   });
 
+  document.getElementById('refreshActivityBtn')?.addEventListener('click', () => {
+    loadActivityPanels();
+  });
+
+  await loadActivityPanels();
   return mapCtrl;
 }
 
-// Start the app
-initApp().catch(console.error);
+async function bootstrap() {
+  bindLoginForm();
 
-// test if GTSP server is running
+  setLoginSuccessHandler(async (session) => {
+    updateSessionDisplay(session);
+    if (mapCtrlInstance) {
+      socket?.disconnect();
+      mapCtrlInstance = null;
+    }
+    await initApp(session.store_number);
+  });
+
+  window.addEventListener('auth:logout', () => {
+    socket?.disconnect();
+    mapCtrlInstance = null;
+    showLogin('Session expired. Please log in again.');
+  });
+
+  const session = await validateSession();
+  if (!session) {
+    showLogin();
+    return;
+  }
+
+  updateSessionDisplay(session);
+  hideLoginFromBootstrap();
+  await initApp(session.store_number);
+}
+
+function hideLoginFromBootstrap() {
+  const overlay = document.getElementById('loginOverlay');
+  const appShell = document.getElementById('appShell');
+  if (overlay) overlay.classList.add('hidden');
+  if (appShell) appShell.classList.remove('hidden');
+}
+
+bootstrap().catch((err) => {
+  console.error(err);
+  showLogin(err.message || 'Failed to start application');
+});
+
 fetch(`${GTSP_SERVER_URL}/ping`)
-  .then(response => response.json())
-  .then(data => {
+  .then((response) => response.json())
+  .then((data) => {
     console.log('GTSP server is running:', data);
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('Error pinging GTSP server:', error);
   });
-
-// attempt to visualize the graph using vis-network
-function visualizeGraph(graphData) {
-  // Ensure every node has a string id
-  const nodes = graphData.nodes.map(node => {
-    let id = node.id !== undefined ? node.id : node;
-    // If id is an array (e.g., [x, y]), convert to string
-    if (Array.isArray(id)) id = `${id[0]},${id[1]}`;
-    return {
-      id: id,
-      label: id
-    };
-  });
-
-  const edges = graphData.links.map(link => {
-    let from = link.source;
-    let to = link.target;
-    // If from/to are arrays, convert to string
-    if (Array.isArray(from)) from = `${from[0]},${from[1]}`;
-    if (Array.isArray(to)) to = `${to[0]},${to[1]}`;
-    return { from, to };
-  });
-
-  const container = document.getElementById('graph');
-  const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
-  const options = {};
-  new vis.Network(container, data, options);
-  console.log('Graph visualized:', graphData);
-}
-// Fetch the graph data from the GTSP server and visualize it
-// commented out for now since it overloads the browser with too many nodes/edges
-// fetch(`${GTSP_SERVER_URL}/graph/${STORE_NUMBER}`)
-//   .then(response => response.json())
-//   .then(data => {
-//     visualizeGraph(data);
-//   console.log('Graph data fetched:', data);

@@ -5,7 +5,66 @@ import {
   snapStagePos,
   placementFromStage,
   shouldDrawMinorFootGrid,
+  pixelsPerFoot,
+  shapeStageBounds,
+  buildShelfArrowPoints,
+  strokeWidthForMap,
+  clampPx,
+  getStageZoom,
+  compensateForStageZoom,
 } from './mapUnits.js';
+
+export function applyZoomCompensatedShelfLabel(text, stage) {
+  const zoom = getStageZoom(stage);
+  const baseFont = text.getAttr('baseFontSize');
+  const baseOffsetY = text.getAttr('baseLabelOffsetY');
+  const centroidX = text.getAttr('baseCentroidX');
+  const centroidY = text.getAttr('baseCentroidY');
+  if (!Number.isFinite(baseFont)) return;
+
+  text.fontSize(compensateForStageZoom(baseFont, zoom));
+  if (Number.isFinite(centroidX) && Number.isFinite(centroidY)) {
+    text.x(centroidX);
+    text.y(centroidY - compensateForStageZoom(baseOffsetY, zoom));
+  }
+  text.offsetX(text.width() / 2);
+  text.offsetY(text.height() / 2);
+}
+
+export function applyZoomCompensatedMapLabel(text, stage) {
+  const zoom = getStageZoom(stage);
+  const baseFont = text.getAttr('baseFontSize');
+  const baseX = text.getAttr('baseX');
+  const baseY = text.getAttr('baseY');
+  if (!Number.isFinite(baseFont)) return;
+
+  text.fontSize(compensateForStageZoom(baseFont, zoom));
+  if (Number.isFinite(baseX)) text.x(compensateForStageZoom(baseX, zoom));
+  if (Number.isFinite(baseY)) text.y(compensateForStageZoom(baseY, zoom));
+}
+
+/** Re-apply zoom compensation for visible shelf hover labels and map labels. */
+export function refreshZoomCompensatedLabels(stage) {
+  if (!stage) return;
+
+  for (const group of stage.find('Group')) {
+    if (!group.getAttr('shelfData')) continue;
+    const text = group.findOne(
+      (node) => node.getClassName() === 'Text' && node.getAttr('baseFontSize')
+    );
+    if (text?.visible()) {
+      applyZoomCompensatedShelfLabel(text, stage);
+    }
+  }
+
+  for (const text of stage.find('.starting-point-marker')) {
+    if (text.getClassName() === 'Text' && text.getAttr('baseFontSize')) {
+      applyZoomCompensatedMapLabel(text, stage);
+    }
+  }
+
+  stage.batchDraw();
+}
 
 function calculatePolygonCentroid(shape, scale_X, scale_Y) {
   let sumX = 0;
@@ -147,13 +206,17 @@ export function drawStoreEdge(layer, store, scale_X, scale_Y) {
 
   const ring = resolveStoreShape(store);
   const scaledPoints = shapeToStagePoints(ring, scale_X, scale_Y);
+  const ppf = pixelsPerFoot(scale_X, scale_Y);
+  const edgeStroke = strokeWidthForMap(ppf, { min: 1, max: 2.5, factor: 1.2 });
+  const dashSeg = Math.max(4, ppf * 2);
+  const dashGap = Math.max(4, ppf);
 
   layer.add(
     new Konva.Line({
       points: scaledPoints,
       stroke: '#334155',
-      strokeWidth: 3,
-      dash: [8, 4],
+      strokeWidth: edgeStroke,
+      dash: [dashSeg, dashGap],
       closed: true,
       listening: false,
       name: 'store-edge-line',
@@ -181,7 +244,16 @@ export function clearMapShelfLayer(layer) {
   remove.forEach((n) => n.destroy());
 }
 
-export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, socket) {
+export function drawShelf(
+  layer,
+  stage,
+  shelfData,
+  template,
+  scale_X,
+  scale_Y,
+  socket,
+  selectionManager = null
+) {
   const shape = template?.shape;
   if (!Array.isArray(shape) || shape.length < 3) {
     console.warn('Invalid template shape for shelf', shelfData.shelf_name);
@@ -192,22 +264,39 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
   const placementX = (shelfData.placement_x || 0) * scale_X;
   const placementY = (shelfData.placement_y || 0) * scale_Y;
 
+  const ppf = pixelsPerFoot(scale_X, scale_Y);
+  const bounds = shapeStageBounds(shape, scale_X, scale_Y);
+  const baseStroke = strokeWidthForMap(ppf, { min: 0.75, max: 1.5, factor: 0.2 });
+  const hoverStroke = clampPx(baseStroke * 2, baseStroke, 3);
+  const arrowLen = Math.max(
+    3,
+    Math.min(
+      Math.min(bounds.width, bounds.height) * 0.45,
+      Math.min(bounds.width, bounds.height)
+    )
+  );
+  const arrowStroke = strokeWidthForMap(ppf, { min: 0.75, max: 2, factor: 0.35 });
+  const labelFontSize = clampPx(ppf * 6, 8, 12);
+  const labelOffsetY = arrowLen * 0.5 + labelFontSize * 0.5;
+
   const polygon = new Konva.Line({
     points,
     fill: template.color || '#828282ff',
     stroke: '#334155',
-    strokeWidth: 1,
+    strokeWidth: baseStroke,
     closed: true,
     draggable: false,
     listening: true,
   });
+  polygon.setAttr('baseStrokeWidth', baseStroke);
+  polygon.setAttr('hoverStrokeWidth', hoverStroke);
 
   const centroid = calculatePolygonCentroid(shape, scale_X, scale_Y);
 
   const arrow = new Konva.Line({
-    points: [0, -10, 0, 10, -5, 5, 0, 10, 5, 5],
+    points: buildShelfArrowPoints(arrowLen),
     stroke: '#000',
-    strokeWidth: 2,
+    strokeWidth: arrowStroke,
     lineCap: 'round',
     lineJoin: 'round',
     x: centroid.x,
@@ -217,15 +306,19 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
 
   const shelfNameText = new Konva.Text({
     text: shelfData.shelf_name || 'Unknown',
-    fontSize: 12,
+    fontSize: labelFontSize,
     fontFamily: 'Arial',
     fill: '#000',
     align: 'center',
     x: centroid.x,
-    y: centroid.y - 25,
+    y: centroid.y - labelOffsetY,
     visible: false,
     listening: false,
   });
+  shelfNameText.setAttr('baseFontSize', labelFontSize);
+  shelfNameText.setAttr('baseLabelOffsetY', labelOffsetY);
+  shelfNameText.setAttr('baseCentroidX', centroid.x);
+  shelfNameText.setAttr('baseCentroidY', centroid.y);
   shelfNameText.offsetX(shelfNameText.width() / 2);
   shelfNameText.offsetY(shelfNameText.height() / 2);
 
@@ -250,21 +343,11 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
     return snapped;
   };
 
-  shelfGroup.on('mouseenter', () => {
-    polygon.strokeWidth(2);
-    shelfNameText.visible(true);
-    layer.batchDraw();
-  });
-
-  shelfGroup.on('mouseleave', () => {
-    polygon.strokeWidth(1);
-    shelfNameText.visible(false);
-    layer.batchDraw();
-  });
-
-  const persistShelfPosition = () => {
-    const currentShelfData = shelfGroup.getAttr('shelfData');
-    const snapped = applySnapPosition();
+  const persistSingleShelf = async (group = shelfGroup) => {
+    const currentShelfData = group.getAttr('shelfData');
+    const pos = group.position();
+    const snapped = snapStagePos(pos, scale_X, scale_Y);
+    group.position(snapped);
     const { placement_x, placement_y } = placementFromStage(
       snapped,
       scale_X,
@@ -280,43 +363,109 @@ export function drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, s
 
     const updatedShelfData = {
       ...currentShelfData,
-      shelf_name: shelfGroup.id(),
+      shelf_name: group.id(),
       placement_x,
       placement_y,
     };
-    shelfGroup.setAttr('shelfData', updatedShelfData);
+    group.setAttr('shelfData', updatedShelfData);
+
+    const mapShelves = selectionManager?.mapController?.map?.shelves;
+    if (mapShelves) {
+      const i = mapShelves.findIndex((s) => s.shelf_name === group.id());
+      if (i >= 0) mapShelves[i] = updatedShelfData;
+    }
+
     socket.emit('updateShelf', {
-      shelf_name: shelfGroup.id(),
+      shelf_name: group.id(),
       x: placement_x,
       y: placement_y,
       rotation: currentShelfData.rotation,
       store_number: currentShelfData.store_number,
     });
-    moveShelf(updatedShelfData, placement_x, placement_y);
-    layer.batchDraw();
+    await moveShelf(updatedShelfData, placement_x, placement_y);
   };
 
-  shelfGroup.on('dragstart', () => {
-    shelfNameText.visible(false);
-  });
+  const applySnapToGroup = (group = shelfGroup) => {
+    const pos = group.position();
+    const snapped = snapStagePos(pos, scale_X, scale_Y);
+    group.position(snapped);
+    return snapped;
+  };
 
-  shelfGroup.on('dragmove', () => {
-    applySnapPosition();
-    layer.batchDraw();
-  });
+  if (selectionManager) {
+    selectionManager.registerShelfGroup(shelfGroup, polygon, {
+      applySnapPosition: applySnapToGroup,
+      persistSingleShelf,
+      onHoverEnter: () => {
+        polygon.strokeWidth(hoverStroke);
+        applyZoomCompensatedShelfLabel(shelfNameText, stage);
+        shelfNameText.visible(true);
+        layer.batchDraw();
+      },
+      onHoverLeave: () => {
+        polygon.strokeWidth(baseStroke);
+        shelfNameText.visible(false);
+        layer.batchDraw();
+      },
+    });
+    if (selectionManager.isSelected(shelfData.shelf_name)) {
+      polygon.stroke('#2563eb');
+      polygon.strokeWidth(hoverStroke);
+    }
+  } else {
+    shelfGroup.on('mouseenter', () => {
+      polygon.strokeWidth(hoverStroke);
+      applyZoomCompensatedShelfLabel(shelfNameText, stage);
+      shelfNameText.visible(true);
+      layer.batchDraw();
+    });
 
-  shelfGroup.on('dragend', () => {
-    persistShelfPosition();
-  });
+    shelfGroup.on('mouseleave', () => {
+      polygon.strokeWidth(baseStroke);
+      shelfNameText.visible(false);
+      layer.batchDraw();
+    });
+
+    shelfGroup.on('dragstart', () => {
+      shelfNameText.visible(false);
+    });
+
+    shelfGroup.on('dragmove', () => {
+      applySnapToGroup();
+      layer.batchDraw();
+    });
+
+    shelfGroup.on('dragend', () => {
+      persistSingleShelf();
+    });
+  }
 
   layer.draw();
 }
 
-export function loadShelves(layer, stage, shelvesData, templates, scale_X, scale_Y, socket) {
+export function loadShelves(
+  layer,
+  stage,
+  shelvesData,
+  templates,
+  scale_X,
+  scale_Y,
+  socket,
+  selectionManager = null
+) {
   shelvesData.forEach((shelfData) => {
     const template = templates[shelfData.template];
     if (template) {
-      drawShelf(layer, stage, shelfData, template, scale_X, scale_Y, socket);
+      drawShelf(
+        layer,
+        stage,
+        shelfData,
+        template,
+        scale_X,
+        scale_Y,
+        socket,
+        selectionManager
+      );
     } else {
       console.warn('Missing template for shelf', shelfData.shelf_name);
     }
@@ -326,35 +475,44 @@ export function loadShelves(layer, stage, shelvesData, templates, scale_X, scale
 export function drawStartingPoints(layer, startingPoints, scale_X, scale_Y) {
   layer.find('.starting-point-marker').forEach((node) => node.destroy());
 
+  const ppf = pixelsPerFoot(scale_X, scale_Y);
+  const markerRadius = clampPx(ppf * 1.5, 3, 8);
+  const labelFontSize = clampPx(ppf * 6, 8, 12);
+  const labelOffset = markerRadius + 2;
+
   startingPoints.forEach((point) => {
     const [x, y] = point.point;
     const labelText = point.id || 'Starting Point';
+    const stageX = x * scale_X;
+    const stageY = y * scale_Y;
 
     layer.add(
       new Konva.Circle({
-        x: x * scale_X,
-        y: y * scale_Y,
-        radius: 5,
+        x: stageX,
+        y: stageY,
+        radius: markerRadius,
         fill: 'red',
         stroke: 'black',
-        strokeWidth: 1,
+        strokeWidth: strokeWidthForMap(ppf, { min: 0.75, max: 1.5, factor: 0.2 }),
         listening: false,
         name: 'starting-point-marker',
       })
     );
 
-    layer.add(
-      new Konva.Text({
-        x: x * scale_X + 10,
-        y: y * scale_Y - 10,
-        text: labelText,
-        fontSize: 14,
-        fontFamily: 'Calibri',
-        fill: 'black',
-        listening: false,
-        name: 'starting-point-marker',
-      })
-    );
+    const label = new Konva.Text({
+      x: stageX + labelOffset,
+      y: stageY - labelOffset,
+      text: labelText,
+      fontSize: labelFontSize,
+      fontFamily: 'Calibri',
+      fill: 'black',
+      listening: false,
+      name: 'starting-point-marker',
+    });
+    label.setAttr('baseFontSize', labelFontSize);
+    label.setAttr('baseX', stageX + labelOffset);
+    label.setAttr('baseY', stageY - labelOffset);
+    layer.add(label);
   });
 
   layer.draw();

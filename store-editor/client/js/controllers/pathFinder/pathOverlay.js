@@ -1,3 +1,11 @@
+import {
+    pixelsPerFoot,
+    strokeWidthForMap,
+    clampPx,
+    getStageZoom,
+    compensateForStageZoom,
+} from '../../konva/mapUnits.js';
+
 export class PathOverlay {
     constructor(stage) {
         this.stage = stage;
@@ -17,6 +25,13 @@ export class PathOverlay {
 
     drawRoute(scale_X, scale_Y, startCoord, result) {
         this.clear();
+
+        const ppf = pixelsPerFoot(scale_X, scale_Y);
+        const routeStroke = strokeWidthForMap(ppf, { min: 1, max: 3, factor: 0.5 });
+        const stopRadius = clampPx(ppf * 2.5, 4, 9);
+        const stopLabelSize = clampPx(ppf * 5, 8, 11);
+        const dashMain = Math.max(4, ppf * 2.5);
+        const dashGap = Math.max(3, ppf * 1.5);
 
         const linePoints = [];
         const stops = [];
@@ -49,43 +64,69 @@ export class PathOverlay {
                 new Konva.Line({
                     points: linePoints,
                     stroke: '#2563eb',
-                    strokeWidth: 3,
+                    strokeWidth: routeStroke,
                     lineCap: 'round',
                     lineJoin: 'round',
-                    dash: [10, 6],
+                    dash: [dashMain, dashGap],
                     listening: false,
                 })
             );
         }
 
+        const stopStroke = strokeWidthForMap(ppf, { min: 0.75, max: 2, factor: 0.35 });
+
         for (const stop of stops) {
             const group = new Konva.Group({ listening: false });
-            group.add(
-                new Konva.Circle({
-                    x: stop.x,
-                    y: stop.y,
-                    radius: 9,
-                    fill: '#2563eb',
-                    stroke: '#ffffff',
-                    strokeWidth: 2,
-                })
-            );
+            const circle = new Konva.Circle({
+                x: stop.x,
+                y: stop.y,
+                radius: stopRadius,
+                fill: '#2563eb',
+                stroke: '#ffffff',
+                strokeWidth: stopStroke,
+            });
+            circle.setAttr('baseRadius', stopRadius);
+            circle.setAttr('baseStrokeWidth', stopStroke);
+            group.add(circle);
+
             const text = new Konva.Text({
                 x: stop.x,
                 y: stop.y,
                 text: stop.label,
-                fontSize: 11,
+                fontSize: stopLabelSize,
                 fontStyle: 'bold',
                 fill: '#ffffff',
                 align: 'center',
                 verticalAlign: 'middle',
             });
+            text.setAttr('baseFontSize', stopLabelSize);
             text.offsetX(text.width() / 2);
             text.offsetY(text.height() / 2);
             group.add(text);
             this.layer.add(group);
         }
 
+        this.applyZoomCompensation();
         this.layer.batchDraw();
+    }
+
+    applyZoomCompensation() {
+        const zoom = getStageZoom(this.stage);
+        for (const group of this.layer.getChildren()) {
+            if (group.getClassName() !== 'Group') continue;
+            const circle = group.findOne('Circle');
+            const text = group.findOne('Text');
+            if (circle?.getAttr('baseRadius')) {
+                circle.radius(compensateForStageZoom(circle.getAttr('baseRadius'), zoom));
+                circle.strokeWidth(
+                    compensateForStageZoom(circle.getAttr('baseStrokeWidth'), zoom)
+                );
+            }
+            if (text?.getAttr('baseFontSize')) {
+                text.fontSize(compensateForStageZoom(text.getAttr('baseFontSize'), zoom));
+                text.offsetX(text.width() / 2);
+                text.offsetY(text.height() / 2);
+            }
+        }
     }
 }

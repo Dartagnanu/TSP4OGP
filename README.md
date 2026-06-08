@@ -10,18 +10,68 @@ From the repo root:
 docker compose up -d mongo app gtsp-server
 ```
 
-Seed demo data for store **3260** (required on a fresh database):
+Seed demo data for store **3260** (required on a fresh database). The full seed also creates store **3261**:
 
 ```bash
 docker compose --profile seed run --rm seed
 ```
 
+Add or refresh **store 3261 only** (Walmart-style 1000×600 ft layout; does not wipe 3260):
+
+```bash
+docker compose --profile seed-3261 run --rm seed-3261
+```
+
 - **Store editor:** http://localhost:42069  
 - **Pathfinder API:** http://localhost:5000  
 
+## Store editor login
+
+The map editor requires a manager login before any store data or edits are available. Sessions are stored in the browser **sessionStorage** (cleared when the tab closes) and sent as `Authorization: Bearer <token>` on API and Socket.io requests.
+
+### Default accounts
+
+On first startup (when no `manager` user exists), the app creates:
+
+| Username | Password | Stores |
+|----------|----------|--------|
+| `manager` | `manager` | All stores in Mongo, or `3260` if none exist |
+| `manager1` | `manager1` | Same as above |
+
+Log in with username, password, and the **store number** you want to edit (`3260` small demo map, `3261` big-box). A manager can only open stores listed on their account. On startup the app merges every store in Mongo into `allowed_store_numbers` for the default managers.
+
+### Store 3261 layout (Walmart-style prototype)
+
+- **Map:** 1000×600 ft (10× store 3260). Minor 1 ft grid is hidden at this size; use pan/zoom.
+- **Entrance:** `Main_Entrance` at front center `[500, 590]`; checkout registers at `[380, 598]` and `[620, 598]`.
+- **Zones:** empty north/east/west perimeter bands; **central racetrack** (no gondolas, promo features inside); **west and east wings** with three aisle pairs each (15-bay runs, two row-blocks per aisle); **front action alley** promos behind the entrance; **endcaps** at the north/south end of each aisle pair.
+
+### Login troubleshooting
+
+- **Invalid username or password** — Restart the app so default managers are created (`docker compose restart app`). Check app logs for `Default managers ensured`.
+- **Store not found** — Seed demo data: `docker compose --profile seed run --rm seed`.
+- **Server error / blank response** — Install server deps: `cd store-editor/server && npm install`, or `docker compose build app`.
+- **Cannot POST /auth/login** — The app container likely crashed: Windows `node_modules/bcrypt` must not be bind-mounted into Linux. Run `docker compose build app && docker compose up -d app` (compose uses a named volume for `store-editor/server/node_modules`).
+- **Logged in but map empty** — Hard-refresh the browser; confirm store `3260` exists and the session store number matches.
+
+### Auth API
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/auth/login` | No | `{ username, password, store_number }` → session token |
+| POST | `/auth/logout` | Bearer | Invalidate session |
+| GET | `/auth/me` | Bearer | Current session profile |
+| GET | `/auth/stores` | Bearer | Stores this manager may access |
+| GET | `/auth/history/me?limit=50` | Bearer | Your activity log |
+| GET | `/auth/history/store/:store_number` | Bearer | Per-store manager last-access summary + recent events |
+
+Shelf create/update/delete/clone and store edits append to **AccessLog** and update **StoreAccessSummary** (last access per manager per store).
+
+Rebuild the app image after pulling auth changes so `bcrypt` is installed: `docker compose build app`.
+
 ## Pathfinding (`POST /find-path`)
 
-The gtsp-server builds a walkability grid from the store layout and shelves, then returns an ordered pick list using a greedy nearest-neighbor heuristic (with optional 2-opt improvement on medium/large stores when a shelf distance matrix is available).
+The gtsp-server builds a polygon-filled walkability grid from shelves (format `walkability_v2`), resolves **front-access** approach cells per shelf template, then returns an ordered pick list using a **GTSP solver** (exact for ≤12 UPCs; insertion + 2-opt + outlier relocation for 13–150). Items on the same shelf are batched into one walk leg but each item remains its own stop in the response.
 
 ### Request body (JSON)
 
@@ -69,8 +119,9 @@ JSON **array** of entries in visit order.
 | `shelf` | Shelf name |
 | `shelf_data` | Shelf metadata (`placement_x`, `placement_y`, `template`, `department`, `modulars`, …) |
 | `modular_location` | Position on shelf modular, if known |
-| `location` | `[x, y]` shelf access coordinate used for routing |
-| `distance_from_previous` | Grid distance from previous stop |
+| `location` | `[x, y]` shelf **approach** coordinate used for routing (aisle cell in front of shelf, not placement corner) |
+| `distance_from_previous` | Grid distance from previous stop (`0` when `same_shelf_batch` is true) |
+| `same_shelf_batch` | Optional; `true` when this item is consecutive with the prior stop at the same shelf |
 
 **Unreachable entry** (no shelf location for this store):
 
@@ -92,8 +143,8 @@ JSON **array** of entries in visit order.
 ### How options are processed
 
 1. **Store scope** — UPCs are resolved via `itemindexes` filtered by `store_number` (not global UPC lookup).
-2. **Graph** — Walkability bitmap is loaded or built from shelves (`store_graphs`, format `walkability_v1`), cached per server with LRU limits.
-3. **Ordering** — Greedy nearest-neighbor on grid distances; optional shelf-to-shelf matrix + 2-opt on larger stores (see env vars below).
+2. **Graph** — Walkability bitmap is loaded or built from shelves (`store_graphs`, format `walkability_v2`), with polygon-filled footprints and per-shelf access points. Cached per server with LRU limits.
+3. **Ordering** — GTSP: pick best location per UPC when multiple exist; prioritize shelves with several items; exact DP (≤12 UPCs) or insertion + 2-opt (13–150); optional outlier relocation for multi-location items.
 4. **Start / end** — If `start` and `end` are provided, routing begins at `start`; after picks, a return entry is appended when `end` is not the last pick location. If they are omitted, both default to the store’s first `starting_points` entry.
 
 ### Store editor integration

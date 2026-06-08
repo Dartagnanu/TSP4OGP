@@ -32,6 +32,121 @@
   --sidebar-width: 240px;
 }
 
+.hidden {
+  display: none !important;
+}
+
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.45);
+  padding: var(--space-3);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-4);
+}
+
+.login-card h1 {
+  margin: 0 0 var(--space-1);
+  font-size: 1.35rem;
+}
+
+.login-subtitle {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.login-error {
+  min-height: 1.25rem;
+  margin: var(--space-1) 0;
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+.login-submit {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+.login-hint {
+  margin: var(--space-2) 0 0;
+  font-size: 12px;
+  text-align: center;
+}
+
+#loginStoreNumber::-webkit-outer-spin-button,
+#loginStoreNumber::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+#loginStoreNumber {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.session-info {
+  margin-left: var(--space-2);
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.activity-panel {
+  margin: var(--space-2);
+  padding: var(--space-1);
+  border-top: 1px solid var(--color-border);
+}
+
+.activity-panel summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.activity-list {
+  margin: var(--space-1) 0 0;
+  padding-left: 1.1rem;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.activity-list li {
+  margin-bottom: var(--space-1);
+}
+
+.activity-list time {
+  display: block;
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.activity-action {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.btn-sm {
+  font-size: 12px;
+  padding: 2px 8px;
+  margin-bottom: var(--space-1);
+}
+
 /* ── Reset & base ──────────────────────────────────────────────── */
 *,
 *::before,
@@ -200,7 +315,7 @@ textarea {
 }
 
 /* ── Context menu ──────────────────────────────────────────────── */
-#contextMenu {
+.context-menu {
   display: none;
   position: absolute;
   z-index: 4000;
@@ -213,7 +328,7 @@ textarea {
   overflow: hidden;
 }
 
-#contextMenu button {
+.context-menu button {
   display: block;
   width: 100%;
   padding: var(--space-1) var(--space-2);
@@ -227,15 +342,16 @@ textarea {
   transition: background 0.12s;
 }
 
-#contextMenu button:hover {
+.context-menu button:hover {
   background: var(--color-surface-muted);
 }
 
-#contextMenu button + button {
+.context-menu button + button {
   border-top: 1px solid var(--color-border);
 }
 
-#deleteShelfBtn:hover {
+#deleteShelfBtn:hover,
+#deleteShelvesBtn:hover {
   color: var(--color-danger);
 }
 
@@ -249,7 +365,8 @@ textarea {
   backdrop-filter: blur(2px);
 }
 
-#shelfEditPopup {
+#shelfEditPopup,
+#pasteOptionsModal {
   display: none;
   position: fixed;
   top: 50%;
@@ -265,9 +382,16 @@ textarea {
   box-shadow: var(--shadow-lg);
 }
 
-#shelfEditPopup h3 {
+#shelfEditPopup h3,
+#pasteOptionsModal h3 {
   margin-bottom: var(--space-2);
   font-size: 18px;
+}
+
+#pasteOptionsMessage {
+  margin-bottom: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 14px;
 }
 
 .form-field {

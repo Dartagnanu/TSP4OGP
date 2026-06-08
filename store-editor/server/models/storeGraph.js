@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const storeGraphSchema = new mongoose.Schema({
     store_number: { type: Number, required: true, unique: true, index: true },
-    format: { type: String, default: 'walkability_v1' },
+    format: { type: String, default: 'walkability_v2' },
     width: { type: Number },
     height: { type: Number },
     walkable: { type: Buffer },

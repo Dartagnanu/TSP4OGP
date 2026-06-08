@@ -32,7 +32,8 @@ export function createStage(containerId, stageWidth, stageHeight) {
     };
 
     stage.position(newPos);
-    stage.batchDraw(); // Redraw the stage
+    stage.batchDraw();
+    stage.fire('zoomChange', { scale: newScale });
   });
 
   return { stage, layer };

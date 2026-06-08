@@ -1,32 +1,29 @@
-"""Shelf-to-shelf distance matrix and 2-opt tour improvement."""
+"""Coordinate distance matrix and 2-opt tour improvement."""
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
-from pathfinder_config import should_build_matrix, should_run_two_opt
 from walkability import Coord, WalkabilityGrid
 
 INF = float("inf")
 
 
-def build_shelf_matrix(
+def build_coord_matrix(
     grid: WalkabilityGrid,
-    shelf_coords: List[Coord],
-    gpu_available: bool = False,
+    coords: List[Coord],
 ) -> Optional[np.ndarray]:
-    """Full n x n distance matrix between shelf access points."""
-    n = len(shelf_coords)
+    """Full n x n BFS distance matrix between grid coordinates."""
+    n = len(coords)
     if n == 0:
         return None
     matrix = np.full((n, n), INF, dtype=np.float64)
     np.fill_diagonal(matrix, 0.0)
 
-    # CPU BFS from each shelf (GPU batch deferred to pathfinder_config gate)
-    for i, start in enumerate(shelf_coords):
+    for i, start in enumerate(coords):
         field = grid.bfs_distance_field(start)
-        for j, (tx, ty) in enumerate(shelf_coords):
+        for j, (tx, ty) in enumerate(coords):
             if i == j:
                 continue
             if 0 <= ty < grid.height and 0 <= tx < grid.width:
@@ -34,6 +31,15 @@ def build_shelf_matrix(
                 if d >= 0:
                     matrix[i, j] = float(d)
     return matrix
+
+
+def build_shelf_matrix(
+    grid: WalkabilityGrid,
+    shelf_coords: List[Coord],
+    gpu_available: bool = False,
+) -> Optional[np.ndarray]:
+    """Backward-compatible shelf matrix builder."""
+    return build_coord_matrix(grid, shelf_coords)
 
 
 def matrix_distance(
@@ -48,7 +54,19 @@ def matrix_distance(
     ib = coord_to_index.get(b)
     if ia is None or ib is None:
         return INF
+    if ia == ib:
+        return 0.0
     return float(matrix[ia, ib])
+
+
+def tour_length(indices: List[int], matrix: np.ndarray) -> float:
+    total = 0.0
+    for i in range(len(indices) - 1):
+        d = matrix[indices[i], indices[i + 1]]
+        if d >= INF:
+            return INF
+        total += d
+    return total
 
 
 def two_opt_improve(
@@ -56,21 +74,12 @@ def two_opt_improve(
     matrix: np.ndarray,
     max_iterations: int = 500,
 ) -> List[int]:
-    """2-opt on a tour of shelf indices (open path, fixed start)."""
+    """2-opt on a tour of matrix indices (open path)."""
     if len(tour_indices) < 4:
         return tour_indices
 
     tour = tour_indices[:]
     n = len(tour)
-
-    def tour_length(seq: List[int]) -> float:
-        total = 0.0
-        for i in range(len(seq) - 1):
-            d = matrix[seq[i], seq[i + 1]]
-            if d >= INF:
-                return INF
-            total += d
-        return total
 
     improved = True
     it = 0
@@ -89,38 +98,3 @@ def two_opt_improve(
                     tour[i:j] = reversed(tour[i:j])
                     improved = True
     return tour
-
-
-def reorder_picks_by_tour(
-    pick_entries: List[dict],
-    tour_indices: List[int],
-    shelf_coord_for_pick: List[Coord],
-    coord_to_index: Dict[Coord, int],
-) -> List[dict]:
-    """Reorder pick list entries to match 2-opt shelf tour (same UPC entries)."""
-    if not pick_entries or len(tour_indices) != len(shelf_coord_for_pick):
-        return pick_entries
-
-    index_to_pick = {}
-    for entry, coord in zip(pick_entries, shelf_coord_for_pick):
-        idx = coord_to_index.get(coord)
-        if idx is not None and idx not in index_to_pick:
-            index_to_pick[idx] = entry
-
-    reordered = []
-    prev_coord = None
-    for idx in tour_indices:
-        entry = index_to_pick.get(idx)
-        if entry is None:
-            continue
-        coord = shelf_coord_for_pick[tour_indices.index(idx)] if idx in tour_indices else None
-        # Recompute distance_from_previous if we have matrix context in entry
-        reordered.append(entry)
-    # Simpler: map pick by coord index
-    ordered = []
-    for idx in tour_indices:
-        for entry, coord in zip(pick_entries, shelf_coord_for_pick):
-            if coord_to_index.get(coord) == idx:
-                ordered.append(entry)
-                break
-    return ordered if ordered else pick_entries
