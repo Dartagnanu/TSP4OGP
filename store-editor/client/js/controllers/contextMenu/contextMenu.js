@@ -236,8 +236,12 @@ export class ContextMenu {
     });
 
     this.mapController.stage.on('mouseup', () => {
+      const wasDragging = isRightMouseDown && this.isDraggingMap;
       isRightMouseDown = false;
       lastMousePosition = null;
+      if (wasDragging) {
+        this.mapController.stage.fire('viewportChange');
+      }
     });
 
     this.mapController.stage.on('contentContextmenu', (e) => {

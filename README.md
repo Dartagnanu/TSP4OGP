@@ -42,7 +42,7 @@ Log in with username, password, and the **store number** you want to edit (`3260
 
 ### Store 3261 layout (Walmart-style prototype)
 
-- **Map:** 1000×600 ft (10× store 3260). Minor 1 ft grid is hidden at this size; use pan/zoom.
+- **Map:** 1000×600 ft (10× store 3260). At overview zoom only major grid lines show; zoom in to reveal a viewport 1–10 ft minor grid.
 - **Entrance:** `Main_Entrance` at front center `[500, 590]`; checkout registers at `[380, 598]` and `[620, 598]`.
 - **Zones:** empty north/east/west perimeter bands; **central racetrack** (no gondolas, promo features inside); **west and east wings** with three aisle pairs each (15-bay runs, two row-blocks per aisle); **front action alley** promos behind the entrance; **endcaps** at the north/south end of each aisle pair.
 

@@ -6,8 +6,11 @@
 /** Placement and drag snap resolution in feet. */
 export const GRID_SNAP_FT = 1;
 
-/** Skip 1 ft minor grid when map cell count exceeds this (performance). */
+/** Skip full-map 1 ft minor grid when map cell count exceeds this (performance). */
 export const MINOR_GRID_MAX_CELLS = 250000;
+
+/** Max minor grid lines per axis in viewport-culled mode. */
+export const MINOR_GRID_MAX_LINES_PER_AXIS = 400;
 
 export function snapFeet(value, snapFt = GRID_SNAP_FT) {
   if (!Number.isFinite(value)) return 0;
@@ -115,4 +118,75 @@ export function getStageZoom(stage) {
 export function compensateForStageZoom(basePx, stageScale) {
   const zoom = Number.isFinite(stageScale) && stageScale > 0 ? stageScale : 1;
   return basePx / zoom;
+}
+
+/** Screen-constant stroke width from immutable base attr and live stage zoom. */
+export function getCompensatedStrokeWidth(basePx, stage) {
+  return compensateForStageZoom(basePx, getStageZoom(stage));
+}
+
+/** Pixels per foot accounting for wheel zoom. */
+export function effectivePixelsPerFoot(ppf, stage) {
+  return ppf * getStageZoom(stage);
+}
+
+/** Visible map layer bounds in stage coordinates. */
+export function getVisibleStageBounds(stage) {
+  const scale = getStageZoom(stage);
+  const x0 = -stage.x() / scale;
+  const y0 = -stage.y() / scale;
+  return {
+    x0,
+    y0,
+    x1: x0 + stage.width() / scale,
+    y1: y0 + stage.height() / scale,
+  };
+}
+
+/**
+ * Minor grid spacing in feet for viewport mode, or null when too zoomed out.
+ * Thresholds are symmetric for zoom-in and zoom-out.
+ */
+export function chooseMinorGridSpacing(effectivePpf) {
+  if (effectivePpf >= 8) return 1;
+  if (effectivePpf >= 4) return 5;
+  if (effectivePpf >= 2) return 10;
+  return null;
+}
+
+/**
+ * Pick minor spacing that fits within line budget for the visible viewport.
+ */
+export function chooseMinorGridSpacingForViewport(
+  viewportWidthFt,
+  viewportHeightFt,
+  effectivePpf
+) {
+  const candidates = [1, 5, 10]
+    .filter((s) => {
+      if (s === 1 && effectivePpf < 8) return false;
+      if (s === 5 && effectivePpf < 4) return false;
+      if (s === 10 && effectivePpf < 2) return false;
+      return true;
+    })
+    .sort((a, b) => a - b);
+
+  for (const spacing of candidates) {
+    const linesX = Math.ceil(viewportWidthFt / spacing) + 1;
+    const linesY = Math.ceil(viewportHeightFt / spacing) + 1;
+    if (
+      linesX <= MINOR_GRID_MAX_LINES_PER_AXIS &&
+      linesY <= MINOR_GRID_MAX_LINES_PER_AXIS
+    ) {
+      return spacing;
+    }
+  }
+  return null;
+}
+
+/** Major grid spacing: denser overview on very large maps. */
+export function resolveMajorGridSpacing(mapSize, configuredSpacingFt = 100) {
+  const w = Number(mapSize?.width) || 0;
+  if (w > 500) return Math.min(configuredSpacingFt, 50);
+  return configuredSpacingFt;
 }

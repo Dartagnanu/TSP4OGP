@@ -60,17 +60,20 @@ export class PathOverlay {
         }
 
         if (linePoints.length >= 4) {
-            this.layer.add(
-                new Konva.Line({
-                    points: linePoints,
-                    stroke: '#2563eb',
-                    strokeWidth: routeStroke,
-                    lineCap: 'round',
-                    lineJoin: 'round',
-                    dash: [dashMain, dashGap],
-                    listening: false,
-                })
-            );
+            const routeLine = new Konva.Line({
+                points: linePoints,
+                stroke: '#2563eb',
+                strokeWidth: routeStroke,
+                lineCap: 'round',
+                lineJoin: 'round',
+                dash: [dashMain, dashGap],
+                listening: false,
+                name: 'path-route-line',
+            });
+            routeLine.setAttr('baseStrokeWidth', routeStroke);
+            routeLine.setAttr('baseDashMain', dashMain);
+            routeLine.setAttr('baseDashGap', dashGap);
+            this.layer.add(routeLine);
         }
 
         const stopStroke = strokeWidthForMap(ppf, { min: 0.75, max: 2, factor: 0.35 });
@@ -112,6 +115,20 @@ export class PathOverlay {
 
     applyZoomCompensation() {
         const zoom = getStageZoom(this.stage);
+        for (const line of this.layer.find('.path-route-line')) {
+            const baseStroke = line.getAttr('baseStrokeWidth');
+            const baseDashMain = line.getAttr('baseDashMain');
+            const baseDashGap = line.getAttr('baseDashGap');
+            if (Number.isFinite(baseStroke)) {
+                line.strokeWidth(compensateForStageZoom(baseStroke, zoom));
+            }
+            if (Number.isFinite(baseDashMain) && Number.isFinite(baseDashGap)) {
+                line.dash([
+                    compensateForStageZoom(baseDashMain, zoom),
+                    compensateForStageZoom(baseDashGap, zoom),
+                ]);
+            }
+        }
         for (const group of this.layer.getChildren()) {
             if (group.getClassName() !== 'Group') continue;
             const circle = group.findOne('Circle');

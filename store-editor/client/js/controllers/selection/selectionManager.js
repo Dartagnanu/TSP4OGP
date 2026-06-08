@@ -3,6 +3,7 @@ import {
   clampPlacementOrigin,
 } from '../../konva/mapUnits.js';
 import { applyZoomCompensatedShelfLabel } from '../../konva/drawUtils.js';
+import { getCompensatedStrokeWidth } from '../../konva/mapUnits.js';
 import { moveShelf } from '../../dataUtils/shelfDataApi.js';
 import { askPasteKeepItems } from './pasteOptionsModal.js';
 
@@ -109,14 +110,14 @@ export class SelectionManager {
 
       if (selected) {
         polygon.stroke(SELECTION_STROKE);
-        polygon.strokeWidth(hover);
+        polygon.strokeWidth(getCompensatedStrokeWidth(hover, stage));
         if (label && stage) {
           applyZoomCompensatedShelfLabel(label, stage);
           label.visible(true);
         }
       } else {
         polygon.stroke('#334155');
-        polygon.strokeWidth(base);
+        polygon.strokeWidth(getCompensatedStrokeWidth(base, stage));
         label?.visible(false);
       }
     }

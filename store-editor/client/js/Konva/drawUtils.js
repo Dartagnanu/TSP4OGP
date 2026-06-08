@@ -12,7 +12,14 @@ import {
   clampPx,
   getStageZoom,
   compensateForStageZoom,
+  getCompensatedStrokeWidth,
+  effectivePixelsPerFoot,
+  getVisibleStageBounds,
+  chooseMinorGridSpacingForViewport,
+  resolveMajorGridSpacing,
 } from './mapUnits.js';
+
+const GRID_BASE_STROKE = 1;
 
 export function applyZoomCompensatedShelfLabel(text, stage) {
   const zoom = getStageZoom(stage);
@@ -66,6 +73,170 @@ export function refreshZoomCompensatedLabels(stage) {
   stage.batchDraw();
 }
 
+function _addGridLine(layer, points, stroke, name) {
+  const line = new Konva.Line({
+    points,
+    stroke,
+    strokeWidth: GRID_BASE_STROKE,
+    listening: false,
+    name,
+  });
+  line.setAttr('baseStrokeWidth', GRID_BASE_STROKE);
+  layer.add(line);
+  return line;
+}
+
+function _drawFullMapMinorGrid(layer, widthFt, heightFt, scale_X, scale_Y) {
+  const stageH = heightFt * scale_Y;
+  const stageW = widthFt * scale_X;
+  for (let x = 0; x <= widthFt; x += GRID_SNAP_FT) {
+    const stageX = x * scale_X;
+    _addGridLine(
+      layer,
+      [stageX, 0, stageX, stageH],
+      '#f1f5f9',
+      'foot-grid-line-minor'
+    );
+  }
+  for (let y = 0; y <= heightFt; y += GRID_SNAP_FT) {
+    const stageY = y * scale_Y;
+    _addGridLine(
+      layer,
+      [0, stageY, stageW, stageY],
+      '#f1f5f9',
+      'foot-grid-line-minor'
+    );
+  }
+}
+
+function _drawViewportMinorGrid(layer, store, scale_X, scale_Y, stage) {
+  const widthFt = store.map_size.width;
+  const heightFt = store.map_size.height;
+  const stageH = heightFt * scale_Y;
+  const stageW = widthFt * scale_X;
+  const ppf = pixelsPerFoot(scale_X, scale_Y);
+  const effPpf = effectivePixelsPerFoot(ppf, stage);
+  const bounds = getVisibleStageBounds(stage);
+
+  const x0ft = Math.max(0, Math.floor(bounds.x0 / scale_X));
+  const x1ft = Math.min(widthFt, Math.ceil(bounds.x1 / scale_X));
+  const y0ft = Math.max(0, Math.floor(bounds.y0 / scale_Y));
+  const y1ft = Math.min(heightFt, Math.ceil(bounds.y1 / scale_Y));
+  const viewportWFt = x1ft - x0ft;
+  const viewportHFt = y1ft - y0ft;
+
+  const spacing = chooseMinorGridSpacingForViewport(
+    viewportWFt,
+    viewportHFt,
+    effPpf
+  );
+  if (!spacing) return;
+
+  const startX = Math.floor(x0ft / spacing) * spacing;
+  const startY = Math.floor(y0ft / spacing) * spacing;
+
+  for (let x = startX; x <= x1ft; x += spacing) {
+    const stageX = x * scale_X;
+    _addGridLine(
+      layer,
+      [stageX, 0, stageX, stageH],
+      '#f1f5f9',
+      'foot-grid-line-minor'
+    );
+  }
+  for (let y = startY; y <= y1ft; y += spacing) {
+    const stageY = y * scale_Y;
+    _addGridLine(
+      layer,
+      [0, stageY, stageW, stageY],
+      '#f1f5f9',
+      'foot-grid-line-minor'
+    );
+  }
+}
+
+/** Recompute viewport-culled minor grid for large maps (destroy-then-redraw). */
+export function redrawViewportGrid(layer, store, scale_X, scale_Y, stage) {
+  if (!layer || !store || !stage) return;
+  if (shouldDrawMinorFootGrid(store.map_size)) return;
+
+  layer.find('.foot-grid-line-minor').forEach((line) => line.destroy());
+  _drawViewportMinorGrid(layer, store, scale_X, scale_Y, stage);
+  layer.batchDraw();
+}
+
+/** Re-apply zoom compensation for boundary, grid, shelves, arrows, starting points. */
+export function refreshZoomCompensatedMapChrome(stage, selectionManager = null) {
+  if (!stage) return;
+  const zoom = getStageZoom(stage);
+  const selectedNames = selectionManager?.selectedNames;
+
+  for (const line of stage.find('.store-edge-line')) {
+    const baseStroke = line.getAttr('baseStrokeWidth');
+    const baseDashMain = line.getAttr('baseDashMain');
+    const baseDashGap = line.getAttr('baseDashGap');
+    if (Number.isFinite(baseStroke)) {
+      line.strokeWidth(compensateForStageZoom(baseStroke, zoom));
+    }
+    if (Number.isFinite(baseDashMain) && Number.isFinite(baseDashGap)) {
+      line.dash([
+        compensateForStageZoom(baseDashMain, zoom),
+        compensateForStageZoom(baseDashGap, zoom),
+      ]);
+    }
+  }
+
+  for (const line of stage.find('.foot-grid-line, .foot-grid-line-minor')) {
+    const baseStroke = line.getAttr('baseStrokeWidth') ?? GRID_BASE_STROKE;
+    line.strokeWidth(compensateForStageZoom(baseStroke, zoom));
+  }
+
+  for (const group of stage.find('Group')) {
+    if (!group.getAttr('shelfData')) continue;
+    const polygon = group.findOne(
+      (n) => n.getClassName() === 'Line' && n.closed()
+    );
+    const arrow = group.findOne(
+      (n) => n.getClassName() === 'Line' && !n.closed()
+    );
+    if (!polygon) continue;
+
+    const base = polygon.getAttr('baseStrokeWidth') ?? 1;
+    const hover = polygon.getAttr('hoverStrokeWidth') ?? base * 2;
+    const selected = selectedNames?.has(group.id());
+    const strokeBase = selected ? hover : base;
+    polygon.stroke(selected ? '#2563eb' : '#334155');
+    polygon.strokeWidth(compensateForStageZoom(strokeBase, zoom));
+
+    if (arrow) {
+      const arrowBaseStroke = arrow.getAttr('baseStrokeWidth');
+      const arrowBaseLen = arrow.getAttr('baseArrowLen');
+      if (Number.isFinite(arrowBaseStroke)) {
+        arrow.strokeWidth(compensateForStageZoom(arrowBaseStroke, zoom));
+      }
+      if (Number.isFinite(arrowBaseLen)) {
+        arrow.points(
+          buildShelfArrowPoints(compensateForStageZoom(arrowBaseLen, zoom))
+        );
+      }
+    }
+  }
+
+  for (const circle of stage.find('.starting-point-marker')) {
+    if (circle.getClassName() !== 'Circle') continue;
+    const baseRadius = circle.getAttr('baseRadius');
+    const baseStroke = circle.getAttr('baseStrokeWidth');
+    if (Number.isFinite(baseRadius)) {
+      circle.radius(compensateForStageZoom(baseRadius, zoom));
+    }
+    if (Number.isFinite(baseStroke)) {
+      circle.strokeWidth(compensateForStageZoom(baseStroke, zoom));
+    }
+  }
+
+  stage.batchDraw();
+}
+
 function calculatePolygonCentroid(shape, scale_X, scale_Y) {
   let sumX = 0;
   let sumY = 0;
@@ -82,7 +253,14 @@ function calculatePolygonCentroid(shape, scale_X, scale_Y) {
   };
 }
 
-export function drawFootGrid(layer, store, scale_X, scale_Y, majorSpacingFt = 100) {
+export function drawFootGrid(
+  layer,
+  store,
+  scale_X,
+  scale_Y,
+  majorSpacingFt = 100,
+  stage = null
+) {
   layer.find('.foot-grid-line').forEach((line) => line.destroy());
   layer.find('.foot-grid-line-minor').forEach((line) => line.destroy());
 
@@ -92,56 +270,32 @@ export function drawFootGrid(layer, store, scale_X, scale_Y, majorSpacingFt = 10
   const stageW = widthFt * scale_X;
 
   if (shouldDrawMinorFootGrid(store.map_size)) {
-    for (let x = 0; x <= widthFt; x += GRID_SNAP_FT) {
-      const stageX = x * scale_X;
-      layer.add(
-        new Konva.Line({
-          points: [stageX, 0, stageX, stageH],
-          stroke: '#f1f5f9',
-          strokeWidth: 1,
-          listening: false,
-          name: 'foot-grid-line-minor',
-        })
-      );
-    }
-    for (let y = 0; y <= heightFt; y += GRID_SNAP_FT) {
-      const stageY = y * scale_Y;
-      layer.add(
-        new Konva.Line({
-          points: [0, stageY, stageW, stageY],
-          stroke: '#f1f5f9',
-          strokeWidth: 1,
-          listening: false,
-          name: 'foot-grid-line-minor',
-        })
-      );
-    }
+    _drawFullMapMinorGrid(layer, widthFt, heightFt, scale_X, scale_Y);
+  } else if (stage) {
+    _drawViewportMinorGrid(layer, store, scale_X, scale_Y, stage);
   }
 
-  const major = Math.max(GRID_SNAP_FT, majorSpacingFt);
+  const major = Math.max(
+    GRID_SNAP_FT,
+    resolveMajorGridSpacing(store.map_size, majorSpacingFt)
+  );
   for (let x = 0; x <= widthFt; x += major) {
     const stageX = x * scale_X;
-    layer.add(
-      new Konva.Line({
-        points: [stageX, 0, stageX, stageH],
-        stroke: '#e5e7eb',
-        strokeWidth: 1,
-        listening: false,
-        name: 'foot-grid-line',
-      })
+    _addGridLine(
+      layer,
+      [stageX, 0, stageX, stageH],
+      '#e5e7eb',
+      'foot-grid-line'
     );
   }
 
   for (let y = 0; y <= heightFt; y += major) {
     const stageY = y * scale_Y;
-    layer.add(
-      new Konva.Line({
-        points: [0, stageY, stageW, stageY],
-        stroke: '#e5e7eb',
-        strokeWidth: 1,
-        listening: false,
-        name: 'foot-grid-line',
-      })
+    _addGridLine(
+      layer,
+      [0, stageY, stageW, stageY],
+      '#e5e7eb',
+      'foot-grid-line'
     );
   }
 
@@ -211,17 +365,19 @@ export function drawStoreEdge(layer, store, scale_X, scale_Y) {
   const dashSeg = Math.max(4, ppf * 2);
   const dashGap = Math.max(4, ppf);
 
-  layer.add(
-    new Konva.Line({
-      points: scaledPoints,
-      stroke: '#334155',
-      strokeWidth: edgeStroke,
-      dash: [dashSeg, dashGap],
-      closed: true,
-      listening: false,
-      name: 'store-edge-line',
-    })
-  );
+  const edgeLine = new Konva.Line({
+    points: scaledPoints,
+    stroke: '#334155',
+    strokeWidth: edgeStroke,
+    dash: [dashSeg, dashGap],
+    closed: true,
+    listening: false,
+    name: 'store-edge-line',
+  });
+  edgeLine.setAttr('baseStrokeWidth', edgeStroke);
+  edgeLine.setAttr('baseDashMain', dashSeg);
+  edgeLine.setAttr('baseDashGap', dashGap);
+  layer.add(edgeLine);
   layer.draw();
 }
 
@@ -303,6 +459,8 @@ export function drawShelf(
     y: centroid.y,
     listening: false,
   });
+  arrow.setAttr('baseStrokeWidth', arrowStroke);
+  arrow.setAttr('baseArrowLen', arrowLen);
 
   const shelfNameText = new Konva.Text({
     text: shelfData.shelf_name || 'Unknown',
@@ -397,31 +555,31 @@ export function drawShelf(
       applySnapPosition: applySnapToGroup,
       persistSingleShelf,
       onHoverEnter: () => {
-        polygon.strokeWidth(hoverStroke);
+        polygon.strokeWidth(getCompensatedStrokeWidth(hoverStroke, stage));
         applyZoomCompensatedShelfLabel(shelfNameText, stage);
         shelfNameText.visible(true);
         layer.batchDraw();
       },
       onHoverLeave: () => {
-        polygon.strokeWidth(baseStroke);
+        polygon.strokeWidth(getCompensatedStrokeWidth(baseStroke, stage));
         shelfNameText.visible(false);
         layer.batchDraw();
       },
     });
     if (selectionManager.isSelected(shelfData.shelf_name)) {
       polygon.stroke('#2563eb');
-      polygon.strokeWidth(hoverStroke);
+      polygon.strokeWidth(getCompensatedStrokeWidth(hoverStroke, stage));
     }
   } else {
     shelfGroup.on('mouseenter', () => {
-      polygon.strokeWidth(hoverStroke);
+      polygon.strokeWidth(getCompensatedStrokeWidth(hoverStroke, stage));
       applyZoomCompensatedShelfLabel(shelfNameText, stage);
       shelfNameText.visible(true);
       layer.batchDraw();
     });
 
     shelfGroup.on('mouseleave', () => {
-      polygon.strokeWidth(baseStroke);
+      polygon.strokeWidth(getCompensatedStrokeWidth(baseStroke, stage));
       shelfNameText.visible(false);
       layer.batchDraw();
     });
@@ -486,18 +644,24 @@ export function drawStartingPoints(layer, startingPoints, scale_X, scale_Y) {
     const stageX = x * scale_X;
     const stageY = y * scale_Y;
 
-    layer.add(
-      new Konva.Circle({
-        x: stageX,
-        y: stageY,
-        radius: markerRadius,
-        fill: 'red',
-        stroke: 'black',
-        strokeWidth: strokeWidthForMap(ppf, { min: 0.75, max: 1.5, factor: 0.2 }),
-        listening: false,
-        name: 'starting-point-marker',
-      })
-    );
+    const markerStroke = strokeWidthForMap(ppf, {
+      min: 0.75,
+      max: 1.5,
+      factor: 0.2,
+    });
+    const circle = new Konva.Circle({
+      x: stageX,
+      y: stageY,
+      radius: markerRadius,
+      fill: 'red',
+      stroke: 'black',
+      strokeWidth: markerStroke,
+      listening: false,
+      name: 'starting-point-marker',
+    });
+    circle.setAttr('baseRadius', markerRadius);
+    circle.setAttr('baseStrokeWidth', markerStroke);
+    layer.add(circle);
 
     const label = new Konva.Text({
       x: stageX + labelOffset,

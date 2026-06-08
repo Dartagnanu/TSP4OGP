@@ -9,6 +9,8 @@ import {
   drawFootGrid,
   clearMapShelfLayer,
   refreshZoomCompensatedLabels,
+  refreshZoomCompensatedMapChrome,
+  redrawViewportGrid,
 } from '../konva/drawUtils.js';
 import {getStore} from '../dataUtils/storeUtils.js';
 import {deleteShelf, updateShelfByOldName, getShelvesByStore} from '../dataUtils/shelfUtils.js';
@@ -118,7 +120,14 @@ export class mapController {
 
     const spacingFt = this.map.store.grid_spacing_ft ?? 100;
     if (this.gridLayer) {
-      drawFootGrid(this.gridLayer, this.map.store, scale_X, scale_Y, spacingFt);
+      drawFootGrid(
+        this.gridLayer,
+        this.map.store,
+        scale_X,
+        scale_Y,
+        spacingFt,
+        this.stage
+      );
     }
     if (this.boundaryLayer) {
       drawStoreEdge(this.boundaryLayer, this.map.store, scale_X, scale_Y);
@@ -141,11 +150,26 @@ export class mapController {
       scale_X,
       scale_Y
     );
-    refreshZoomCompensatedLabels(this.stage);
+    this._refreshMapViewport();
     if (this.palette) {
       this.palette.updateScales(scale_X, scale_Y);
     }
     this.stage.batchDraw();
+  }
+
+  _refreshMapViewport() {
+    if (!this.stage || !this.map?.store) return;
+
+    redrawViewportGrid(
+      this.gridLayer,
+      this.map.store,
+      this.scale_X,
+      this.scale_Y,
+      this.stage
+    );
+    refreshZoomCompensatedMapChrome(this.stage, this.selectionManager);
+    refreshZoomCompensatedLabels(this.stage);
+    this.pathOverlay?.applyZoomCompensation();
   }
 
   _bindResizeObserver() {
@@ -196,7 +220,7 @@ export class mapController {
     this.scale_Y = scale_Y;
 
     const spacingFt = map.store.grid_spacing_ft ?? 100;
-    drawFootGrid(gridLayer, map.store, scale_X, scale_Y, spacingFt);
+    drawFootGrid(gridLayer, map.store, scale_X, scale_Y, spacingFt, stage);
     this.gridLayer = gridLayer;
 
     drawStoreEdge(boundaryLayer, map.store, scale_X, scale_Y);
@@ -225,7 +249,6 @@ export class mapController {
       this.selectionManager
     );
     drawStartingPoints(layer, map.store.starting_points || [], scale_X, scale_Y);
-    refreshZoomCompensatedLabels(stage);
 
     const contextMenu = new ContextMenu(this);
     contextMenu.init();
@@ -235,10 +258,10 @@ export class mapController {
     this.pathResultsPopup = new PathResultsPopup(() => this.pathOverlay.clear());
     this.walkFinder = new walkFinder(GTSP_SERVER_URL);
 
-    stage.on('zoomChange', () => {
-      refreshZoomCompensatedLabels(stage);
-      this.pathOverlay.applyZoomCompensation();
-    });
+    stage.on('zoomChange', () => this._refreshMapViewport());
+    stage.on('viewportChange', () => this._refreshMapViewport());
+
+    this._refreshMapViewport();
 
     return { contextMenu, layer, map, stage};
   }
