@@ -148,7 +148,8 @@ export class mapController {
       this.layer,
       this.map.store.starting_points || [],
       scale_X,
-      scale_Y
+      scale_Y,
+      this.stage
     );
     this._refreshMapViewport();
     if (this.palette) {
@@ -248,7 +249,13 @@ export class mapController {
       this.socket,
       this.selectionManager
     );
-    drawStartingPoints(layer, map.store.starting_points || [], scale_X, scale_Y);
+    drawStartingPoints(
+      layer,
+      map.store.starting_points || [],
+      scale_X,
+      scale_Y,
+      stage
+    );
 
     const contextMenu = new ContextMenu(this);
     contextMenu.init();

@@ -20,53 +20,97 @@ import {
 } from './mapUnits.js';
 
 const GRID_BASE_STROKE = 1;
+const LABEL_OFFSET_X_PX = 12;
+const LABEL_OFFSET_Y_PX = 16;
 
-export function applyZoomCompensatedShelfLabel(text, stage) {
+export function createNameLabel(text, { name, baseFontSize }) {
+  const label = new Konva.Label({ visible: false, listening: false, name });
+  label.add(
+    new Konva.Tag({
+      fill: 'rgba(15, 23, 42, 0.82)',
+      cornerRadius: 4,
+      pointerDirection: 'none',
+    })
+  );
+  label.add(
+    new Konva.Text({
+      text,
+      fontFamily: 'Arial',
+      fill: '#f8fafc',
+      padding: 4,
+    })
+  );
+  label.setAttr('baseFontSize', baseFontSize);
+  return label;
+}
+
+/** Keep label text upright when parent shelf group is rotated. */
+export function applyLabelUpright(label, parentNode) {
+  const parentRotation = parentNode?.rotation?.() ?? 0;
+  label.rotation(-parentRotation);
+}
+
+export function positionNameLabelAtPointer(label, stage, parentNode) {
   const zoom = getStageZoom(stage);
-  const baseFont = text.getAttr('baseFontSize');
-  const baseOffsetY = text.getAttr('baseLabelOffsetY');
-  const centroidX = text.getAttr('baseCentroidX');
-  const centroidY = text.getAttr('baseCentroidY');
-  if (!Number.isFinite(baseFont)) return;
-
-  text.fontSize(compensateForStageZoom(baseFont, zoom));
-  if (Number.isFinite(centroidX) && Number.isFinite(centroidY)) {
-    text.x(centroidX);
-    text.y(centroidY - compensateForStageZoom(baseOffsetY, zoom));
+  const pointer = stage.getPointerPosition();
+  if (!pointer) return;
+  const transform = parentNode.getAbsoluteTransform().copy().invert();
+  const local = transform.point(pointer);
+  label.x(local.x + compensateForStageZoom(LABEL_OFFSET_X_PX, zoom));
+  label.y(local.y - compensateForStageZoom(LABEL_OFFSET_Y_PX, zoom));
+  applyLabelUpright(label, parentNode);
+  // #region agent log
+  if (parentNode.getAttr?.('shelfData')) {
+    fetch('http://127.0.0.1:7564/ingest/326e187e-4e6f-4a2c-af02-5659473e063d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'5bfbd6'},body:JSON.stringify({sessionId:'5bfbd6',location:'drawUtils.js:positionNameLabelAtPointer',message:'label upright',data:{parentRotation:parentNode.rotation(),labelRotation:label.rotation(),shelf:parentNode.id?.()},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
   }
-  text.offsetX(text.width() / 2);
-  text.offsetY(text.height() / 2);
+  // #endregion
 }
 
-export function applyZoomCompensatedMapLabel(text, stage) {
+export function applyZoomCompensatedNameLabel(label, stage) {
   const zoom = getStageZoom(stage);
-  const baseFont = text.getAttr('baseFontSize');
-  const baseX = text.getAttr('baseX');
-  const baseY = text.getAttr('baseY');
-  if (!Number.isFinite(baseFont)) return;
-
-  text.fontSize(compensateForStageZoom(baseFont, zoom));
-  if (Number.isFinite(baseX)) text.x(compensateForStageZoom(baseX, zoom));
-  if (Number.isFinite(baseY)) text.y(compensateForStageZoom(baseY, zoom));
+  const baseFont = label.getAttr('baseFontSize');
+  const textNode = label.findOne('Text');
+  if (textNode && Number.isFinite(baseFont)) {
+    textNode.fontSize(compensateForStageZoom(baseFont, zoom));
+  }
 }
 
-/** Re-apply zoom compensation for visible shelf hover labels and map labels. */
+export function showNameLabel(label, stage, parentNode) {
+  parentNode.moveToTop();
+  positionNameLabelAtPointer(label, stage, parentNode);
+  applyZoomCompensatedNameLabel(label, stage);
+  label.visible(true);
+}
+
+/** @deprecated Use showNameLabel / applyZoomCompensatedNameLabel for Label nodes. */
+export function applyZoomCompensatedShelfLabel(label, stage, parentNode) {
+  if (label.getClassName() === 'Label' && parentNode) {
+    positionNameLabelAtPointer(label, stage, parentNode);
+    applyZoomCompensatedNameLabel(label, stage);
+    return;
+  }
+  applyZoomCompensatedNameLabel(label, stage);
+}
+
+/** Re-apply zoom compensation for visible shelf and entrance name labels. */
 export function refreshZoomCompensatedLabels(stage) {
   if (!stage) return;
 
   for (const group of stage.find('Group')) {
-    if (!group.getAttr('shelfData')) continue;
-    const text = group.findOne(
-      (node) => node.getClassName() === 'Text' && node.getAttr('baseFontSize')
-    );
-    if (text?.visible()) {
-      applyZoomCompensatedShelfLabel(text, stage);
+    if (group.getAttr('shelfData')) {
+      const label = group.findOne('.shelf-name-label');
+      if (label?.visible()) {
+        positionNameLabelAtPointer(label, stage, group);
+        applyZoomCompensatedNameLabel(label, stage);
+      }
+      continue;
     }
-  }
-
-  for (const text of stage.find('.starting-point-marker')) {
-    if (text.getClassName() === 'Text' && text.getAttr('baseFontSize')) {
-      applyZoomCompensatedMapLabel(text, stage);
+    if (group.name() === 'starting-point-marker') {
+      const label = group.findOne('.entrance-name-label');
+      if (label?.visible()) {
+        positionNameLabelAtPointer(label, stage, group);
+        applyZoomCompensatedNameLabel(label, stage);
+      }
     }
   }
 
@@ -222,8 +266,10 @@ export function refreshZoomCompensatedMapChrome(stage, selectionManager = null) 
     }
   }
 
-  for (const circle of stage.find('.starting-point-marker')) {
-    if (circle.getClassName() !== 'Circle') continue;
+  for (const group of stage.find('.starting-point-marker')) {
+    if (group.getClassName() !== 'Group') continue;
+    const circle = group.findOne('Circle');
+    if (!circle) continue;
     const baseRadius = circle.getAttr('baseRadius');
     const baseStroke = circle.getAttr('baseStrokeWidth');
     if (Number.isFinite(baseRadius)) {
@@ -433,7 +479,6 @@ export function drawShelf(
   );
   const arrowStroke = strokeWidthForMap(ppf, { min: 0.75, max: 2, factor: 0.35 });
   const labelFontSize = clampPx(ppf * 6, 8, 12);
-  const labelOffsetY = arrowLen * 0.5 + labelFontSize * 0.5;
 
   const polygon = new Konva.Line({
     points,
@@ -462,23 +507,10 @@ export function drawShelf(
   arrow.setAttr('baseStrokeWidth', arrowStroke);
   arrow.setAttr('baseArrowLen', arrowLen);
 
-  const shelfNameText = new Konva.Text({
-    text: shelfData.shelf_name || 'Unknown',
-    fontSize: labelFontSize,
-    fontFamily: 'Arial',
-    fill: '#000',
-    align: 'center',
-    x: centroid.x,
-    y: centroid.y - labelOffsetY,
-    visible: false,
-    listening: false,
+  const shelfNameLabel = createNameLabel(shelfData.shelf_name || 'Unknown', {
+    name: 'shelf-name-label',
+    baseFontSize: labelFontSize,
   });
-  shelfNameText.setAttr('baseFontSize', labelFontSize);
-  shelfNameText.setAttr('baseLabelOffsetY', labelOffsetY);
-  shelfNameText.setAttr('baseCentroidX', centroid.x);
-  shelfNameText.setAttr('baseCentroidY', centroid.y);
-  shelfNameText.offsetX(shelfNameText.width() / 2);
-  shelfNameText.offsetY(shelfNameText.height() / 2);
 
   const shelfGroup = new Konva.Group({
     x: placementX,
@@ -490,9 +522,28 @@ export function drawShelf(
 
   shelfGroup.add(polygon);
   shelfGroup.add(arrow);
-  shelfGroup.add(shelfNameText);
+  shelfGroup.add(shelfNameLabel);
   shelfGroup.id(shelfData.shelf_name);
   layer.add(shelfGroup);
+
+  const showShelfLabel = () => {
+    showNameLabel(shelfNameLabel, stage, shelfGroup);
+    layer.batchDraw();
+  };
+
+  const hideShelfLabel = () => {
+    shelfNameLabel.visible(false);
+    layer.batchDraw();
+  };
+
+  const trackShelfLabel = () => {
+    if (!shelfNameLabel.visible()) return;
+    positionNameLabelAtPointer(shelfNameLabel, stage, shelfGroup);
+    applyZoomCompensatedNameLabel(shelfNameLabel, stage);
+    layer.batchDraw();
+  };
+
+  shelfGroup.on('mousemove', trackShelfLabel);
 
   const applySnapPosition = () => {
     const pos = shelfGroup.position();
@@ -556,14 +607,11 @@ export function drawShelf(
       persistSingleShelf,
       onHoverEnter: () => {
         polygon.strokeWidth(getCompensatedStrokeWidth(hoverStroke, stage));
-        applyZoomCompensatedShelfLabel(shelfNameText, stage);
-        shelfNameText.visible(true);
-        layer.batchDraw();
+        showShelfLabel();
       },
       onHoverLeave: () => {
         polygon.strokeWidth(getCompensatedStrokeWidth(baseStroke, stage));
-        shelfNameText.visible(false);
-        layer.batchDraw();
+        hideShelfLabel();
       },
     });
     if (selectionManager.isSelected(shelfData.shelf_name)) {
@@ -573,19 +621,16 @@ export function drawShelf(
   } else {
     shelfGroup.on('mouseenter', () => {
       polygon.strokeWidth(getCompensatedStrokeWidth(hoverStroke, stage));
-      applyZoomCompensatedShelfLabel(shelfNameText, stage);
-      shelfNameText.visible(true);
-      layer.batchDraw();
+      showShelfLabel();
     });
 
     shelfGroup.on('mouseleave', () => {
       polygon.strokeWidth(getCompensatedStrokeWidth(baseStroke, stage));
-      shelfNameText.visible(false);
-      layer.batchDraw();
+      hideShelfLabel();
     });
 
     shelfGroup.on('dragstart', () => {
-      shelfNameText.visible(false);
+      hideShelfLabel();
     });
 
     shelfGroup.on('dragmove', () => {
@@ -630,13 +675,12 @@ export function loadShelves(
   });
 }
 
-export function drawStartingPoints(layer, startingPoints, scale_X, scale_Y) {
+export function drawStartingPoints(layer, startingPoints, scale_X, scale_Y, stage) {
   layer.find('.starting-point-marker').forEach((node) => node.destroy());
 
   const ppf = pixelsPerFoot(scale_X, scale_Y);
   const markerRadius = clampPx(ppf * 1.5, 3, 8);
   const labelFontSize = clampPx(ppf * 6, 8, 12);
-  const labelOffset = markerRadius + 2;
 
   startingPoints.forEach((point) => {
     const [x, y] = point.point;
@@ -649,6 +693,14 @@ export function drawStartingPoints(layer, startingPoints, scale_X, scale_Y) {
       max: 1.5,
       factor: 0.2,
     });
+
+    const group = new Konva.Group({
+      x: 0,
+      y: 0,
+      name: 'starting-point-marker',
+      listening: true,
+    });
+
     const circle = new Konva.Circle({
       x: stageX,
       y: stageY,
@@ -656,27 +708,41 @@ export function drawStartingPoints(layer, startingPoints, scale_X, scale_Y) {
       fill: 'red',
       stroke: 'black',
       strokeWidth: markerStroke,
-      listening: false,
-      name: 'starting-point-marker',
+      listening: true,
     });
     circle.setAttr('baseRadius', markerRadius);
     circle.setAttr('baseStrokeWidth', markerStroke);
-    layer.add(circle);
 
-    const label = new Konva.Text({
-      x: stageX + labelOffset,
-      y: stageY - labelOffset,
-      text: labelText,
-      fontSize: labelFontSize,
-      fontFamily: 'Calibri',
-      fill: 'black',
-      listening: false,
-      name: 'starting-point-marker',
+    const nameLabel = createNameLabel(labelText, {
+      name: 'entrance-name-label',
+      baseFontSize: labelFontSize,
     });
-    label.setAttr('baseFontSize', labelFontSize);
-    label.setAttr('baseX', stageX + labelOffset);
-    label.setAttr('baseY', stageY - labelOffset);
-    layer.add(label);
+
+    group.add(circle);
+    group.add(nameLabel);
+    layer.add(group);
+
+    const showEntranceLabel = () => {
+      if (!stage) return;
+      showNameLabel(nameLabel, stage, group);
+      layer.batchDraw();
+    };
+
+    const hideEntranceLabel = () => {
+      nameLabel.visible(false);
+      layer.batchDraw();
+    };
+
+    const trackEntranceLabel = () => {
+      if (!nameLabel.visible() || !stage) return;
+      positionNameLabelAtPointer(nameLabel, stage, group);
+      applyZoomCompensatedNameLabel(nameLabel, stage);
+      layer.batchDraw();
+    };
+
+    group.on('mouseenter', showEntranceLabel);
+    group.on('mousemove', trackEntranceLabel);
+    group.on('mouseleave', hideEntranceLabel);
   });
 
   layer.draw();

@@ -2,7 +2,7 @@ import {
   placementFromStage,
   clampPlacementOrigin,
 } from '../../konva/mapUnits.js';
-import { applyZoomCompensatedShelfLabel } from '../../konva/drawUtils.js';
+import { showNameLabel } from '../../konva/drawUtils.js';
 import { getCompensatedStrokeWidth } from '../../konva/mapUnits.js';
 import { moveShelf } from '../../dataUtils/shelfDataApi.js';
 import { askPasteKeepItems } from './pasteOptionsModal.js';
@@ -103,7 +103,7 @@ export class SelectionManager {
       if (child.getClassName() !== 'Group' || !child.getAttr('shelfData')) continue;
       const polygon = this._getPolygon(child);
       if (!polygon) continue;
-      const label = child.findOne((n) => n.getClassName() === 'Text');
+      const label = child.findOne('.shelf-name-label');
       const base = polygon.getAttr('baseStrokeWidth') ?? 1;
       const hover = polygon.getAttr('hoverStrokeWidth') ?? base * 2;
       const selected = this.selectedNames.has(child.id());
@@ -112,8 +112,7 @@ export class SelectionManager {
         polygon.stroke(SELECTION_STROKE);
         polygon.strokeWidth(getCompensatedStrokeWidth(hover, stage));
         if (label && stage) {
-          applyZoomCompensatedShelfLabel(label, stage);
-          label.visible(true);
+          showNameLabel(label, stage, child);
         }
       } else {
         polygon.stroke('#334155');
@@ -143,7 +142,13 @@ export class SelectionManager {
     });
 
     shelfGroup.on('mouseenter', () => {
-      if (!this.isSelected(shelfGroup.id())) {
+      if (this.isSelected(shelfGroup.id())) {
+        const label = shelfGroup.findOne('.shelf-name-label');
+        const stage = this.mapController.stage;
+        if (label?.visible() && stage) {
+          showNameLabel(label, stage, shelfGroup);
+        }
+      } else {
         onHoverEnter?.();
       }
     });
@@ -160,7 +165,7 @@ export class SelectionManager {
         this.selectOne(name);
       }
       this._beginGroupDrag(shelfGroup, applySnapPosition);
-      shelfGroup.findOne('Text')?.visible(false);
+      shelfGroup.findOne('.shelf-name-label')?.visible(false);
     });
 
     shelfGroup.on('dragmove', () => {
