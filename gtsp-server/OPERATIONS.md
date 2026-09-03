@@ -4,12 +4,12 @@
 
 - Any pod can serve any `store_number`; no sticky sessions.
 - **Mongo `store_graphs`** is the source of truth (`format: walkability_v2`).
-- In-process **LRU cache** is per-pod only.
+- In-process **LRU cache** is per-pod only. Invalidate by copying `stores.updatedAt` onto `store_graphs.store_updated_at` and comparing **equality** (not wall-clock `last_updated`). Shelf create/update/delete/clone (and seed) must `$set` `stores.updatedAt`. Direct Compass/Mongo shelf edits do not invalidate until something touches the store document.
 
 ## Mongo
 
 - Index: `store_graphs.store_number` (unique in app schema).
-- Compact documents: `width`, `height`, packed `walkable` bits, `shelf_nodes`, `shelves_hash`.
+- Compact documents: `width`, `height`, packed `walkable` bits, `shelf_nodes`, `shelves_hash`, `store_updated_at`.
 
 ## Environment variables
 
@@ -26,6 +26,10 @@
 | `PATHFINDER_GTSP_EXACT_MAX_K` | 12 | Exact GTSP DP up to this pick count |
 | `PATHFINDER_COLLATION_WEIGHT` | 2 | Same-shelf routing priority bonus (grid cells) |
 | `PATHFINDER_RELOCATE_MAX_OUTLIERS` | 3 | Multi-location outlier re-checks per pass |
+| `PATHFINDER_OROPT` | 1 | Or-opt longest-leg relocate after 2-opt (`0`/`false`/`no` to disable) |
+| `PATHFINDER_OROPT_MAX_LEGS` | 8 | Max unique-shelf long hops considered per Or-opt pass |
+| `PATHFINDER_OROPT_NEIGHBORS` | 5 | k-nearest other stops to try as relocate targets |
+| `PATHFINDER_OROPT_MAX_PASSES` | 3 | Max Or-opt passes (stops early if no improvement) |
 | `PATHFINDER_MAX_MAP_WIDTH` | 2000 | Reject wider maps |
 | `PATHFINDER_MAX_MAP_HEIGHT` | 2500 | Reject taller maps |
 | `PATHFINDER_GPU_MATRIX_PRECOMPUTE` | 1 | GPU for matrix build (still CPU BFS today) |

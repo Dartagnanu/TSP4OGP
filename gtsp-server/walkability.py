@@ -39,6 +39,28 @@ class WalkabilityGrid:
             return False
         return bool(self.walkable[y, x])
 
+    def snap_to_walkable(self, point: Coord, max_radius: int = 30) -> Coord:
+        """Nearest walkable cell in grid steps, or the original point if none."""
+        sx, sy = int(point[0]), int(point[1])
+        if self.is_walkable(sx, sy):
+            return (sx, sy)
+        seen = {(sx, sy)}
+        q: deque = deque([(sx, sy, 0)])
+        while q:
+            x, y, r = q.popleft()
+            if r >= max_radius:
+                continue
+            for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if (nx, ny) in seen:
+                    continue
+                if nx < 0 or ny < 0 or nx >= self.width or ny >= self.height:
+                    continue
+                seen.add((nx, ny))
+                if self.walkable[ny, nx]:
+                    return (nx, ny)
+                q.append((nx, ny, r + 1))
+        return (sx, sy)
+
     def bfs_distance_field(self, start: Coord) -> np.ndarray:
         """
         4-neighbor BFS from start. Returns int32 array (height, width);

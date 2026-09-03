@@ -75,6 +75,21 @@ services:
       - .:/usr/src/app
       - app_server_node_modules:/usr/src/app/store-editor/server/node_modules
 
+  seed-3262:
+    profiles: [seed-3262]
+    build: ./store-editor
+    container_name: store-seed-3262
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/storemaps
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - "cd /usr/src/app/store-editor/server && (test -f node_modules/mongoose/package.json || npm install --omit=dev) && cd /usr/src/app && node store-editor/server/scripts/seedStore3262.js"
+    volumes:
+      - .:/usr/src/app
+      - app_server_node_modules:/usr/src/app/store-editor/server/node_modules
+
 volumes:
   mongo-data:
   app_server_node_modules:

@@ -22,5 +22,8 @@ const itemIndexSchema = new mongoose.Schema({
 });
 
 itemIndexSchema.index({ store: 1, upcs: 1 }, { unique: true }); // fast UPC lookup
+itemIndexSchema.index({ store_number: 1, upcs: 1 });
+itemIndexSchema.index({ store_number: 1, item_number: 1 });
+itemIndexSchema.index({ store_number: 1, 'locations.shelf_name': 1 });
 
 export default mongoose.model('ItemIndex', itemIndexSchema);

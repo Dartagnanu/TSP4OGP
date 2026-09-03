@@ -10,16 +10,22 @@ From the repo root:
 docker compose up -d mongo app gtsp-server
 ```
 
-Seed demo data for store **3260** (required on a fresh database). The full seed also creates store **3261**:
+Seed demo data for store **3260** (required on a fresh database). The full seed also creates stores **3261** and **3262**:
 
 ```bash
 docker compose --profile seed run --rm seed
 ```
 
-Add or refresh **store 3261 only** (Walmart-style 1000×600 ft layout; does not wipe 3260):
+Add or refresh **store 3261 only** (1000×600 corridor-block demo; does not wipe 3260):
 
 ```bash
 docker compose --profile seed-3261 run --rm seed-3261
+```
+
+Add or refresh **store 3262 only** (dense 500×300 ft test layout; does not wipe 3260/3261):
+
+```bash
+docker compose --profile seed-3262 run --rm seed-3262
 ```
 
 - **Store editor:** http://localhost:42069  
@@ -38,13 +44,30 @@ On first startup (when no `manager` user exists), the app creates:
 | `manager` | `manager` | All stores in Mongo, or `3260` if none exist |
 | `manager1` | `manager1` | Same as above |
 
-Log in with username, password, and the **store number** you want to edit (`3260` small demo map, `3261` big-box). A manager can only open stores listed on their account. On startup the app merges every store in Mongo into `allowed_store_numbers` for the default managers.
+Log in with username, password, and the **store number** you want to edit (`3260` small demo map, `3261` big-box, `3262` dense test). Example: username `manager`, password `manager`, store `3262`. A manager can only open stores listed on their account. On startup the app merges every store in Mongo into `allowed_store_numbers` for the default managers.
 
-### Store 3261 layout (Walmart-style prototype)
+Gondola aisles are the same in every store: **15-bay runs** (60 ft), **6-cell walkable aisle** between facing shelves, and the next aisle **back-to-back** (pair pitch 10 ft). Store **3260** uses one modular per gondola bay (one unique SKU each). Stores **3261** and **3262** share 40-modular / 160-SKU merchandising. All three have 36 flex SKUs on 20 feature bins and named Test Walks (`20/60/80/100 SKU ambient`). Re-seed after pulling these changes so the dropdown fills.
 
-- **Map:** 1000×600 ft (10× store 3260). At overview zoom only major grid lines show; zoom in to reveal a viewport 1–10 ft minor grid.
-- **Entrance:** `Main_Entrance` at front center `[500, 590]`; checkout registers at `[380, 598]` and `[620, 598]`.
-- **Zones:** empty north/east/west perimeter bands; **central racetrack** (no gondolas, promo features inside); **west and east wings** with three aisle pairs each (15-bay runs, two row-blocks per aisle); **front action alley** promos behind the entrance; **endcaps** at the north/south end of each aisle pair.
+### Store 3260 layout (compact demo)
+
+- **Map:** 100×84 ft (west/east gondola wings like 3262, 15-bay runs, 4 aisle pairs, 20 feature bins — not a 3k-shelf store). Each gondola has its own modular and unique SKU so Test Walks cover the full aisle length.
+- **Entrance:** `Main_Entrance` at `[50, 78]` (front aisle, clear of feature bins).
+
+### Store 3261 layout (corridor-block demo)
+
+- **Map:** 1000×600 ft. At overview zoom only major grid lines show; zoom in to reveal a viewport 1–10 ft minor grid.
+- **Entrance:** `Main_Entrance` at `[500, 590]` (walkable gap between register lanes).
+- **Blocks (letter in the shelf name):** **A** 15-bay vertical, **B** 6-bay vertical, **C** 15-bay horizontal, **D** 6-bay horizontal, **E** 15-bay vertical (east), **Z** 3-bay vertical register corridors at the front. Grocery runs are only 15 or 6 bays; registers are only 3. Corridor count per block is whatever fits.
+- **Aisles:** 6 empty cells between facing fronts; next gondola row at pitch 10. Arrows face the corridor center.
+- **Merchandising:** 40 modulars / 160 SKUs on gondola bays; Test Walks use the shared 20/60/80/100 SKU lists.
+- **Seed only 3261:** `docker compose --profile seed-3261 run --rm seed-3261`
+
+### Store 3262 layout (dense test prototype)
+
+- **Map:** 500×300 ft. Same `standard_shelf` / `feature_bin` templates as 3261, with denser gondola packing (15-bay runs, 6-cell aisles, 22 aisle pairs per wing).
+- **Merchandising:** 40 modulars / 160 SKUs; item numbers start at 3000001.
+- **Login:** username `manager`, password `manager`, store `3262`.
+- **Seed only 3262:** `docker compose --profile seed-3262 run --rm seed-3262`
 
 ### Login troubleshooting
 

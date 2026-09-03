@@ -22,6 +22,10 @@ RELOCATE_MAX_OUTLIERS = int(os.environ.get("PATHFINDER_RELOCATE_MAX_OUTLIERS", "
 RELOCATE_MAX_PASSES = int(os.environ.get("PATHFINDER_RELOCATE_MAX_PASSES", "2"))
 RELOCATE_LARGE_K_THRESHOLD = int(os.environ.get("PATHFINDER_RELOCATE_LARGE_K", "50"))
 RELOCATE_MAX_OUTLIERS_LARGE = int(os.environ.get("PATHFINDER_RELOCATE_MAX_OUTLIERS_LARGE", "5"))
+OROPT_ENABLED = os.environ.get("PATHFINDER_OROPT", "1").lower() in ("1", "true", "yes")
+OROPT_MAX_LEGS = int(os.environ.get("PATHFINDER_OROPT_MAX_LEGS", "8"))
+OROPT_NEIGHBORS = int(os.environ.get("PATHFINDER_OROPT_NEIGHBORS", "5"))
+OROPT_MAX_PASSES = int(os.environ.get("PATHFINDER_OROPT_MAX_PASSES", "3"))
 
 WALKABILITY_FORMAT = "walkability_v2"
 
@@ -77,3 +81,10 @@ def relocate_outlier_cap(k: int) -> int:
     if k > RELOCATE_LARGE_K_THRESHOLD:
         return RELOCATE_MAX_OUTLIERS_LARGE
     return RELOCATE_MAX_OUTLIERS
+
+
+def should_run_or_opt(k: int) -> bool:
+    """Or-opt runs on the insertion heuristic branch only (not exact DP)."""
+    if not OROPT_ENABLED:
+        return False
+    return k > GTSP_EXACT_MAX_K

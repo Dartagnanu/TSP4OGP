@@ -15,7 +15,7 @@ const shelfSchema = new mongoose.Schema({
 });
 
 // enforce uniqueness per store
-shelfSchema.index({ store: 1, shelf_name: 1 }, { unique: true });
+shelfSchema.index({ store_number: 1, shelf_name: 1 }, { unique: true });
 
 
 export default mongoose.model('Shelf', shelfSchema);

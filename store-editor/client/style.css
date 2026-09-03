@@ -257,6 +257,34 @@ textarea {
   gap: var(--space-1);
 }
 
+#testWalkSelect {
+  height: 32px;
+  min-width: 160px;
+  max-width: 240px;
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 13px;
+}
+
+#testWalkSelect:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.btn:disabled,
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary:disabled:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
 /* ── Canvas container ──────────────────────────────────────────── */
 #container {
   margin-top: var(--topbar-height);

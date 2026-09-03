@@ -59,11 +59,6 @@ export function positionNameLabelAtPointer(label, stage, parentNode) {
   label.x(local.x + compensateForStageZoom(LABEL_OFFSET_X_PX, zoom));
   label.y(local.y - compensateForStageZoom(LABEL_OFFSET_Y_PX, zoom));
   applyLabelUpright(label, parentNode);
-  // #region agent log
-  if (parentNode.getAttr?.('shelfData')) {
-    fetch('http://127.0.0.1:7564/ingest/326e187e-4e6f-4a2c-af02-5659473e063d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'5bfbd6'},body:JSON.stringify({sessionId:'5bfbd6',location:'drawUtils.js:positionNameLabelAtPointer',message:'label upright',data:{parentRotation:parentNode.rotation(),labelRotation:label.rotation(),shelf:parentNode.id?.()},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
-  }
-  // #endregion
 }
 
 export function applyZoomCompensatedNameLabel(label, stage) {
@@ -642,8 +637,6 @@ export function drawShelf(
       persistSingleShelf();
     });
   }
-
-  layer.draw();
 }
 
 export function loadShelves(
@@ -673,6 +666,7 @@ export function loadShelves(
       console.warn('Missing template for shelf', shelfData.shelf_name);
     }
   });
+  layer.batchDraw();
 }
 
 export function drawStartingPoints(layer, startingPoints, scale_X, scale_Y, stage) {

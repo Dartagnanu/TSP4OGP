@@ -17,9 +17,17 @@ export async function syncManagerStoreAccess() {
   return { updated: true, storeNumbers };
 }
 
-export async function grantStore3261Access() {
+export async function grantStoreAccess(storeNumber) {
   await Manager.updateMany(
     { username: { $in: ['manager', 'manager1'] } },
-    { $addToSet: { allowed_store_numbers: 3261 } }
+    { $addToSet: { allowed_store_numbers: storeNumber } }
   );
+}
+
+export async function grantStore3261Access() {
+  return grantStoreAccess(3261);
+}
+
+export async function grantStore3262Access() {
+  return grantStoreAccess(3262);
 }

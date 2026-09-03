@@ -8,6 +8,7 @@ from typing import Dict, List, Optional, TYPE_CHECKING
 
 import numpy as np
 
+from graphBuilder import timestamps_equal
 from pathfinder_config import MAX_CACHE_MB, MAX_CACHED_STORES, tier_for_walkable_count
 from shelf_access import shelf_node_lookup
 from walkability import Coord, WalkabilityGrid
@@ -29,6 +30,7 @@ class StoreContext:
     shelf_node_by_name: Dict[str, dict] = field(default_factory=dict)
     distance_matrix: Optional[np.ndarray] = None
     matrix_building: bool = False
+    store_updated_at: object = None
 
     def estimate_bytes(self) -> int:
         nbytes = self.grid.estimate_bytes()
@@ -47,16 +49,16 @@ class StoreCache:
         self._entries.pop(store_number, None)
 
     def get_context(self, store_number: int) -> StoreContext:
-        current_hash = self.graph_builder.shelves_hash_for_store(store_number)
+        current_updated = self.graph_builder.store_updated_at(store_number)
 
         if store_number in self._entries:
             ctx = self._entries[store_number]
-            if ctx.shelves_hash == current_hash:
+            if timestamps_equal(ctx.store_updated_at, current_updated):
                 self._entries.move_to_end(store_number)
                 self._stats["hits"] += 1
                 return ctx
             print(
-                f"StoreCache: shelves changed for store {store_number}, invalidating",
+                f"StoreCache: store {store_number} updatedAt changed, invalidating",
                 flush=True,
             )
             self.invalidate(store_number)
@@ -90,6 +92,7 @@ class StoreCache:
             grid=grid,
             shelf_nodes=shelf_nodes,
             shelves_hash=shelves_hash,
+            store_updated_at=current_updated,
             tier=tier,
             walkable_count=walkable_count,
             n_shelves=len(shelf_nodes),

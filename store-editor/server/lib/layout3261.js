@@ -1,26 +1,29 @@
 /**
- * Walmart-style supercenter layout for store 3261 (1000×600 ft).
- * Gondola runs along Y; wings west/east of central racetrack.
+ * Store 3261 demonstration: supermarket corridor blocks on 1000×600.
+ * Grocery runs are only 15 or 6 bays; registers (block Z) are 3-bay vertical
+ * corridors at the front. Facing matches live 3260 (front = local +Y).
  */
 
+import {
+  TEST_MERCH,
+  buildTestMerchandising,
+  summarizeTestMerch,
+} from './testMerchandising.js';
+
 const STORE_NUMBER = 3261;
+const ITEM_NUMBER_START = 2100001;
+const START_POINT = { id: 'Main_Entrance', point: [500, 590] };
 const MAP_WIDTH = 1000;
 const MAP_HEIGHT = 600;
 
-const BAYS_PER_RUN = 15;
 const BAY_PITCH = 4;
-const RUN_LENGTH = BAYS_PER_RUN * BAY_PITCH;
 const GONDOLA_DEPTH = 2;
-const MERCH_AISLE = 12;
-const CROSS_AISLE = 18;
-const PAIR_PITCH_X = 30;
+const MERCH_AISLE = 6;
+const COLUMN_PITCH = GONDOLA_DEPTH + MERCH_AISLE + GONDOLA_DEPTH;
+const ORIGIN_ALIGN = 4;
 
-const WING_WEST_X0 = 80;
-const WING_EAST_X0 = 550;
-const AISLE_PAIRS_PER_WING = 3;
-
-const BLOCK1_Y0 = 100;
-const BLOCK2_Y0 = BLOCK1_Y0 + RUN_LENGTH + CROSS_AISLE;
+const GROCERY_BAYS = new Set([15, 6]);
+const REGISTER_BAYS = 3;
 
 const SHELF_TEMPLATES = {
   standard_shelf: {
@@ -47,6 +50,22 @@ const SHELF_TEMPLATES = {
 
 function snap(n) {
   return Math.round(n);
+}
+
+function pad2(n) {
+  return String(n).padStart(2, '0');
+}
+
+function assertBayCount(bayCount, blockLetter) {
+  if (blockLetter === 'Z') {
+    if (bayCount !== REGISTER_BAYS) {
+      throw new Error(`Register block Z only allows ${REGISTER_BAYS} bays, got ${bayCount}`);
+    }
+    return;
+  }
+  if (!GROCERY_BAYS.has(bayCount)) {
+    throw new Error(`Grocery block ${blockLetter} only allows 15 or 6 bays, got ${bayCount}`);
+  }
 }
 
 function makeStandardShelf(name, placement_x, placement_y, rotation, department = 'general') {
@@ -77,119 +96,308 @@ function makeFeatureShelf(name, placement_x, placement_y, rotation = 0, departme
   };
 }
 
-/** West run faces +X (rotation 90); east run faces -X (rotation 270). */
-function placeRun(shelves, wingCode, aisleIndex, blockIndex, side, xBase, yBase) {
-  const sideCode = side === 'west' ? 'W' : 'E';
-  const rot = side === 'west' ? 90 : 270;
-  const x =
-    side === 'west' ? xBase : xBase + GONDOLA_DEPTH + MERCH_AISLE;
-
-  for (let bay = 1; bay <= BAYS_PER_RUN; bay += 1) {
-    const y = yBase + (bay - 1) * BAY_PITCH;
-    const name = `3261-${wingCode}${aisleIndex}-B${blockIndex}-${sideCode}${String(bay).padStart(2, '0')}`;
-    shelves.push(makeStandardShelf(name, x, y, rot));
+/** Double-sided vertical gondola: 90° faces −X, 270° faces +X (into adjacent aisles). */
+function placeVerticalGondolaColumn(shelves, { x, y0, bayCount, blockLetter, colIndex, department }) {
+  for (let bay = 1; bay <= bayCount; bay += 1) {
+    const y90 = y0 + (bay - 1) * BAY_PITCH;
+    const y270 = y90 + ORIGIN_ALIGN;
+    const prefix = `3261-${blockLetter}-C${pad2(colIndex)}`;
+    shelves.push(makeStandardShelf(`${prefix}-W${pad2(bay)}`, x, y90, 90, department));
+    shelves.push(makeStandardShelf(`${prefix}-E${pad2(bay)}`, x, y270, 270, department));
   }
 }
 
-function placeWing(shelves, wingCode, x0) {
-  for (let aisle = 1; aisle <= AISLE_PAIRS_PER_WING; aisle += 1) {
-    const xBase = x0 + (aisle - 1) * PAIR_PITCH_X;
-    const aisleCenterX = xBase + GONDOLA_DEPTH + MERCH_AISLE / 2;
-
-    for (const block of [1, 2]) {
-      const yBase = block === 1 ? BLOCK1_Y0 : BLOCK2_Y0;
-      placeRun(shelves, wingCode, aisle, block, 'west', xBase, yBase);
-      placeRun(shelves, wingCode, aisle, block, 'east', xBase, yBase);
-    }
-
-    const pairNorthY = BLOCK1_Y0 - 4;
-    const pairSouthY = BLOCK2_Y0 + RUN_LENGTH;
-    shelves.push(
-      makeFeatureShelf(`3261-${wingCode}${aisle}-ECAP-N`, aisleCenterX - 2, pairNorthY, 0)
-    );
-    shelves.push(
-      makeFeatureShelf(`3261-${wingCode}${aisle}-ECAP-S`, aisleCenterX - 2, pairSouthY, 0)
-    );
+/**
+ * Continuous vertical field: corridorCount aisles, corridorCount+1 gondola columns.
+ */
+function placeVerticalBlock(shelves, { x0, y0, corridorCount, bayCount, blockLetter, department = 'general', colIndexStart = 1 }) {
+  assertBayCount(bayCount, blockLetter);
+  if (corridorCount < 1) {
+    throw new Error(`Block ${blockLetter} needs at least 1 corridor`);
+  }
+  const columnCount = corridorCount + 1;
+  for (let col = 1; col <= columnCount; col += 1) {
+    placeVerticalGondolaColumn(shelves, {
+      x: x0 + (col - 1) * COLUMN_PITCH,
+      y0,
+      bayCount,
+      blockLetter,
+      colIndex: colIndexStart + col - 1,
+      department,
+    });
   }
 }
 
-function placeRacetrackFeatures(shelves) {
-  const xs = [500];
-  const ys = [220, 280, 340, 400];
-  ys.forEach((y, i) => {
-    shelves.push(makeFeatureShelf(`3261-RT-PROMO-${i + 1}`, xs[0] - 2, y, 0));
-  });
+/** Double-sided horizontal gondola: 0° faces +Y, 180° faces −Y. */
+function placeHorizontalGondolaRow(shelves, { y, x0, bayCount, blockLetter, rowIndex, department }) {
+  for (let bay = 1; bay <= bayCount; bay += 1) {
+    const x0face = x0 + (bay - 1) * BAY_PITCH;
+    const x180 = x0face + ORIGIN_ALIGN;
+    const prefix = `3261-${blockLetter}-R${pad2(rowIndex)}`;
+    shelves.push(makeStandardShelf(`${prefix}-S${pad2(bay)}`, x0face, y, 0, department));
+    shelves.push(makeStandardShelf(`${prefix}-N${pad2(bay)}`, x180, y, 180, department));
+  }
 }
 
-function placeFrontActionAlley(shelves) {
-  const y = 545;
-  const xs = [420, 440, 460, 480, 520, 540, 560, 580];
-  xs.forEach((x, i) => {
-    shelves.push(makeFeatureShelf(`3261-FRONT-PROMO-${i + 1}`, x, y, 0));
-  });
+function placeHorizontalBlock(shelves, { y0, x0, corridorCount, bayCount, blockLetter, department = 'general' }) {
+  assertBayCount(bayCount, blockLetter);
+  if (corridorCount < 1) {
+    throw new Error(`Block ${blockLetter} needs at least 1 corridor`);
+  }
+  const rowCount = corridorCount + 1;
+  for (let row = 1; row <= rowCount; row += 1) {
+    placeHorizontalGondolaRow(shelves, {
+      y: y0 + (row - 1) * COLUMN_PITCH,
+      x0,
+      bayCount,
+      blockLetter,
+      rowIndex: row,
+      department,
+    });
+  }
 }
 
-function placeCrossAisleFeatures(shelves) {
+function placeFeatures(shelves) {
   const spots = [
-    [200, 200],
-    [800, 200],
-    [200, 360],
-    [800, 360],
+    [50, 112],
+    [70, 112],
+    [90, 112],
+    [110, 112],
+    [140, 112],
+    [180, 112],
+    [400, 80],
+    [450, 80],
+    [760, 80],
+    [820, 80],
+    [80, 200],
+    [150, 200],
+    [500, 250],
+    [500, 320],
+    [500, 400],
+    [500, 480],
+    [300, 520],
+    [400, 520],
+    [600, 520],
+    [700, 520],
   ];
+  if (spots.length !== TEST_MERCH.FEATURE_COUNT) {
+    throw new Error(`Store 3261 expected ${TEST_MERCH.FEATURE_COUNT} feature spots, got ${spots.length}`);
+  }
   spots.forEach(([x, y], i) => {
-    shelves.push(makeFeatureShelf(`3261-CROSS-${i + 1}`, x, y, 0));
+    shelves.push(makeFeatureShelf(`3261-PROMO-${pad2(i + 1)}`, x, y, 0));
   });
 }
 
-function placeNorthPerimeterFeatures(shelves) {
-  shelves.push(makeFeatureShelf('3261-BACK-PROMO-1', 480, 28, 0));
-  shelves.push(makeFeatureShelf('3261-BACK-PROMO-2', 520, 28, 0));
+function parseShelfName(name) {
+  const m = name.match(/^3261-([A-Z])-(C|R)(\d{2})-([WESN])(\d{2})$/);
+  if (!m) {
+    throw new Error(`Unexpected 3261 shelf name: ${name}`);
+  }
+  return {
+    block: m[1],
+    kind: m[2],
+    index: Number(m[3]),
+    side: m[4],
+    bay: Number(m[5]),
+  };
+}
+
+function assertLayoutGeometry(shelves) {
+  if (COLUMN_PITCH !== GONDOLA_DEPTH + MERCH_AISLE + GONDOLA_DEPTH) {
+    throw new Error('3261 column pitch must be 2+6+2');
+  }
+  const standard = shelves.filter((s) => s.template === 'standard_shelf');
+  const byCol = new Map();
+  const byRow = new Map();
+  for (const s of standard) {
+    const p = parseShelfName(s.shelf_name);
+    if (p.kind === 'C') {
+      const key = `${p.block}-${p.index}`;
+      if (!byCol.has(key)) {
+        byCol.set(key, { block: p.block, index: p.index, x: s.placement_x, bays: new Set(), rots: {} });
+      }
+      const col = byCol.get(key);
+      if (col.x !== s.placement_x) {
+        throw new Error(`Column ${key} has mixed placement_x`);
+      }
+      col.bays.add(p.bay);
+      col.rots[p.side] = s.rotation;
+      if (p.side === 'W' && s.rotation !== 90) {
+        throw new Error(`${s.shelf_name} west face must be 90°`);
+      }
+      if (p.side === 'E' && s.rotation !== 270) {
+        throw new Error(`${s.shelf_name} east face must be 270°`);
+      }
+    } else {
+      const key = `${p.block}-${p.index}`;
+      if (!byRow.has(key)) {
+        byRow.set(key, { block: p.block, index: p.index, y: s.placement_y, bays: new Set() });
+      }
+      const row = byRow.get(key);
+      if (row.y !== s.placement_y) {
+        throw new Error(`Row ${key} has mixed placement_y`);
+      }
+      row.bays.add(p.bay);
+      if (p.side === 'S' && s.rotation !== 0) {
+        throw new Error(`${s.shelf_name} south face must be 0°`);
+      }
+      if (p.side === 'N' && s.rotation !== 180) {
+        throw new Error(`${s.shelf_name} north face must be 180°`);
+      }
+    }
+  }
+
+  const columnsByBlock = new Map();
+  for (const col of byCol.values()) {
+    if (!columnsByBlock.has(col.block)) {
+      columnsByBlock.set(col.block, []);
+    }
+    columnsByBlock.get(col.block).push(col);
+    const bayCount = col.bays.size;
+    if (col.block === 'Z') {
+      if (bayCount !== REGISTER_BAYS) {
+        throw new Error(`Register column ${col.block}-${col.index} has ${bayCount} bays`);
+      }
+    } else if (!GROCERY_BAYS.has(bayCount)) {
+      throw new Error(`Grocery column ${col.block}-${col.index} has ${bayCount} bays`);
+    }
+  }
+  for (const [block, cols] of columnsByBlock) {
+    cols.sort((a, b) => a.x - b.x);
+    for (let i = 1; i < cols.length; i += 1) {
+      const dx = cols[i].x - cols[i - 1].x;
+      if (dx !== COLUMN_PITCH) {
+        if (block !== 'Z') {
+          throw new Error(`Block ${block} column Δx=${dx}, expected ${COLUMN_PITCH}`);
+        }
+        continue;
+      }
+      const facingGap = dx - 2 * GONDOLA_DEPTH;
+      if (facingGap !== MERCH_AISLE) {
+        throw new Error(`Block ${block} facing gap ${facingGap}, expected ${MERCH_AISLE}`);
+      }
+    }
+  }
+
+  const rowsByBlock = new Map();
+  for (const row of byRow.values()) {
+    if (!rowsByBlock.has(row.block)) {
+      rowsByBlock.set(row.block, []);
+    }
+    rowsByBlock.get(row.block).push(row);
+    if (!GROCERY_BAYS.has(row.bays.size)) {
+      throw new Error(`Grocery row ${row.block}-${row.index} has ${row.bays.size} bays`);
+    }
+  }
+  for (const [block, rows] of rowsByBlock) {
+    rows.sort((a, b) => a.y - b.y);
+    for (let i = 1; i < rows.length; i += 1) {
+      const dy = rows[i].y - rows[i - 1].y;
+      if (dy !== COLUMN_PITCH) {
+        throw new Error(`Block ${block} row Δy=${dy}, expected ${COLUMN_PITCH}`);
+      }
+      const facingGap = dy - 2 * GONDOLA_DEPTH;
+      if (facingGap !== MERCH_AISLE) {
+        throw new Error(`Block ${block} horizontal facing gap ${facingGap}, expected ${MERCH_AISLE}`);
+      }
+    }
+  }
+
+  const start = START_POINT.point;
+  for (const s of shelves.filter((sh) => sh.template === 'feature_bin')) {
+    if (
+      start[0] >= s.placement_x &&
+      start[0] < s.placement_x + 4 &&
+      start[1] >= s.placement_y &&
+      start[1] < s.placement_y + 4
+    ) {
+      throw new Error(`Start ${start} overlaps feature ${s.shelf_name}`);
+    }
+  }
+}
+
+function registerPointsForBlock({ x0, corridorCount, y, idPrefix }) {
+  const points = [];
+  for (let i = 1; i <= corridorCount; i += 1) {
+    const x = x0 + (i - 1) * COLUMN_PITCH + 5;
+    points.push({ id: `${idPrefix}${pad2(i)}`, point: [x, y] });
+  }
+  return points;
 }
 
 export function buildStore3261Seed() {
   const shelves = [];
-  placeWing(shelves, 'W', WING_WEST_X0);
-  placeWing(shelves, 'E', WING_EAST_X0);
-  placeRacetrackFeatures(shelves);
-  placeFrontActionAlley(shelves);
-  placeCrossAisleFeatures(shelves);
-  placeNorthPerimeterFeatures(shelves);
 
-  const demoModulars = [
-    {
-      modular_id: '3261-001',
-      modular: 1,
-      modular_section: 1,
-      items: [
-        { location: 1, item_number: 2000001 },
-        { location: 2, item_number: 2000002 },
-      ],
-    },
+  placeVerticalBlock(shelves, {
+    x0: 40,
+    y0: 40,
+    corridorCount: 12,
+    bayCount: 15,
+    blockLetter: 'A',
+  });
+  placeVerticalBlock(shelves, {
+    x0: 40,
+    y0: 130,
+    corridorCount: 9,
+    bayCount: 6,
+    blockLetter: 'B',
+  });
+  placeHorizontalBlock(shelves, {
+    y0: 40,
+    x0: 220,
+    corridorCount: 9,
+    bayCount: 15,
+    blockLetter: 'C',
+  });
+  placeHorizontalBlock(shelves, {
+    y0: 40,
+    x0: 320,
+    corridorCount: 6,
+    bayCount: 6,
+    blockLetter: 'D',
+  });
+  placeVerticalBlock(shelves, {
+    x0: 500,
+    y0: 40,
+    corridorCount: 20,
+    bayCount: 15,
+    blockLetter: 'E',
+  });
+
+  const zWest = { x0: 200, y0: 548, corridorCount: 6, bayCount: 3, blockLetter: 'Z', department: 'checkout' };
+  const zEast = { x0: 560, y0: 548, corridorCount: 6, bayCount: 3, blockLetter: 'Z', department: 'checkout' };
+  placeVerticalBlock(shelves, zWest);
+  placeVerticalBlock(shelves, { ...zEast, colIndexStart: 20 });
+
+  placeFeatures(shelves);
+  assertLayoutGeometry(shelves);
+
+  const { modulars, items, pickwalks } = buildTestMerchandising(shelves, {
+    storeNumber: STORE_NUMBER,
+    itemNumberStart: ITEM_NUMBER_START,
+    modularIdPrefix: '3261-',
+    startPoint: START_POINT,
+    pickwalkIdPrefix: 'pickwalk_3261_',
+  });
+
+  const standard = shelves.filter((s) => s.template === 'standard_shelf').length;
+  const features = shelves.filter((s) => s.template === 'feature_bin').length;
+  if (standard < TEST_MERCH.MODULAR_COUNT) {
+    throw new Error(
+      `Store 3261 expected at least ${TEST_MERCH.MODULAR_COUNT} standard shelves, got ${standard}`
+    );
+  }
+  if (features !== TEST_MERCH.FEATURE_COUNT) {
+    throw new Error(`Store 3261 expected ${TEST_MERCH.FEATURE_COUNT} feature shelves, got ${features}`);
+  }
+  if (items.length !== TEST_MERCH.TOTAL_ITEMS) {
+    throw new Error(`Store 3261 expected ${TEST_MERCH.TOTAL_ITEMS} items, got ${items.length}`);
+  }
+
+  const registers = [
+    ...registerPointsForBlock({ x0: zWest.x0, corridorCount: zWest.corridorCount, y: 582, idPrefix: 'Checkout_W' }),
+    ...registerPointsForBlock({ x0: zEast.x0, corridorCount: zEast.corridorCount, y: 582, idPrefix: 'Checkout_E' }),
   ];
-
-  const demoItems = [
-    {
-      item_number: 2000001,
-      upcs: ['0032612000001'],
-      name: 'Trail Mix',
-      department: 'grocery',
-      photo: '',
-      price: 4.99,
-      pickwalk: 'ambient',
-    },
-    {
-      item_number: 2000002,
-      upcs: ['0032612000002'],
-      name: 'Bottled Water 24pk',
-      department: 'grocery',
-      photo: '',
-      price: 3.99,
-      pickwalk: 'ambient',
-    },
-  ];
-
-  const demoShelf = shelves.find((s) => s.shelf_name === '3261-W1-B1-W01');
-  if (demoShelf) demoShelf.modulars = ['3261-001'];
 
   return {
     store_number: STORE_NUMBER,
@@ -204,13 +412,15 @@ export function buildStore3261Seed() {
     ],
     walls: [],
     shelf_templates: SHELF_TEMPLATES,
-    starting_points: [{ id: 'Main_Entrance', point: [500, 590] }],
-    registers: [
-      { id: 'Checkout_West', point: [380, 598] },
-      { id: 'Checkout_East', point: [620, 598] },
-    ],
+    starting_points: [START_POINT],
+    registers,
     shelves,
-    modulars: demoModulars,
-    items: demoItems,
+    modulars,
+    items,
+    pickwalks,
   };
+}
+
+export function summarizeStore3261Seed(data = buildStore3261Seed()) {
+  return summarizeTestMerch(data);
 }

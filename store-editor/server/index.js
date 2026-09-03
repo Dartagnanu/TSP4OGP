@@ -40,6 +40,65 @@ async function resolveModularRef(ref) {
   return null;
 }
 
+function modularRefKey(ref) {
+  if (ref == null || ref === '') return '';
+  if (typeof ref === 'object') {
+    if (ref.modular_id != null) return String(ref.modular_id);
+    if (ref._id != null) return String(ref._id);
+  }
+  return String(ref);
+}
+
+function collectModularRefKeys(refs) {
+  const modularIds = [];
+  const objectIds = [];
+  for (const ref of refs || []) {
+    if (ref == null || ref === '') continue;
+    const key = modularRefKey(ref);
+    if (!key) continue;
+    modularIds.push(key);
+    if (mongoose.Types.ObjectId.isValid(key)) {
+      try {
+        objectIds.push(new mongoose.Types.ObjectId(key));
+      } catch {
+        // ignore invalid ObjectId strings
+      }
+    }
+  }
+  return { modularIds, objectIds };
+}
+
+async function batchModularIdLookup(allRefs) {
+  const { modularIds, objectIds } = collectModularRefKeys(allRefs);
+  const or = [];
+  if (modularIds.length) or.push({ modular_id: { $in: [...new Set(modularIds)] } });
+  if (objectIds.length) or.push({ _id: { $in: objectIds } });
+  const byModularId = new Map();
+  const byObjectId = new Map();
+  if (or.length === 0) return { byModularId, byObjectId };
+  const docs = await Modular.find({ $or: or }).select('modular_id').lean();
+  for (const doc of docs) {
+    byModularId.set(String(doc.modular_id), doc.modular_id);
+    byObjectId.set(String(doc._id), doc.modular_id);
+  }
+  return { byModularId, byObjectId };
+}
+
+function clientModularIds(refs, lookup) {
+  return (refs || [])
+    .filter((ref) => ref != null && ref !== '')
+    .map((ref) => {
+      const key = modularRefKey(ref);
+      return lookup.byModularId.get(key) || lookup.byObjectId.get(key) || key;
+    });
+}
+
+async function touchStoreUpdatedAt(storeNumber) {
+  const n = Number(storeNumber);
+  if (!Number.isFinite(n)) return;
+  await Store.updateOne({ store_number: n }, { $set: { updatedAt: new Date() } });
+}
+
 function modularRefsFromPayload(payload, sourceShelf) {
   const fromPayload = payload?.modulars;
   if (Array.isArray(fromPayload) && fromPayload.length > 0) {
@@ -64,13 +123,33 @@ async function shelfToClientJson(shelf) {
   return obj;
 }
 
+async function modularsUnchanged(prevRefs, nextRefs) {
+  const prev = prevRefs || [];
+  const next = nextRefs || [];
+  const prevKeys = prev.map(modularRefKey).filter(Boolean).sort();
+  const nextKeys = next.map(modularRefKey).filter(Boolean).sort();
+  if (
+    prevKeys.length === nextKeys.length &&
+    prevKeys.every((k, i) => k === nextKeys[i])
+  ) {
+    return true;
+  }
+  const [prevIds, nextIds] = await Promise.all([
+    modularIdsForClient(prev),
+    modularIdsForClient(next),
+  ]);
+  const a = [...prevIds].sort();
+  const b = [...nextIds].sort();
+  return a.length === b.length && a.every((k, i) => k === b[i]);
+}
+
 /** Rebuild itemindex locations for one shelf from its modulars (pathfinder reads itemindexes, not shelf.modulars). */
 async function syncItemIndexForShelf(shelf, storeNumber) {
   const shelfId = shelf._id;
   const modularRefs = (shelf.modulars || []).filter(Boolean);
 
   await ItemIndex.updateMany(
-    { store_number: storeNumber },
+    { store_number: storeNumber, 'locations.shelf_name': shelfId },
     { $pull: { locations: { shelf_name: shelfId } } }
   );
 
@@ -216,6 +295,7 @@ api.post('/shelf', async (req, res) => {
     const shelf = new Shelf(req.body);
     await shelf.save();
     const storeNum = Number(shelf.store_number);
+    await touchStoreUpdatedAt(storeNum);
     const syncResult = await syncItemIndexForShelf(shelf, storeNum);
     await recordAccess({
       username: req.auth.username,
@@ -260,6 +340,7 @@ api.post('/shelf/:source_shelf_name/clone', async (req, res) => {
       department: payload.department ?? sourceShelf.department,
     });
     await newShelf.save();
+    await touchStoreUpdatedAt(store_number);
 
     const sourceId = sourceShelf._id;
     const newId = newShelf._id;
@@ -331,15 +412,28 @@ api.put('/shelf/:shelf_name/store/:store_number', async (req, res) => {
       return res.status(400).send({ error: 'store_number must be a number' });
     }
     console.log(req.body);
+    const storeNum = Number(store_number);
+    const existing = await Shelf.findOne({
+      shelf_name,
+      store_number: storeNum,
+    });
+    if (!existing) {
+      return res.status(404).send({ error: 'Shelf not found', shelf_name, store_number });
+    }
+    const nextModulars =
+      req.body?.modulars !== undefined ? req.body.modulars : existing.modulars;
+    const skipSync = await modularsUnchanged(existing.modulars, nextModulars);
     const shelf = await Shelf.findOneAndUpdate(
-      { shelf_name, store_number: Number(store_number) },
+      { shelf_name, store_number: storeNum },
       req.body,
       { new: true }
     );
 
     if (!shelf) return res.status(404).send({ error: 'Shelf not found', shelf_name, store_number});
-    const storeNum = Number(store_number);
-    const syncResult = await syncItemIndexForShelf(shelf, storeNum);
+    await touchStoreUpdatedAt(storeNum);
+    const syncResult = skipSync
+      ? { indexesUpdated: 0, modularsResolved: [], modularsMissing: [], skipped: true }
+      : await syncItemIndexForShelf(shelf, storeNum);
     await recordAccess({
       username: req.auth.username,
       store_number: req.auth.store_number,
@@ -374,9 +468,10 @@ api.delete('/shelf/:shelf_name/store/:store_number', async (req, res) => {
             });
         }
         await ItemIndex.updateMany(
-            { store_number: Number(req.params.store_number) },
+            { store_number: Number(req.params.store_number), 'locations.shelf_name': shelf._id },
             { $pull: { locations: { shelf_name: shelf._id } } }
         );
+        await touchStoreUpdatedAt(req.params.store_number);
         await recordAccess({
           username: req.auth.username,
           store_number: req.auth.store_number,
@@ -396,11 +491,12 @@ api.get('/shelves', async (req, res) => {
   try {
     const store_number = Number(req.query.store);
     console.log('Query for shelves of store number:', store_number);
-    const shelves = await Shelf.find({ store_number: store_number });
-    const out = [];
-    for (const shelf of shelves) {
-      out.push(await shelfToClientJson(shelf));
-    }
+    const shelves = await Shelf.find({ store_number: store_number }).lean();
+    const lookup = await batchModularIdLookup(shelves.flatMap((s) => s.modulars || []));
+    const out = shelves.map((shelf) => ({
+      ...shelf,
+      modulars: clientModularIds(shelf.modulars, lookup),
+    }));
     res.send(out);
   } catch (err) {
     res.status(500).send({ error: err.message });
@@ -663,7 +759,7 @@ api.delete('/pickwalk/:pickwalk_id/store/:store_id', async (req, res) => {
 // get all pickwalks by store_id
 api.get('/pickwalks/store/:store_id', async (req, res) => {
   try {
-    const pickwalks = await Pickwalk.find({ store_id: req.params.store_id });
+    const pickwalks = await Pickwalk.find({ store_id: Number(req.params.store_id) });
     res.send(pickwalks);
   } catch (err) {
     res.status(500).send(err);

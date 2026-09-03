@@ -1,93 +1,5668 @@
 {
   "pickwalks": [
     {
-      "pickwalk_id": "pickwalk_001",
-      "store_id": 3260,
-      "pickwalk_subtype": "chilled",
-      "starting_point": { "id": "Main_Entrance", "point": [10, 50] },
-      "itemList": [
-        { "upc": "0010001000001", "quantity": 2, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0010001000002", "quantity": 1, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0010001000003", "quantity": 3, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0010001000004", "quantity": 1, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0020001000011", "quantity": 2, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0020001000012", "quantity": 1, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000021", "quantity": 4, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000022", "quantity": 2, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000031", "quantity": 1, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0050001000041", "quantity": 3, "customer": "Jane Smith", "shelf": null, "ordered_number": null }
-      ],
-      "dueDate": null,
-      "dueTime": null
-    },
-    {
-      "pickwalk_id": "pickwalk_002",
+      "pickwalk_id": "pickwalk_3260_100",
+      "name": "100 SKU ambient",
       "store_id": 3260,
       "pickwalk_subtype": "ambient",
-      "starting_point": { "id": "Main_Entrance", "point": [10, 50] },
+      "starting_point": {
+        "id": "Main_Entrance",
+        "point": [
+          10,
+          50
+        ]
+      },
       "itemList": [
-        { "upc": "0010001000001", "quantity": 1, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0010001000002", "quantity": 2, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0010001000003", "quantity": 1, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0010001000004", "quantity": 3, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0020001000011", "quantity": 1, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0020001000012", "quantity": 2, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0020001000013", "quantity": 1, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0020001000014", "quantity": 3, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000021", "quantity": 2, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000022", "quantity": 1, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000023", "quantity": 3, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000024", "quantity": 1, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000031", "quantity": 2, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000032", "quantity": 1, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000033", "quantity": 3, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000034", "quantity": 1, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0050001000041", "quantity": 2, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0050001000042", "quantity": 1, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0050001000043", "quantity": 3, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0050001000044", "quantity": 1, "customer": "Jane Smith", "shelf": null, "ordered_number": null }
+        {
+          "upc": "0032603000001",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000002",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000003",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000004",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000005",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000006",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000007",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000008",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000009",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000010",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000011",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000012",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000013",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000014",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000015",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000016",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000017",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000018",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000019",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000020",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000021",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000022",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000023",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000024",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000025",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000026",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000027",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000028",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000029",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000030",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000031",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000032",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000033",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000034",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000035",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000036",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000037",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000038",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000039",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000040",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000041",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000042",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000043",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000044",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000045",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000046",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000047",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000048",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000049",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000050",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000051",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000052",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000053",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000054",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000055",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000056",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000057",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000058",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000059",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000060",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000061",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000062",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000063",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000064",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000065",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000066",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000067",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000068",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000069",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000070",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000071",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000072",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000073",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000074",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000075",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000076",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000077",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000078",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000079",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000080",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000081",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000082",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000083",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000084",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000085",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000086",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000087",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000088",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000089",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000090",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000091",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000092",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000093",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000094",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000095",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000096",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000097",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000098",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000099",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000100",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        }
       ],
-      "dueDate": null,
-      "dueTime": null
+      "dueDate": "2026-12-31T17:00:00.000Z",
+      "dueTime": "17:00"
     },
     {
-      "pickwalk_id": "pickwalk_003",
+      "pickwalk_id": "pickwalk_3260_80",
+      "name": "80 SKU ambient",
       "store_id": 3260,
-      "pickwalk_subtype": "frozen",
-      "starting_point": { "id": "Main_Entrance", "point": [10, 50] },
+      "pickwalk_subtype": "ambient",
+      "starting_point": {
+        "id": "Main_Entrance",
+        "point": [
+          10,
+          50
+        ]
+      },
       "itemList": [
-        { "upc": "0010001000001", "quantity": 1, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0010001000002", "quantity": 2, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0010001000003", "quantity": 1, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0010001000004", "quantity": 3, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0020001000011", "quantity": 1, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0020001000012", "quantity": 2, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0020001000013", "quantity": 1, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0020001000014", "quantity": 3, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000021", "quantity": 2, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000022", "quantity": 1, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000023", "quantity": 3, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000024", "quantity": 1, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000031", "quantity": 2, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000032", "quantity": 1, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000033", "quantity": 3, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000034", "quantity": 1, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0050001000041", "quantity": 2, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0050001000042", "quantity": 1, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0050001000043", "quantity": 3, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0050001000044", "quantity": 1, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000021", "quantity": 2, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000022", "quantity": 1, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000023", "quantity": 3, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0030001000024", "quantity": 1, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000031", "quantity": 2, "customer": "John Doe", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000032", "quantity": 1, "customer": "Jane Smith", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000033", "quantity": 3, "customer": "Alice Johnson", "shelf": null, "ordered_number": null },
-        { "upc": "0040001000034", "quantity": 1, "customer": "Bob Brown", "shelf": null, "ordered_number": null },
-        { "upc": "0050001000041", "quantity": 2, "customer": "John Doe", "shelf": null, "ordered_number": null }
+        {
+          "upc": "0032603000001",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000002",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000003",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000004",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000005",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000006",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000007",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000008",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000009",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000010",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000011",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000012",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000013",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000014",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000015",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000016",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000017",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000018",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000019",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000020",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000021",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000022",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000023",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000024",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000025",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000026",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000027",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000028",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000029",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000030",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000031",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000032",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000033",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000034",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000035",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000036",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000037",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000038",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000039",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000040",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000041",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000042",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000043",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000044",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000045",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000046",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000047",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000048",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000049",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000050",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000051",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000052",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000053",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000054",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000055",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000056",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000057",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000058",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000059",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000060",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000061",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000062",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000063",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000064",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000065",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000066",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000067",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000068",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000069",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000070",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000071",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000072",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000073",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000074",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000075",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000076",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000077",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000078",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000079",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000080",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        }
       ],
-      "dueDate": null,
-      "dueTime": null
+      "dueDate": "2026-12-31T17:00:00.000Z",
+      "dueTime": "17:00"
+    },
+    {
+      "pickwalk_id": "pickwalk_3260_60",
+      "name": "60 SKU ambient",
+      "store_id": 3260,
+      "pickwalk_subtype": "ambient",
+      "starting_point": {
+        "id": "Main_Entrance",
+        "point": [
+          10,
+          50
+        ]
+      },
+      "itemList": [
+        {
+          "upc": "0032603000001",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000002",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000003",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000004",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000005",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000006",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000007",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000008",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000009",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000010",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000011",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000012",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000013",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000014",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000015",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000016",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000017",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000018",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000019",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000020",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000021",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000022",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000023",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000024",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000025",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000026",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000027",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000028",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000029",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000030",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000031",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000032",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000033",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000034",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000035",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000036",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000037",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000038",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000039",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000040",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000041",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000042",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000043",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000044",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000045",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000046",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000047",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000048",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000049",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000050",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000051",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000052",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000053",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000054",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000055",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000056",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000057",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000058",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000059",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000060",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        }
+      ],
+      "dueDate": "2026-12-31T17:00:00.000Z",
+      "dueTime": "17:00"
+    },
+    {
+      "pickwalk_id": "pickwalk_3260_20",
+      "name": "20 SKU ambient",
+      "store_id": 3260,
+      "pickwalk_subtype": "ambient",
+      "starting_point": {
+        "id": "Main_Entrance",
+        "point": [
+          10,
+          50
+        ]
+      },
+      "itemList": [
+        {
+          "upc": "0032603000001",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000002",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000003",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000004",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000005",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000006",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000007",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000008",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000009",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000010",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000011",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000012",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000013",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000014",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000015",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000016",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000017",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000018",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000019",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032603000020",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        }
+      ],
+      "dueDate": "2026-12-31T17:00:00.000Z",
+      "dueTime": "17:00"
+    },
+    {
+      "pickwalk_id": "pickwalk_3261_100",
+      "name": "100 SKU ambient",
+      "store_id": 3261,
+      "pickwalk_subtype": "ambient",
+      "starting_point": {
+        "id": "Main_Entrance",
+        "point": [
+          500,
+          590
+        ]
+      },
+      "itemList": [
+        {
+          "upc": "0032613000001",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000002",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000003",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000004",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000005",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000006",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000007",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000008",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000009",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000010",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000011",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000012",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000013",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000014",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000015",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000016",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000017",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000018",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000019",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000020",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000021",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000022",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000023",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000024",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000025",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000026",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000027",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000028",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000029",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000030",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000031",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000032",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000033",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000034",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000035",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000036",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000037",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000038",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000039",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000040",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000041",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000042",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000043",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000044",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000045",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000046",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000047",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000048",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000049",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000050",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000051",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000052",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000053",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000054",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000055",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000056",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000057",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000058",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000059",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000060",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000061",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000062",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000063",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000064",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000065",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000066",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000067",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000068",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000069",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000070",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000071",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000072",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000073",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000074",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000075",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000076",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000077",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000078",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000079",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000080",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000081",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000082",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000083",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000084",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000085",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000086",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000087",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000088",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000089",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000090",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000091",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000092",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000093",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000094",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000095",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000096",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000097",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000098",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000099",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000100",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        }
+      ],
+      "dueDate": "2026-12-31T17:00:00.000Z",
+      "dueTime": "17:00"
+    },
+    {
+      "pickwalk_id": "pickwalk_3261_80",
+      "name": "80 SKU ambient",
+      "store_id": 3261,
+      "pickwalk_subtype": "ambient",
+      "starting_point": {
+        "id": "Main_Entrance",
+        "point": [
+          500,
+          590
+        ]
+      },
+      "itemList": [
+        {
+          "upc": "0032613000001",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000002",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000003",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000004",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000005",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000006",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000007",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000008",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000009",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000010",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000011",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000012",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000013",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000014",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000015",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000016",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000017",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000018",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000019",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000020",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000021",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000022",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000023",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000024",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000025",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000026",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000027",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000028",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000029",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000030",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000031",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000032",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000033",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000034",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000035",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000036",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000037",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000038",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000039",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000040",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000041",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000042",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000043",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000044",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000045",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000046",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000047",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000048",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000049",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000050",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000051",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000052",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000053",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000054",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000055",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000056",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000057",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000058",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000059",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000060",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000061",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000062",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000063",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000064",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000065",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000066",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000067",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000068",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000069",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000070",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000071",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000072",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000073",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000074",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000075",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000076",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000077",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000078",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000079",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000080",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        }
+      ],
+      "dueDate": "2026-12-31T17:00:00.000Z",
+      "dueTime": "17:00"
+    },
+    {
+      "pickwalk_id": "pickwalk_3261_60",
+      "name": "60 SKU ambient",
+      "store_id": 3261,
+      "pickwalk_subtype": "ambient",
+      "starting_point": {
+        "id": "Main_Entrance",
+        "point": [
+          500,
+          590
+        ]
+      },
+      "itemList": [
+        {
+          "upc": "0032613000001",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000002",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000003",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000004",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000005",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000006",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000007",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000008",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000009",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000010",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000011",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000012",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000013",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000014",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000015",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000016",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000017",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000018",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000019",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000020",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000021",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000022",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000023",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000024",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000025",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000026",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000027",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000028",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000029",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000030",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000031",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000032",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000033",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000034",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000035",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000036",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000037",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000038",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000039",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000040",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000041",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000042",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000043",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000044",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000045",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000046",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000047",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000048",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000049",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000050",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000051",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000052",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000053",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000054",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000055",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000056",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000057",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000058",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000059",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000060",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        }
+      ],
+      "dueDate": "2026-12-31T17:00:00.000Z",
+      "dueTime": "17:00"
+    },
+    {
+      "pickwalk_id": "pickwalk_3261_20",
+      "name": "20 SKU ambient",
+      "store_id": 3261,
+      "pickwalk_subtype": "ambient",
+      "starting_point": {
+        "id": "Main_Entrance",
+        "point": [
+          500,
+          590
+        ]
+      },
+      "itemList": [
+        {
+          "upc": "0032613000001",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000002",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000003",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000004",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000005",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000006",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000007",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000008",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000009",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000010",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000011",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000012",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000013",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000014",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000015",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000016",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000017",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000018",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000019",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032613000020",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        }
+      ],
+      "dueDate": "2026-12-31T17:00:00.000Z",
+      "dueTime": "17:00"
+    },
+    {
+      "pickwalk_id": "pickwalk_3262_100",
+      "name": "100 SKU ambient",
+      "store_id": 3262,
+      "pickwalk_subtype": "ambient",
+      "starting_point": {
+        "id": "Main_Entrance",
+        "point": [
+          250,
+          290
+        ]
+      },
+      "itemList": [
+        {
+          "upc": "0032623000001",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000002",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000003",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000004",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000005",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000006",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000007",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000008",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000009",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000010",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000011",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000012",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000013",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000014",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000015",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000016",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000017",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000018",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000019",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000020",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000021",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000022",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000023",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000024",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000025",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000026",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000027",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000028",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000029",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000030",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000031",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000032",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000033",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000034",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000035",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000036",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000037",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000038",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000039",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000040",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000041",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000042",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000043",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000044",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000045",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000046",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000047",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000048",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000049",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000050",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000051",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000052",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000053",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000054",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000055",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000056",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000057",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000058",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000059",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000060",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000061",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000062",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000063",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000064",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000065",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000066",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000067",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000068",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000069",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000070",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000071",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000072",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000073",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000074",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000075",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000076",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000077",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000078",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000079",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000080",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000081",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000082",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000083",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000084",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000085",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000086",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000087",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000088",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000089",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000090",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000091",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000092",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000093",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000094",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000095",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000096",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000097",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000098",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000099",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000100",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        }
+      ],
+      "dueDate": "2026-12-31T17:00:00.000Z",
+      "dueTime": "17:00"
+    },
+    {
+      "pickwalk_id": "pickwalk_3262_80",
+      "name": "80 SKU ambient",
+      "store_id": 3262,
+      "pickwalk_subtype": "ambient",
+      "starting_point": {
+        "id": "Main_Entrance",
+        "point": [
+          250,
+          290
+        ]
+      },
+      "itemList": [
+        {
+          "upc": "0032623000001",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000002",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000003",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000004",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000005",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000006",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000007",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000008",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000009",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000010",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000011",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000012",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000013",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000014",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000015",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000016",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000017",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000018",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000019",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000020",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000021",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000022",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000023",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000024",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000025",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000026",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000027",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000028",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000029",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000030",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000031",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000032",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000033",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000034",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000035",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000036",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000037",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000038",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000039",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000040",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000041",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000042",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000043",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000044",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000045",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000046",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000047",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000048",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000049",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000050",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000051",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000052",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000053",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000054",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000055",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000056",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000057",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000058",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000059",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000060",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000061",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000062",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000063",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000064",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000065",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000066",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000067",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000068",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000069",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000070",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000071",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000072",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000073",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000074",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000075",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000076",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000077",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000078",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000079",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000080",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        }
+      ],
+      "dueDate": "2026-12-31T17:00:00.000Z",
+      "dueTime": "17:00"
+    },
+    {
+      "pickwalk_id": "pickwalk_3262_60",
+      "name": "60 SKU ambient",
+      "store_id": 3262,
+      "pickwalk_subtype": "ambient",
+      "starting_point": {
+        "id": "Main_Entrance",
+        "point": [
+          250,
+          290
+        ]
+      },
+      "itemList": [
+        {
+          "upc": "0032623000001",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000002",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000003",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000004",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000005",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000006",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000007",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000008",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000009",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000010",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000011",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000012",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000013",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000014",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000015",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000016",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000017",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000018",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000019",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000020",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000021",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000022",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000023",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000024",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000025",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000026",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000027",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000028",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000029",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000030",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000031",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000032",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000033",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000034",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000035",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000036",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000037",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000038",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000039",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000040",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000041",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000042",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000043",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000044",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000045",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000046",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000047",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000048",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000049",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000050",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000051",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000052",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000053",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000054",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000055",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000056",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000057",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000058",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000059",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000060",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        }
+      ],
+      "dueDate": "2026-12-31T17:00:00.000Z",
+      "dueTime": "17:00"
+    },
+    {
+      "pickwalk_id": "pickwalk_3262_20",
+      "name": "20 SKU ambient",
+      "store_id": 3262,
+      "pickwalk_subtype": "ambient",
+      "starting_point": {
+        "id": "Main_Entrance",
+        "point": [
+          250,
+          290
+        ]
+      },
+      "itemList": [
+        {
+          "upc": "0032623000001",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000002",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000003",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000004",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000005",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000006",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000007",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000008",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000009",
+          "quantity": 3,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000010",
+          "quantity": 1,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000011",
+          "quantity": 2,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000012",
+          "quantity": 3,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000013",
+          "quantity": 1,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000014",
+          "quantity": 2,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000015",
+          "quantity": 3,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000016",
+          "quantity": 1,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000017",
+          "quantity": 2,
+          "customer": "Alex Rivera",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000018",
+          "quantity": 3,
+          "customer": "Jordan Lee",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000019",
+          "quantity": 1,
+          "customer": "Sam Patel",
+          "shelf": null,
+          "ordered_number": null
+        },
+        {
+          "upc": "0032623000020",
+          "quantity": 2,
+          "customer": "Casey Nguyen",
+          "shelf": null,
+          "ordered_number": null
+        }
+      ],
+      "dueDate": "2026-12-31T17:00:00.000Z",
+      "dueTime": "17:00"
     }
   ]
 }

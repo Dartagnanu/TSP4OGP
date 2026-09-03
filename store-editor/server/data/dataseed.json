@@ -1,186 +1,3574 @@
 {
   "store_number": 3260,
-  "map_size": { "width": 100, "height": 60 },
-  "store_shape": [[0,0],[0,60],[100,60],[100,0]],
+  "name": "Demo Store 3260",
+  "location": "Demo Compact",
+  "map_size": {
+    "width": 100,
+    "height": 60
+  },
+  "store_shape": [
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      60
+    ],
+    [
+      100,
+      60
+    ],
+    [
+      100,
+      0
+    ]
+  ],
   "walls": [],
   "shelf_templates": {
     "standard_shelf": {
-      "shape": [[0,0],[0,2],[4,2],[4,0]],
+      "shape": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          4,
+          0
+        ]
+      ],
       "access": "front",
       "color": "#b0c4de"
     },
     "feature_bin": {
-      "shape": [[0,0],[0,4],[4,4],[4,0]],
+      "shape": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          0
+        ]
+      ],
       "access": "all_sides",
       "color": "#ffa500"
     }
   },
   "starting_points": [
-    { "id": "Main_Entrance", "point": [10,50] }
+    {
+      "id": "Main_Entrance",
+      "point": [
+        10,
+        50
+      ]
+    }
   ],
   "registers": [
-    { "id": "Checkout_1", "point": [40,0] }
+    {
+      "id": "Checkout_1",
+      "point": [
+        40,
+        58
+      ]
+    }
   ],
   "shelves": [
     {
       "store_number": 3260,
-      "shelf_name": "shelf_001",
+      "shelf_name": "3260-A1-W01",
       "template": "standard_shelf",
-      "placement_x": 5,
-      "placement_y": 5,
-      "rotation": 0,
-      "flex_items": [],
-      "modulars": ["201"],
-      "department": "frozen"
-    },
-    {
-      "store_number": 3260,
-      "shelf_name": "shelf_002",
-      "template": "standard_shelf",
-      "placement_x": 10,
-      "placement_y": 5,
-      "rotation": 0,
-      "flex_items": [],
-      "modulars": ["202"],
-      "department": "dairy"
-    },
-    {
-      "store_number": 3260,
-      "shelf_name": "shelf_003",
-      "template": "standard_shelf",
-      "placement_x": 15,
-      "placement_y": 10,
-      "rotation": 0,
-      "flex_items": [],
-      "modulars": ["203"],
-      "department": "produce"
-    },
-    {
-      "store_number": 3260,
-      "shelf_name": "shelf_004",
-      "template": "standard_shelf",
-      "placement_x": 20,
-      "placement_y": 15,
-      "rotation": 0,
-      "flex_items": [],
-      "modulars": ["204"],
-      "department": "meat"
-    },
-    {
-      "store_number": 3260,
-      "shelf_name": "shelf_005",
-      "template": "feature_bin",
-      "placement_x": 25,
-      "placement_y": 20,
-      "rotation": 10,
-      "flex_items": [],
-      "modulars": ["205"],
-      "department": "bakery"
-    },
-    {
-      "store_number": 3260,
-      "shelf_name": "blank_shelf_001",
-      "template": "standard_shelf",
-      "placement_x": 30,
-      "placement_y": 20,
-      "rotation": 0,
-      "flex_items": [],
-      "modulars": [],
-      "department": "Unknown"
-    },
-    {
-      "store_number": 3260,
-      "shelf_name": "blank_shelf_002",
-      "template": "standard_shelf",
-      "placement_x": 30,
-      "placement_y": 20,
+      "placement_x": 6,
+      "placement_y": 6,
       "rotation": 90,
       "flex_items": [],
+      "modulars": [
+        "3260-001"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-W02",
+      "template": "standard_shelf",
+      "placement_x": 6,
+      "placement_y": 10,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-002"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-W03",
+      "template": "standard_shelf",
+      "placement_x": 6,
+      "placement_y": 14,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-003"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-W04",
+      "template": "standard_shelf",
+      "placement_x": 6,
+      "placement_y": 18,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-004"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-W05",
+      "template": "standard_shelf",
+      "placement_x": 6,
+      "placement_y": 22,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-005"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-W06",
+      "template": "standard_shelf",
+      "placement_x": 6,
+      "placement_y": 26,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-006"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-W07",
+      "template": "standard_shelf",
+      "placement_x": 6,
+      "placement_y": 30,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-007"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-W08",
+      "template": "standard_shelf",
+      "placement_x": 6,
+      "placement_y": 34,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-008"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-W09",
+      "template": "standard_shelf",
+      "placement_x": 6,
+      "placement_y": 38,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-009"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-W10",
+      "template": "standard_shelf",
+      "placement_x": 6,
+      "placement_y": 42,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-010"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-E01",
+      "template": "standard_shelf",
+      "placement_x": 16,
+      "placement_y": 6,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-011"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-E02",
+      "template": "standard_shelf",
+      "placement_x": 16,
+      "placement_y": 10,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-012"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-E03",
+      "template": "standard_shelf",
+      "placement_x": 16,
+      "placement_y": 14,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-013"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-E04",
+      "template": "standard_shelf",
+      "placement_x": 16,
+      "placement_y": 18,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-014"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-E05",
+      "template": "standard_shelf",
+      "placement_x": 16,
+      "placement_y": 22,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-015"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-E06",
+      "template": "standard_shelf",
+      "placement_x": 16,
+      "placement_y": 26,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-016"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-E07",
+      "template": "standard_shelf",
+      "placement_x": 16,
+      "placement_y": 30,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-017"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-E08",
+      "template": "standard_shelf",
+      "placement_x": 16,
+      "placement_y": 34,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-018"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-E09",
+      "template": "standard_shelf",
+      "placement_x": 16,
+      "placement_y": 38,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-019"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A1-E10",
+      "template": "standard_shelf",
+      "placement_x": 16,
+      "placement_y": 42,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-020"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-W01",
+      "template": "standard_shelf",
+      "placement_x": 18,
+      "placement_y": 6,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-021"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-W02",
+      "template": "standard_shelf",
+      "placement_x": 18,
+      "placement_y": 10,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-022"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-W03",
+      "template": "standard_shelf",
+      "placement_x": 18,
+      "placement_y": 14,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-023"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-W04",
+      "template": "standard_shelf",
+      "placement_x": 18,
+      "placement_y": 18,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-024"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-W05",
+      "template": "standard_shelf",
+      "placement_x": 18,
+      "placement_y": 22,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-025"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-W06",
+      "template": "standard_shelf",
+      "placement_x": 18,
+      "placement_y": 26,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-026"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-W07",
+      "template": "standard_shelf",
+      "placement_x": 18,
+      "placement_y": 30,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-027"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-W08",
+      "template": "standard_shelf",
+      "placement_x": 18,
+      "placement_y": 34,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-028"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-W09",
+      "template": "standard_shelf",
+      "placement_x": 18,
+      "placement_y": 38,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-029"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-W10",
+      "template": "standard_shelf",
+      "placement_x": 18,
+      "placement_y": 42,
+      "rotation": 90,
+      "flex_items": [],
+      "modulars": [
+        "3260-030"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-E01",
+      "template": "standard_shelf",
+      "placement_x": 28,
+      "placement_y": 6,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-031"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-E02",
+      "template": "standard_shelf",
+      "placement_x": 28,
+      "placement_y": 10,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-032"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-E03",
+      "template": "standard_shelf",
+      "placement_x": 28,
+      "placement_y": 14,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-033"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-E04",
+      "template": "standard_shelf",
+      "placement_x": 28,
+      "placement_y": 18,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-034"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-E05",
+      "template": "standard_shelf",
+      "placement_x": 28,
+      "placement_y": 22,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-035"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-E06",
+      "template": "standard_shelf",
+      "placement_x": 28,
+      "placement_y": 26,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-036"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-E07",
+      "template": "standard_shelf",
+      "placement_x": 28,
+      "placement_y": 30,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-037"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-E08",
+      "template": "standard_shelf",
+      "placement_x": 28,
+      "placement_y": 34,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-038"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-E09",
+      "template": "standard_shelf",
+      "placement_x": 28,
+      "placement_y": 38,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-039"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-A2-E10",
+      "template": "standard_shelf",
+      "placement_x": 28,
+      "placement_y": 42,
+      "rotation": 270,
+      "flex_items": [],
+      "modulars": [
+        "3260-040"
+      ],
+      "department": "general"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-1",
+      "template": "feature_bin",
+      "placement_x": 40,
+      "placement_y": 6,
+      "rotation": 0,
+      "flex_items": [
+        1000125,
+        1000126
+      ],
       "modulars": [],
-      "department": "Unknown"
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-2",
+      "template": "feature_bin",
+      "placement_x": 52,
+      "placement_y": 6,
+      "rotation": 0,
+      "flex_items": [
+        1000127,
+        1000128
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-3",
+      "template": "feature_bin",
+      "placement_x": 64,
+      "placement_y": 6,
+      "rotation": 0,
+      "flex_items": [
+        1000129,
+        1000130
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-4",
+      "template": "feature_bin",
+      "placement_x": 76,
+      "placement_y": 6,
+      "rotation": 0,
+      "flex_items": [
+        1000131,
+        1000132
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-5",
+      "template": "feature_bin",
+      "placement_x": 40,
+      "placement_y": 18,
+      "rotation": 0,
+      "flex_items": [
+        1000133,
+        1000134
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-6",
+      "template": "feature_bin",
+      "placement_x": 52,
+      "placement_y": 18,
+      "rotation": 0,
+      "flex_items": [
+        1000135,
+        1000136
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-7",
+      "template": "feature_bin",
+      "placement_x": 64,
+      "placement_y": 18,
+      "rotation": 0,
+      "flex_items": [
+        1000137,
+        1000138
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-8",
+      "template": "feature_bin",
+      "placement_x": 76,
+      "placement_y": 18,
+      "rotation": 0,
+      "flex_items": [
+        1000139,
+        1000140
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-9",
+      "template": "feature_bin",
+      "placement_x": 40,
+      "placement_y": 30,
+      "rotation": 0,
+      "flex_items": [
+        1000141,
+        1000142
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-10",
+      "template": "feature_bin",
+      "placement_x": 52,
+      "placement_y": 30,
+      "rotation": 0,
+      "flex_items": [
+        1000143,
+        1000144
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-11",
+      "template": "feature_bin",
+      "placement_x": 64,
+      "placement_y": 30,
+      "rotation": 0,
+      "flex_items": [
+        1000145,
+        1000146
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-12",
+      "template": "feature_bin",
+      "placement_x": 76,
+      "placement_y": 30,
+      "rotation": 0,
+      "flex_items": [
+        1000147,
+        1000148
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-13",
+      "template": "feature_bin",
+      "placement_x": 40,
+      "placement_y": 42,
+      "rotation": 0,
+      "flex_items": [
+        1000149,
+        1000150
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-14",
+      "template": "feature_bin",
+      "placement_x": 52,
+      "placement_y": 42,
+      "rotation": 0,
+      "flex_items": [
+        1000151,
+        1000152
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-15",
+      "template": "feature_bin",
+      "placement_x": 64,
+      "placement_y": 42,
+      "rotation": 0,
+      "flex_items": [
+        1000153,
+        1000154
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-16",
+      "template": "feature_bin",
+      "placement_x": 76,
+      "placement_y": 42,
+      "rotation": 0,
+      "flex_items": [
+        1000155,
+        1000156
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-17",
+      "template": "feature_bin",
+      "placement_x": 40,
+      "placement_y": 50,
+      "rotation": 0,
+      "flex_items": [
+        1000157
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-18",
+      "template": "feature_bin",
+      "placement_x": 52,
+      "placement_y": 50,
+      "rotation": 0,
+      "flex_items": [
+        1000158
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-19",
+      "template": "feature_bin",
+      "placement_x": 64,
+      "placement_y": 50,
+      "rotation": 0,
+      "flex_items": [
+        1000159
+      ],
+      "modulars": [],
+      "department": "promo"
+    },
+    {
+      "store_number": 3260,
+      "shelf_name": "3260-PROMO-20",
+      "template": "feature_bin",
+      "placement_x": 76,
+      "placement_y": 50,
+      "rotation": 0,
+      "flex_items": [
+        1000160
+      ],
+      "modulars": [],
+      "department": "promo"
     }
   ],
   "modulars": [
     {
-      "modular_id": "201",
+      "modular_id": "3260-001",
       "modular": 1,
       "modular_section": 1,
       "items": [
-        { "location": 1, "item_number": 1000001 },
-        { "location": 2, "item_number": 1000002 },
-        { "location": 3, "item_number": 1000003 },
-        { "location": 4, "item_number": 1000004 }
+        {
+          "location": 1,
+          "item_number": 1000001
+        },
+        {
+          "location": 2,
+          "item_number": 1000002
+        },
+        {
+          "location": 3,
+          "item_number": 1000003
+        },
+        {
+          "location": 4,
+          "item_number": 1000121
+        }
       ]
     },
     {
-      "modular_id": "202",
+      "modular_id": "3260-002",
       "modular": 2,
       "modular_section": 1,
       "items": [
-        { "location": 1, "item_number": 1000011 },
-        { "location": 2, "item_number": 1000012 },
-        { "location": 3, "item_number": 1000013 },
-        { "location": 4, "item_number": 1000014 }
+        {
+          "location": 1,
+          "item_number": 1000004
+        },
+        {
+          "location": 2,
+          "item_number": 1000005
+        },
+        {
+          "location": 3,
+          "item_number": 1000006
+        },
+        {
+          "location": 4,
+          "item_number": 1000121
+        }
       ]
     },
     {
-      "modular_id": "203",
+      "modular_id": "3260-003",
       "modular": 3,
       "modular_section": 1,
       "items": [
-        { "location": 1, "item_number": 1000021 },
-        { "location": 2, "item_number": 1000022 },
-        { "location": 3, "item_number": 1000023 },
-        { "location": 4, "item_number": 1000024 }
+        {
+          "location": 1,
+          "item_number": 1000007
+        },
+        {
+          "location": 2,
+          "item_number": 1000008
+        },
+        {
+          "location": 3,
+          "item_number": 1000009
+        },
+        {
+          "location": 4,
+          "item_number": 1000121
+        }
       ]
     },
     {
-      "modular_id": "204",
+      "modular_id": "3260-004",
       "modular": 4,
       "modular_section": 1,
       "items": [
-        { "location": 1, "item_number": 1000031 },
-        { "location": 2, "item_number": 1000032 },
-        { "location": 3, "item_number": 1000033 },
-        { "location": 4, "item_number": 1000034 }
+        {
+          "location": 1,
+          "item_number": 1000010
+        },
+        {
+          "location": 2,
+          "item_number": 1000011
+        },
+        {
+          "location": 3,
+          "item_number": 1000012
+        },
+        {
+          "location": 4,
+          "item_number": 1000121
+        }
       ]
     },
     {
-      "modular_id": "205",
+      "modular_id": "3260-005",
       "modular": 5,
       "modular_section": 1,
       "items": [
-        { "location": 1, "item_number": 1000041 },
-        { "location": 2, "item_number": 1000042 },
-        { "location": 3, "item_number": 1000043 },
-        { "location": 4, "item_number": 1000044 }
+        {
+          "location": 1,
+          "item_number": 1000013
+        },
+        {
+          "location": 2,
+          "item_number": 1000014
+        },
+        {
+          "location": 3,
+          "item_number": 1000015
+        },
+        {
+          "location": 4,
+          "item_number": 1000121
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-006",
+      "modular": 6,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000016
+        },
+        {
+          "location": 2,
+          "item_number": 1000017
+        },
+        {
+          "location": 3,
+          "item_number": 1000018
+        },
+        {
+          "location": 4,
+          "item_number": 1000121
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-007",
+      "modular": 7,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000019
+        },
+        {
+          "location": 2,
+          "item_number": 1000020
+        },
+        {
+          "location": 3,
+          "item_number": 1000021
+        },
+        {
+          "location": 4,
+          "item_number": 1000121
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-008",
+      "modular": 8,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000022
+        },
+        {
+          "location": 2,
+          "item_number": 1000023
+        },
+        {
+          "location": 3,
+          "item_number": 1000024
+        },
+        {
+          "location": 4,
+          "item_number": 1000121
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-009",
+      "modular": 9,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000025
+        },
+        {
+          "location": 2,
+          "item_number": 1000026
+        },
+        {
+          "location": 3,
+          "item_number": 1000027
+        },
+        {
+          "location": 4,
+          "item_number": 1000121
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-010",
+      "modular": 10,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000028
+        },
+        {
+          "location": 2,
+          "item_number": 1000029
+        },
+        {
+          "location": 3,
+          "item_number": 1000030
+        },
+        {
+          "location": 4,
+          "item_number": 1000121
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-011",
+      "modular": 11,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000031
+        },
+        {
+          "location": 2,
+          "item_number": 1000032
+        },
+        {
+          "location": 3,
+          "item_number": 1000033
+        },
+        {
+          "location": 4,
+          "item_number": 1000122
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-012",
+      "modular": 12,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000034
+        },
+        {
+          "location": 2,
+          "item_number": 1000035
+        },
+        {
+          "location": 3,
+          "item_number": 1000036
+        },
+        {
+          "location": 4,
+          "item_number": 1000122
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-013",
+      "modular": 13,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000037
+        },
+        {
+          "location": 2,
+          "item_number": 1000038
+        },
+        {
+          "location": 3,
+          "item_number": 1000039
+        },
+        {
+          "location": 4,
+          "item_number": 1000122
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-014",
+      "modular": 14,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000040
+        },
+        {
+          "location": 2,
+          "item_number": 1000041
+        },
+        {
+          "location": 3,
+          "item_number": 1000042
+        },
+        {
+          "location": 4,
+          "item_number": 1000122
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-015",
+      "modular": 15,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000043
+        },
+        {
+          "location": 2,
+          "item_number": 1000044
+        },
+        {
+          "location": 3,
+          "item_number": 1000045
+        },
+        {
+          "location": 4,
+          "item_number": 1000122
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-016",
+      "modular": 16,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000046
+        },
+        {
+          "location": 2,
+          "item_number": 1000047
+        },
+        {
+          "location": 3,
+          "item_number": 1000048
+        },
+        {
+          "location": 4,
+          "item_number": 1000122
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-017",
+      "modular": 17,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000049
+        },
+        {
+          "location": 2,
+          "item_number": 1000050
+        },
+        {
+          "location": 3,
+          "item_number": 1000051
+        },
+        {
+          "location": 4,
+          "item_number": 1000122
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-018",
+      "modular": 18,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000052
+        },
+        {
+          "location": 2,
+          "item_number": 1000053
+        },
+        {
+          "location": 3,
+          "item_number": 1000054
+        },
+        {
+          "location": 4,
+          "item_number": 1000122
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-019",
+      "modular": 19,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000055
+        },
+        {
+          "location": 2,
+          "item_number": 1000056
+        },
+        {
+          "location": 3,
+          "item_number": 1000057
+        },
+        {
+          "location": 4,
+          "item_number": 1000122
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-020",
+      "modular": 20,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000058
+        },
+        {
+          "location": 2,
+          "item_number": 1000059
+        },
+        {
+          "location": 3,
+          "item_number": 1000060
+        },
+        {
+          "location": 4,
+          "item_number": 1000122
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-021",
+      "modular": 21,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000061
+        },
+        {
+          "location": 2,
+          "item_number": 1000062
+        },
+        {
+          "location": 3,
+          "item_number": 1000063
+        },
+        {
+          "location": 4,
+          "item_number": 1000123
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-022",
+      "modular": 22,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000064
+        },
+        {
+          "location": 2,
+          "item_number": 1000065
+        },
+        {
+          "location": 3,
+          "item_number": 1000066
+        },
+        {
+          "location": 4,
+          "item_number": 1000123
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-023",
+      "modular": 23,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000067
+        },
+        {
+          "location": 2,
+          "item_number": 1000068
+        },
+        {
+          "location": 3,
+          "item_number": 1000069
+        },
+        {
+          "location": 4,
+          "item_number": 1000123
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-024",
+      "modular": 24,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000070
+        },
+        {
+          "location": 2,
+          "item_number": 1000071
+        },
+        {
+          "location": 3,
+          "item_number": 1000072
+        },
+        {
+          "location": 4,
+          "item_number": 1000123
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-025",
+      "modular": 25,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000073
+        },
+        {
+          "location": 2,
+          "item_number": 1000074
+        },
+        {
+          "location": 3,
+          "item_number": 1000075
+        },
+        {
+          "location": 4,
+          "item_number": 1000123
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-026",
+      "modular": 26,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000076
+        },
+        {
+          "location": 2,
+          "item_number": 1000077
+        },
+        {
+          "location": 3,
+          "item_number": 1000078
+        },
+        {
+          "location": 4,
+          "item_number": 1000123
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-027",
+      "modular": 27,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000079
+        },
+        {
+          "location": 2,
+          "item_number": 1000080
+        },
+        {
+          "location": 3,
+          "item_number": 1000081
+        },
+        {
+          "location": 4,
+          "item_number": 1000123
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-028",
+      "modular": 28,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000082
+        },
+        {
+          "location": 2,
+          "item_number": 1000083
+        },
+        {
+          "location": 3,
+          "item_number": 1000084
+        },
+        {
+          "location": 4,
+          "item_number": 1000123
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-029",
+      "modular": 29,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000085
+        },
+        {
+          "location": 2,
+          "item_number": 1000086
+        },
+        {
+          "location": 3,
+          "item_number": 1000087
+        },
+        {
+          "location": 4,
+          "item_number": 1000123
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-030",
+      "modular": 30,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000088
+        },
+        {
+          "location": 2,
+          "item_number": 1000089
+        },
+        {
+          "location": 3,
+          "item_number": 1000090
+        },
+        {
+          "location": 4,
+          "item_number": 1000123
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-031",
+      "modular": 31,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000091
+        },
+        {
+          "location": 2,
+          "item_number": 1000092
+        },
+        {
+          "location": 3,
+          "item_number": 1000093
+        },
+        {
+          "location": 4,
+          "item_number": 1000124
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-032",
+      "modular": 32,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000094
+        },
+        {
+          "location": 2,
+          "item_number": 1000095
+        },
+        {
+          "location": 3,
+          "item_number": 1000096
+        },
+        {
+          "location": 4,
+          "item_number": 1000124
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-033",
+      "modular": 33,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000097
+        },
+        {
+          "location": 2,
+          "item_number": 1000098
+        },
+        {
+          "location": 3,
+          "item_number": 1000099
+        },
+        {
+          "location": 4,
+          "item_number": 1000124
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-034",
+      "modular": 34,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000100
+        },
+        {
+          "location": 2,
+          "item_number": 1000101
+        },
+        {
+          "location": 3,
+          "item_number": 1000102
+        },
+        {
+          "location": 4,
+          "item_number": 1000124
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-035",
+      "modular": 35,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000103
+        },
+        {
+          "location": 2,
+          "item_number": 1000104
+        },
+        {
+          "location": 3,
+          "item_number": 1000105
+        },
+        {
+          "location": 4,
+          "item_number": 1000124
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-036",
+      "modular": 36,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000106
+        },
+        {
+          "location": 2,
+          "item_number": 1000107
+        },
+        {
+          "location": 3,
+          "item_number": 1000108
+        },
+        {
+          "location": 4,
+          "item_number": 1000124
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-037",
+      "modular": 37,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000109
+        },
+        {
+          "location": 2,
+          "item_number": 1000110
+        },
+        {
+          "location": 3,
+          "item_number": 1000111
+        },
+        {
+          "location": 4,
+          "item_number": 1000124
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-038",
+      "modular": 38,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000112
+        },
+        {
+          "location": 2,
+          "item_number": 1000113
+        },
+        {
+          "location": 3,
+          "item_number": 1000114
+        },
+        {
+          "location": 4,
+          "item_number": 1000124
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-039",
+      "modular": 39,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000115
+        },
+        {
+          "location": 2,
+          "item_number": 1000116
+        },
+        {
+          "location": 3,
+          "item_number": 1000117
+        },
+        {
+          "location": 4,
+          "item_number": 1000124
+        }
+      ]
+    },
+    {
+      "modular_id": "3260-040",
+      "modular": 40,
+      "modular_section": 1,
+      "items": [
+        {
+          "location": 1,
+          "item_number": 1000118
+        },
+        {
+          "location": 2,
+          "item_number": 1000119
+        },
+        {
+          "location": 3,
+          "item_number": 1000120
+        },
+        {
+          "location": 4,
+          "item_number": 1000124
+        }
       ]
     }
   ],
   "items": [
-    { "item_number": 1000001, "upcs": ["0010001000001"], "name": "Whole Milk", "department": "dairy", "photo": "milk.jpg", "price": 3.49, "pickwalk": "chilled"},
-    { "item_number": 1000002, "upcs": ["0010001000002"], "name": "Cheddar Cheese", "department": "dairy", "photo": "cheddar.jpg", "price": 4.99, "pickwalk": "chilled" },
-    { "item_number": 1000003, "upcs": ["0010001000003"], "name": "Greek Yogurt", "department": "dairy", "photo": "yogurt.jpg", "price": 1.29, "pickwalk": "chilled" },
-    { "item_number": 1000004, "upcs": ["0010001000004"], "name": "Butter", "department": "dairy", "photo": "butter.jpg", "price": 2.99, "pickwalk": "chilled" },
-
-    { "item_number": 1000011, "upcs": ["0020001000011"], "name": "Chicken Breast", "department": "meat", "photo": "chicken.jpg", "price": 5.99, "pickwalk": "chilled" },
-    { "item_number": 1000012, "upcs": ["0020001000012"], "name": "Ground Beef", "department": "meat", "photo": "beef.jpg", "price": 6.49, "pickwalk": "chilled" },
-    { "item_number": 1000013, "upcs": ["0020001000013"], "name": "Pork Chops", "department": "meat", "photo": "pork.jpg", "price": 4.99, "pickwalk": "chilled" },
-    { "item_number": 1000014, "upcs": ["0020001000014"], "name": "Turkey Slices", "department": "meat", "photo": "turkey.jpg", "price": 3.99, "pickwalk": "chilled" },
-
-    { "item_number": 1000021, "upcs": ["0030001000021"], "name": "Apples", "department": "produce", "photo": "apples.jpg", "price": 2.49, "pickwalk": "ambient" },
-    { "item_number": 1000022, "upcs": ["0030001000022"], "name": "Bananas", "department": "produce", "photo": "bananas.jpg", "price": 1.19, "pickwalk": "ambient" },
-    { "item_number": 1000023, "upcs": ["0030001000023"], "name": "Carrots", "department": "produce", "photo": "carrots.jpg", "price": 1.99, "pickwalk": "ambient" },
-    { "item_number": 1000024, "upcs": ["0030001000024"], "name": "Broccoli", "department": "produce", "photo": "broccoli.jpg", "price": 2.29, "pickwalk": "ambient" },
-
-    { "item_number": 1000031, "upcs": ["0040001000031"], "name": "Frozen Pizza", "department": "frozen", "photo": "pizza.jpg", "price": 5.49, "pickwalk": "frozen" },
-    { "item_number": 1000032, "upcs": ["0040001000032"], "name": "Ice Cream", "department": "frozen", "photo": "icecream.jpg", "price": 3.99, "pickwalk": "frozen" },
-    { "item_number": 1000033, "upcs": ["0040001000033"], "name": "Frozen Peas", "department": "frozen", "photo": "peas.jpg", "price": 1.49, "pickwalk": "frozen" },
-    { "item_number": 1000034, "upcs": ["0040001000034"], "name": "Frozen Corn", "department": "frozen", "photo": "corn.jpg", "price": 1.49, "pickwalk": "frozen" },
-
-    { "item_number": 1000041, "upcs": ["0050001000041"], "name": "White Bread", "department": "bakery", "photo": "bread.jpg", "price": 2.49, "pickwalk": "ambient" },
-    { "item_number": 1000042, "upcs": ["0050001000042"], "name": "Bagels", "department": "bakery", "photo": "bagels.jpg", "price": 3.49, "pickwalk": "ambient" },
-    { "item_number": 1000043, "upcs": ["0050001000043"], "name": "Croissants", "department": "bakery", "photo": "croissants.jpg", "price": 4.29, "pickwalk": "ambient" },
-    { "item_number": 1000044, "upcs": ["0050001000044"], "name": "Donuts", "department": "bakery", "photo": "donuts.jpg", "price": 2.99, "pickwalk": "ambient" }
+    {
+      "item_number": 1000001,
+      "upcs": [
+        "0032603000001"
+      ],
+      "name": "Pasta 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 1.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000002,
+      "upcs": [
+        "0032603000002"
+      ],
+      "name": "Rice 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 1.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000003,
+      "upcs": [
+        "0032603000003"
+      ],
+      "name": "Beans 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 1.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000004,
+      "upcs": [
+        "0032603000004"
+      ],
+      "name": "Cereal 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 2.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000005,
+      "upcs": [
+        "0032603000005"
+      ],
+      "name": "Oats 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 2.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000006,
+      "upcs": [
+        "0032603000006"
+      ],
+      "name": "Flour 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 2.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000007,
+      "upcs": [
+        "0032603000007"
+      ],
+      "name": "Sugar 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 2.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000008,
+      "upcs": [
+        "0032603000008"
+      ],
+      "name": "Salt 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 2.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000009,
+      "upcs": [
+        "0032603000009"
+      ],
+      "name": "Pepper 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 3.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000010,
+      "upcs": [
+        "0032603000010"
+      ],
+      "name": "Canola Oil 3260",
+      "department": "household",
+      "photo": "",
+      "price": 3.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000011,
+      "upcs": [
+        "0032603000011"
+      ],
+      "name": "Olive Oil 3260",
+      "department": "household",
+      "photo": "",
+      "price": 3.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000012,
+      "upcs": [
+        "0032603000012"
+      ],
+      "name": "Vinegar 3260",
+      "department": "household",
+      "photo": "",
+      "price": 3.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000013,
+      "upcs": [
+        "0032603000013"
+      ],
+      "name": "Pasta Sauce 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 3.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000014,
+      "upcs": [
+        "0032603000014"
+      ],
+      "name": "Soup 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 4.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000015,
+      "upcs": [
+        "0032603000015"
+      ],
+      "name": "Broth 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 4.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000016,
+      "upcs": [
+        "0032603000016"
+      ],
+      "name": "Crackers 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 4.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000017,
+      "upcs": [
+        "0032603000017"
+      ],
+      "name": "Chips 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 4.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000018,
+      "upcs": [
+        "0032603000018"
+      ],
+      "name": "Pretzels 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 4.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000019,
+      "upcs": [
+        "0032603000019"
+      ],
+      "name": "Popcorn 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 5.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000020,
+      "upcs": [
+        "0032603000020"
+      ],
+      "name": "Nuts 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 5.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000021,
+      "upcs": [
+        "0032603000021"
+      ],
+      "name": "Trail Mix 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 5.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000022,
+      "upcs": [
+        "0032603000022"
+      ],
+      "name": "Granola 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 5.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000023,
+      "upcs": [
+        "0032603000023"
+      ],
+      "name": "Cookies 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 5.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000024,
+      "upcs": [
+        "0032603000024"
+      ],
+      "name": "Candy 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 6.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000025,
+      "upcs": [
+        "0032603000025"
+      ],
+      "name": "Chocolate 3260",
+      "department": "household",
+      "photo": "",
+      "price": 6.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000026,
+      "upcs": [
+        "0032603000026"
+      ],
+      "name": "Soda 3260",
+      "department": "household",
+      "photo": "",
+      "price": 6.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000027,
+      "upcs": [
+        "0032603000027"
+      ],
+      "name": "Sparkling Water 3260",
+      "department": "household",
+      "photo": "",
+      "price": 6.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000028,
+      "upcs": [
+        "0032603000028"
+      ],
+      "name": "Juice 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 6.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000029,
+      "upcs": [
+        "0032603000029"
+      ],
+      "name": "Tea Bags 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 7.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000030,
+      "upcs": [
+        "0032603000030"
+      ],
+      "name": "Coffee 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 7.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000031,
+      "upcs": [
+        "0032603000031"
+      ],
+      "name": "Paper Towels 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 7.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000032,
+      "upcs": [
+        "0032603000032"
+      ],
+      "name": "Toilet Paper 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 7.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000033,
+      "upcs": [
+        "0032603000033"
+      ],
+      "name": "Dish Soap 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 7.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000034,
+      "upcs": [
+        "0032603000034"
+      ],
+      "name": "Laundry Detergent 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 8.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000035,
+      "upcs": [
+        "0032603000035"
+      ],
+      "name": "Trash Bags 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 8.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000036,
+      "upcs": [
+        "0032603000036"
+      ],
+      "name": "Sponges 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 8.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000037,
+      "upcs": [
+        "0032603000037"
+      ],
+      "name": "Shampoo 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 8.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000038,
+      "upcs": [
+        "0032603000038"
+      ],
+      "name": "Conditioner 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 8.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000039,
+      "upcs": [
+        "0032603000039"
+      ],
+      "name": "Toothpaste 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 9.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000040,
+      "upcs": [
+        "0032603000040"
+      ],
+      "name": "Soap 3260",
+      "department": "household",
+      "photo": "",
+      "price": 9.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000041,
+      "upcs": [
+        "0032603000041"
+      ],
+      "name": "Pasta 2-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 9.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000042,
+      "upcs": [
+        "0032603000042"
+      ],
+      "name": "Rice 2-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 9.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000043,
+      "upcs": [
+        "0032603000043"
+      ],
+      "name": "Beans 2-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 9.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000044,
+      "upcs": [
+        "0032603000044"
+      ],
+      "name": "Cereal 2-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 10.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000045,
+      "upcs": [
+        "0032603000045"
+      ],
+      "name": "Oats 2-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 10.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000046,
+      "upcs": [
+        "0032603000046"
+      ],
+      "name": "Flour 2-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 10.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000047,
+      "upcs": [
+        "0032603000047"
+      ],
+      "name": "Sugar 2-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 10.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000048,
+      "upcs": [
+        "0032603000048"
+      ],
+      "name": "Salt 2-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 10.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000049,
+      "upcs": [
+        "0032603000049"
+      ],
+      "name": "Pepper 2-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 11.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000050,
+      "upcs": [
+        "0032603000050"
+      ],
+      "name": "Canola Oil 2-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 1.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000051,
+      "upcs": [
+        "0032603000051"
+      ],
+      "name": "Olive Oil 2-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 1.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000052,
+      "upcs": [
+        "0032603000052"
+      ],
+      "name": "Vinegar 2-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 1.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000053,
+      "upcs": [
+        "0032603000053"
+      ],
+      "name": "Pasta Sauce 2-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 1.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000054,
+      "upcs": [
+        "0032603000054"
+      ],
+      "name": "Soup 2-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 2.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000055,
+      "upcs": [
+        "0032603000055"
+      ],
+      "name": "Broth 2-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 2.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000056,
+      "upcs": [
+        "0032603000056"
+      ],
+      "name": "Crackers 2-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 2.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000057,
+      "upcs": [
+        "0032603000057"
+      ],
+      "name": "Chips 2-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 2.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000058,
+      "upcs": [
+        "0032603000058"
+      ],
+      "name": "Pretzels 2-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 2.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000059,
+      "upcs": [
+        "0032603000059"
+      ],
+      "name": "Popcorn 2-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 3.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000060,
+      "upcs": [
+        "0032603000060"
+      ],
+      "name": "Nuts 2-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 3.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000061,
+      "upcs": [
+        "0032603000061"
+      ],
+      "name": "Trail Mix 2-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 3.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000062,
+      "upcs": [
+        "0032603000062"
+      ],
+      "name": "Granola 2-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 3.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000063,
+      "upcs": [
+        "0032603000063"
+      ],
+      "name": "Cookies 2-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 3.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000064,
+      "upcs": [
+        "0032603000064"
+      ],
+      "name": "Candy 2-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 4.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000065,
+      "upcs": [
+        "0032603000065"
+      ],
+      "name": "Chocolate 2-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 4.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000066,
+      "upcs": [
+        "0032603000066"
+      ],
+      "name": "Soda 2-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 4.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000067,
+      "upcs": [
+        "0032603000067"
+      ],
+      "name": "Sparkling Water 2-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 4.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000068,
+      "upcs": [
+        "0032603000068"
+      ],
+      "name": "Juice 2-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 4.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000069,
+      "upcs": [
+        "0032603000069"
+      ],
+      "name": "Tea Bags 2-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 5.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000070,
+      "upcs": [
+        "0032603000070"
+      ],
+      "name": "Coffee 2-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 5.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000071,
+      "upcs": [
+        "0032603000071"
+      ],
+      "name": "Paper Towels 2-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 5.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000072,
+      "upcs": [
+        "0032603000072"
+      ],
+      "name": "Toilet Paper 2-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 5.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000073,
+      "upcs": [
+        "0032603000073"
+      ],
+      "name": "Dish Soap 2-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 5.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000074,
+      "upcs": [
+        "0032603000074"
+      ],
+      "name": "Laundry Detergent 2-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 6.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000075,
+      "upcs": [
+        "0032603000075"
+      ],
+      "name": "Trash Bags 2-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 6.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000076,
+      "upcs": [
+        "0032603000076"
+      ],
+      "name": "Sponges 2-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 6.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000077,
+      "upcs": [
+        "0032603000077"
+      ],
+      "name": "Shampoo 2-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 6.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000078,
+      "upcs": [
+        "0032603000078"
+      ],
+      "name": "Conditioner 2-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 6.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000079,
+      "upcs": [
+        "0032603000079"
+      ],
+      "name": "Toothpaste 2-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 7.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000080,
+      "upcs": [
+        "0032603000080"
+      ],
+      "name": "Soap 2-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 7.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000081,
+      "upcs": [
+        "0032603000081"
+      ],
+      "name": "Pasta 3-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 7.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000082,
+      "upcs": [
+        "0032603000082"
+      ],
+      "name": "Rice 3-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 7.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000083,
+      "upcs": [
+        "0032603000083"
+      ],
+      "name": "Beans 3-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 7.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000084,
+      "upcs": [
+        "0032603000084"
+      ],
+      "name": "Cereal 3-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 8.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000085,
+      "upcs": [
+        "0032603000085"
+      ],
+      "name": "Oats 3-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 8.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000086,
+      "upcs": [
+        "0032603000086"
+      ],
+      "name": "Flour 3-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 8.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000087,
+      "upcs": [
+        "0032603000087"
+      ],
+      "name": "Sugar 3-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 8.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000088,
+      "upcs": [
+        "0032603000088"
+      ],
+      "name": "Salt 3-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 8.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000089,
+      "upcs": [
+        "0032603000089"
+      ],
+      "name": "Pepper 3-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 9.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000090,
+      "upcs": [
+        "0032603000090"
+      ],
+      "name": "Canola Oil 3-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 9.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000091,
+      "upcs": [
+        "0032603000091"
+      ],
+      "name": "Olive Oil 3-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 9.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000092,
+      "upcs": [
+        "0032603000092"
+      ],
+      "name": "Vinegar 3-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 9.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000093,
+      "upcs": [
+        "0032603000093"
+      ],
+      "name": "Pasta Sauce 3-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 9.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000094,
+      "upcs": [
+        "0032603000094"
+      ],
+      "name": "Soup 3-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 10.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000095,
+      "upcs": [
+        "0032603000095"
+      ],
+      "name": "Broth 3-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 10.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000096,
+      "upcs": [
+        "0032603000096"
+      ],
+      "name": "Crackers 3-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 10.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000097,
+      "upcs": [
+        "0032603000097"
+      ],
+      "name": "Chips 3-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 10.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000098,
+      "upcs": [
+        "0032603000098"
+      ],
+      "name": "Pretzels 3-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 10.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000099,
+      "upcs": [
+        "0032603000099"
+      ],
+      "name": "Popcorn 3-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 11.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000100,
+      "upcs": [
+        "0032603000100"
+      ],
+      "name": "Nuts 3-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 1.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000101,
+      "upcs": [
+        "0032603000101"
+      ],
+      "name": "Trail Mix 3-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 1.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000102,
+      "upcs": [
+        "0032603000102"
+      ],
+      "name": "Granola 3-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 1.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000103,
+      "upcs": [
+        "0032603000103"
+      ],
+      "name": "Cookies 3-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 1.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000104,
+      "upcs": [
+        "0032603000104"
+      ],
+      "name": "Candy 3-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 2.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000105,
+      "upcs": [
+        "0032603000105"
+      ],
+      "name": "Chocolate 3-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 2.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000106,
+      "upcs": [
+        "0032603000106"
+      ],
+      "name": "Soda 3-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 2.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000107,
+      "upcs": [
+        "0032603000107"
+      ],
+      "name": "Sparkling Water 3-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 2.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000108,
+      "upcs": [
+        "0032603000108"
+      ],
+      "name": "Juice 3-Pack 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 2.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000109,
+      "upcs": [
+        "0032603000109"
+      ],
+      "name": "Tea Bags 3-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 3.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000110,
+      "upcs": [
+        "0032603000110"
+      ],
+      "name": "Coffee 3-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 3.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000111,
+      "upcs": [
+        "0032603000111"
+      ],
+      "name": "Paper Towels 3-Pack 3260",
+      "department": "snacks",
+      "photo": "",
+      "price": 3.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000112,
+      "upcs": [
+        "0032603000112"
+      ],
+      "name": "Toilet Paper 3-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 3.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000113,
+      "upcs": [
+        "0032603000113"
+      ],
+      "name": "Dish Soap 3-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 3.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000114,
+      "upcs": [
+        "0032603000114"
+      ],
+      "name": "Laundry Detergent 3-Pack 3260",
+      "department": "beverages",
+      "photo": "",
+      "price": 4.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000115,
+      "upcs": [
+        "0032603000115"
+      ],
+      "name": "Trash Bags 3-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 4.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000116,
+      "upcs": [
+        "0032603000116"
+      ],
+      "name": "Sponges 3-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 4.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000117,
+      "upcs": [
+        "0032603000117"
+      ],
+      "name": "Shampoo 3-Pack 3260",
+      "department": "household",
+      "photo": "",
+      "price": 4.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000118,
+      "upcs": [
+        "0032603000118"
+      ],
+      "name": "Conditioner 3-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 4.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000119,
+      "upcs": [
+        "0032603000119"
+      ],
+      "name": "Toothpaste 3-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 5.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000120,
+      "upcs": [
+        "0032603000120"
+      ],
+      "name": "Soap 3-Pack 3260",
+      "department": "personal_care",
+      "photo": "",
+      "price": 5.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000121,
+      "upcs": [
+        "0032603000121"
+      ],
+      "name": "Multi-Location A 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 5.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000122,
+      "upcs": [
+        "0032603000122"
+      ],
+      "name": "Multi-Location B 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 5.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000123,
+      "upcs": [
+        "0032603000123"
+      ],
+      "name": "Multi-Location C 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 5.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000124,
+      "upcs": [
+        "0032603000124"
+      ],
+      "name": "Multi-Location D 3260",
+      "department": "grocery",
+      "photo": "",
+      "price": 6.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000125,
+      "upcs": [
+        "0032603000125"
+      ],
+      "name": "Feature Flex 1 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 6.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000126,
+      "upcs": [
+        "0032603000126"
+      ],
+      "name": "Feature Flex 2 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 6.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000127,
+      "upcs": [
+        "0032603000127"
+      ],
+      "name": "Feature Flex 3 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 6.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000128,
+      "upcs": [
+        "0032603000128"
+      ],
+      "name": "Feature Flex 4 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 6.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000129,
+      "upcs": [
+        "0032603000129"
+      ],
+      "name": "Feature Flex 5 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 7.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000130,
+      "upcs": [
+        "0032603000130"
+      ],
+      "name": "Feature Flex 6 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 7.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000131,
+      "upcs": [
+        "0032603000131"
+      ],
+      "name": "Feature Flex 7 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 7.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000132,
+      "upcs": [
+        "0032603000132"
+      ],
+      "name": "Feature Flex 8 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 7.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000133,
+      "upcs": [
+        "0032603000133"
+      ],
+      "name": "Feature Flex 9 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 7.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000134,
+      "upcs": [
+        "0032603000134"
+      ],
+      "name": "Feature Flex 10 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 8.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000135,
+      "upcs": [
+        "0032603000135"
+      ],
+      "name": "Feature Flex 11 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 8.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000136,
+      "upcs": [
+        "0032603000136"
+      ],
+      "name": "Feature Flex 12 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 8.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000137,
+      "upcs": [
+        "0032603000137"
+      ],
+      "name": "Feature Flex 13 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 8.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000138,
+      "upcs": [
+        "0032603000138"
+      ],
+      "name": "Feature Flex 14 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 8.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000139,
+      "upcs": [
+        "0032603000139"
+      ],
+      "name": "Feature Flex 15 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 9.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000140,
+      "upcs": [
+        "0032603000140"
+      ],
+      "name": "Feature Flex 16 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 9.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000141,
+      "upcs": [
+        "0032603000141"
+      ],
+      "name": "Feature Flex 17 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 9.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000142,
+      "upcs": [
+        "0032603000142"
+      ],
+      "name": "Feature Flex 18 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 9.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000143,
+      "upcs": [
+        "0032603000143"
+      ],
+      "name": "Feature Flex 19 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 9.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000144,
+      "upcs": [
+        "0032603000144"
+      ],
+      "name": "Feature Flex 20 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 10.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000145,
+      "upcs": [
+        "0032603000145"
+      ],
+      "name": "Feature Flex 21 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 10.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000146,
+      "upcs": [
+        "0032603000146"
+      ],
+      "name": "Feature Flex 22 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 10.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000147,
+      "upcs": [
+        "0032603000147"
+      ],
+      "name": "Feature Flex 23 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 10.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000148,
+      "upcs": [
+        "0032603000148"
+      ],
+      "name": "Feature Flex 24 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 10.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000149,
+      "upcs": [
+        "0032603000149"
+      ],
+      "name": "Feature Flex 25 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 11.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000150,
+      "upcs": [
+        "0032603000150"
+      ],
+      "name": "Feature Flex 26 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 1.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000151,
+      "upcs": [
+        "0032603000151"
+      ],
+      "name": "Feature Flex 27 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 1.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000152,
+      "upcs": [
+        "0032603000152"
+      ],
+      "name": "Feature Flex 28 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 1.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000153,
+      "upcs": [
+        "0032603000153"
+      ],
+      "name": "Feature Flex 29 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 1.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000154,
+      "upcs": [
+        "0032603000154"
+      ],
+      "name": "Feature Flex 30 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 2.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000155,
+      "upcs": [
+        "0032603000155"
+      ],
+      "name": "Feature Flex 31 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 2.29,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000156,
+      "upcs": [
+        "0032603000156"
+      ],
+      "name": "Feature Flex 32 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 2.49,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000157,
+      "upcs": [
+        "0032603000157"
+      ],
+      "name": "Feature Flex 33 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 2.69,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000158,
+      "upcs": [
+        "0032603000158"
+      ],
+      "name": "Feature Flex 34 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 2.89,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000159,
+      "upcs": [
+        "0032603000159"
+      ],
+      "name": "Feature Flex 35 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 3.09,
+      "pickwalk": "ambient"
+    },
+    {
+      "item_number": 1000160,
+      "upcs": [
+        "0032603000160"
+      ],
+      "name": "Feature Flex 36 3260",
+      "department": "promo",
+      "photo": "",
+      "price": 3.29,
+      "pickwalk": "ambient"
+    }
   ]
 }

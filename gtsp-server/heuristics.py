@@ -45,29 +45,42 @@ class Heuristics:
     ) -> List[dict]:
         self._sssp_count = 0
         ctx = self.store_cache.get_context(store_number)
+        orig_start = (int(start_point[0]), int(start_point[1]))
+        orig_end = (
+            (int(end_point[0]), int(end_point[1])) if end_point is not None else None
+        )
+        start = ctx.grid.snap_to_walkable(orig_start)
+        end = ctx.grid.snap_to_walkable(orig_end) if orig_end is not None else start
+        if start != orig_start:
+            print(
+                f"find-path store {store_number}: snapped start {orig_start} -> {start}",
+                flush=True,
+            )
+        if orig_end is not None and end != orig_end:
+            print(
+                f"find-path store {store_number}: snapped end {orig_end} -> {end}",
+                flush=True,
+            )
         upc_to_data = self._fetch_upc_locations(store_number, upcs, ctx)
 
         pick_list, _unreachable = solve_tour(
-            ctx, upc_to_data, upcs, start_point, end_point
+            ctx, upc_to_data, upcs, start, end
         )
 
-        if end_point is not None:
-            current_location = start_point
-            for entry in pick_list:
-                if entry.get("location") is not None:
-                    current_location = tuple(entry["location"])
-            if current_location != end_point:
-                return_distance = ctx.grid.distance_between(
-                    current_location, end_point
-                )
-                self._sssp_count += 1
-                pick_list.append(
-                    {
-                        "type": "return",
-                        "location": list(end_point),
-                        "distance_from_previous": return_distance,
-                    }
-                )
+        current_location = start
+        for entry in pick_list:
+            if entry.get("location") is not None:
+                current_location = tuple(entry["location"])
+        if current_location != end:
+            return_distance = ctx.grid.distance_between(current_location, end)
+            self._sssp_count += 1
+            pick_list.append(
+                {
+                    "type": "return",
+                    "location": list(end),
+                    "distance_from_previous": return_distance,
+                }
+            )
 
         print(
             f"find-path store {store_number}: tier={ctx.tier} "

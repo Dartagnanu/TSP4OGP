@@ -1,4 +1,4 @@
-"""GTSP tour solver: exact DP (small k), insertion + 2-opt, collation, outlier pass."""
+"""GTSP tour solver: exact DP (small k), insertion + 2-opt, Or-opt, collation, outlier pass."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -11,9 +11,14 @@ from pathfinder_config import (
     COLLATION_MERGE_PASS,
     COLLATION_WEIGHT,
     GTSP_EXACT_MAX_K,
+    OROPT_ENABLED,
+    OROPT_MAX_LEGS,
+    OROPT_MAX_PASSES,
+    OROPT_NEIGHBORS,
     RELOCATE_MAX_PASSES,
     relocate_outlier_cap,
     should_build_matrix,
+    should_run_or_opt,
     should_run_two_opt,
     two_opt_iterations,
 )
@@ -463,6 +468,135 @@ def _two_opt_on_stops(
     return [s for seg in new_segments for s in seg]
 
 
+def _unique_shelf_legs(
+    accesses: List[Coord],
+    start: Coord,
+    end: Optional[Coord],
+    matrix,
+    idx,
+    grid,
+) -> List[Tuple[float, Optional[int], Optional[int]]]:
+    """Unique-shelf hops as (grid_dist, c_seg_idx|None, d_seg_idx|None)."""
+    legs: List[Tuple[float, Optional[int], Optional[int]]] = []
+    n = len(accesses)
+    if n == 0:
+        return legs
+    legs.append((_dist(matrix, idx, start, accesses[0], grid), None, 0))
+    for i in range(n - 1):
+        legs.append((_dist(matrix, idx, accesses[i], accesses[i + 1], grid), i, i + 1))
+    if end is not None:
+        legs.append((_dist(matrix, idx, accesses[-1], end, grid), n - 1, None))
+    return legs
+
+
+def _k_nearest_segments(
+    move_idx: int,
+    accesses: List[Coord],
+    matrix,
+    idx,
+    grid,
+    k: int,
+) -> List[Tuple[float, int]]:
+    neighbors: List[Tuple[float, int]] = []
+    move_access = accesses[move_idx]
+    for j, access in enumerate(accesses):
+        if j == move_idx:
+            continue
+        neighbors.append((_dist(matrix, idx, move_access, access, grid), j))
+    neighbors.sort(key=lambda x: x[0])
+    return neighbors[:k]
+
+
+def _relocate_segment(
+    segments: List[List[TourStop]],
+    move_idx: int,
+    neighbor_idx: int,
+    place_after: bool,
+) -> Optional[List[List[TourStop]]]:
+    n = len(segments)
+    if move_idx == neighbor_idx or move_idx < 0 or neighbor_idx < 0:
+        return None
+    if move_idx >= n or neighbor_idx >= n:
+        return None
+    if place_after and move_idx == neighbor_idx + 1:
+        return None
+    if not place_after and move_idx == neighbor_idx - 1:
+        return None
+    moved = segments[move_idx]
+    rest = segments[:move_idx] + segments[move_idx + 1 :]
+    adj = neighbor_idx if neighbor_idx < move_idx else neighbor_idx - 1
+    insert_at = adj + 1 if place_after else adj
+    return rest[:insert_at] + [moved] + rest[insert_at:]
+
+
+def or_opt_longest_legs(
+    stops: List[TourStop],
+    start: Coord,
+    end: Optional[Coord],
+    matrix,
+    idx,
+    grid,
+) -> List[TourStop]:
+    """Or-opt-1 on unique-shelf clusters: relocate endpoints of long hops.
+
+    Same-shelf 0-step batches stay together. The 2× nearest-neighbor check is
+    only a candidate filter; a move is kept only if total tour length drops.
+    """
+    if not OROPT_ENABLED or len(stops) < 2:
+        return stops
+
+    for _ in range(OROPT_MAX_PASSES):
+        segments = _segments_from_stops(stops)
+        n = len(segments)
+        if n < 3:
+            break
+        accesses = [seg[0].access_point for seg in segments]
+        old_total = _total_tour_dist(stops, start, end, matrix, idx, grid)
+        if old_total >= INF:
+            break
+
+        legs = _unique_shelf_legs(accesses, start, end, matrix, idx, grid)
+        legs.sort(key=lambda x: x[0], reverse=True)
+
+        improved = False
+        for dist_cd, c_idx, d_idx in legs[:OROPT_MAX_LEGS]:
+            if dist_cd <= 0 or dist_cd >= INF:
+                continue
+            for move_idx in (c_idx, d_idx):
+                if move_idx is None:
+                    continue
+                neighbors = _k_nearest_segments(
+                    move_idx, accesses, matrix, idx, grid, OROPT_NEIGHBORS
+                )
+                for dj, j in neighbors:
+                    # Nearby-neighbor filter only; not a proof of improvement.
+                    if dist_cd <= 2.0 * dj:
+                        continue
+                    for place_after in (False, True):
+                        trial_segs = _relocate_segment(
+                            segments, move_idx, j, place_after
+                        )
+                        if trial_segs is None:
+                            continue
+                        trial = [s for seg in trial_segs for s in seg]
+                        new_total = _total_tour_dist(
+                            trial, start, end, matrix, idx, grid
+                        )
+                        if new_total < old_total:
+                            stops = trial
+                            improved = True
+                            break
+                    if improved:
+                        break
+                if improved:
+                    break
+            if improved:
+                break
+        if not improved:
+            break
+    return stops
+
+
 def relocate_outliers(
     stops: List[TourStop],
     groups: Dict[str, List[Candidate]],
@@ -616,6 +750,13 @@ def solve_tour(
         )
         if matrix is not None and should_run_two_opt(ctx.tier, k):
             stops = _two_opt_on_stops(stops, start, matrix, idx, two_opt_iterations(k))
+        # 2-opt reverses unique-shelf subsequences. Or-opt then relocates a
+        # shelf cluster off a long hop (reorder only). relocate_outliers
+        # afterwards only swaps which location a multi-SKU uses.
+        if should_run_or_opt(k):
+            stops = or_opt_longest_legs(
+                stops, start, end, matrix, idx, ctx.grid
+            )
         if matrix is not None:
             stops = relocate_outliers(
                 stops, groups, matrix, idx, start, end, ctx.grid, k

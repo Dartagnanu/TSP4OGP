@@ -9,7 +9,8 @@ const storeGraphSchema = new mongoose.Schema({
     shelf_nodes: { type: Array, default: [] },
     shelves_hash: { type: String },
     graph: { type: Object }, // legacy node_link; deprecated
-    last_updated: { type: Date, required: true, default: Date.now }
+    last_updated: { type: Date, required: true, default: Date.now },
+    store_updated_at: { type: Date },
 });
 
 const StoreGraph = mongoose.model("StoreGraph", storeGraphSchema);

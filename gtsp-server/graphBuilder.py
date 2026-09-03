@@ -1,7 +1,7 @@
 import hashlib
 import json
 import math
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Tuple
 
 import numpy as np
@@ -12,6 +12,21 @@ from pathfinder_config import MAX_MAP_HEIGHT, MAX_MAP_WIDTH, WALKABILITY_FORMAT
 from polygon_grid import get_covered_cells, rotate_point, translated_rotated_shape
 from shelf_access import build_shelf_node
 from walkability import WalkabilityGrid
+
+
+def timestamps_equal(a, b) -> bool:
+    """True when both datetimes exist and represent the same UTC instant."""
+    if a is None or b is None:
+        return False
+    return _as_utc_naive(a) == _as_utc_naive(b)
+
+
+def _as_utc_naive(dt):
+    if not hasattr(dt, "tzinfo"):
+        return dt
+    if dt.tzinfo is not None:
+        return dt.astimezone(timezone.utc).replace(tzinfo=None)
+    return dt
 
 
 class GraphBuilder:
@@ -96,38 +111,53 @@ class GraphBuilder:
         shelf_nodes = graph_doc.get("shelf_nodes") or []
         return WalkabilityGrid(width, height, walkable), shelf_nodes
 
+    def store_updated_at(self, store_number: int):
+        store = self.db.stores.find_one(
+            {"store_number": store_number}, {"updatedAt": 1}
+        )
+        if not store:
+            return None
+        return store.get("updatedAt")
+
+    def _unpack_walkability(
+        self, graph_doc: dict, shelves_hash: str
+    ) -> Tuple[WalkabilityGrid, list, str]:
+        w = int(graph_doc["width"])
+        h = int(graph_doc["height"])
+        data = graph_doc["walkable"]
+        if isinstance(data, Binary):
+            data = bytes(data)
+        walkable = WalkabilityGrid.unpack_bits(data, w, h)
+        grid = WalkabilityGrid(w, h, walkable)
+        return grid, graph_doc.get("shelf_nodes", []), shelves_hash
+
     def load_or_build_walkability(self, store_number: int) -> Tuple[WalkabilityGrid, list, str]:
         store = self.db.stores.find_one({"store_number": store_number})
         if not store:
             raise ValueError(f"Store {store_number} not found")
 
-        shelves = list(self.db.shelves.find({"store_number": store_number}))
-        shelves_hash = self.compute_shelves_hash(shelves)
         store_updated = store.get("updatedAt")
-
         graph_doc = self.db.store_graphs.find_one({"store_number": store_number})
 
-        if graph_doc and graph_doc.get("format") == WALKABILITY_FORMAT:
-            doc_hash = graph_doc.get("shelves_hash")
-            graph_last = graph_doc.get("last_updated")
-            fresh = doc_hash == shelves_hash
-            if store_updated and graph_last:
-                fresh = fresh and graph_last >= store_updated
-            if fresh:
-                w = int(graph_doc["width"])
-                h = int(graph_doc["height"])
-                data = graph_doc["walkable"]
-                if isinstance(data, Binary):
-                    data = bytes(data)
-                walkable = WalkabilityGrid.unpack_bits(data, w, h)
-                grid = WalkabilityGrid(w, h, walkable)
-                return grid, graph_doc.get("shelf_nodes", []), shelves_hash
+        if (
+            graph_doc
+            and graph_doc.get("format") == WALKABILITY_FORMAT
+            and timestamps_equal(store_updated, graph_doc.get("store_updated_at"))
+        ):
+            return self._unpack_walkability(
+                graph_doc, graph_doc.get("shelves_hash") or ""
+            )
+
+        shelves = list(self.db.shelves.find({"store_number": store_number}))
+        shelves_hash = self.compute_shelves_hash(shelves)
 
         if self.on_graph_rebuild:
             self.on_graph_rebuild(store_number)
 
         grid, shelf_nodes = self.build_walkability(store, shelves)
-        self._persist_walkability(store_number, grid, shelf_nodes, shelves_hash)
+        self._persist_walkability(
+            store_number, grid, shelf_nodes, shelves_hash, store_updated
+        )
         return grid, shelf_nodes, shelves_hash
 
     def _persist_walkability(
@@ -136,6 +166,7 @@ class GraphBuilder:
         grid: WalkabilityGrid,
         shelf_nodes: list,
         shelves_hash: str,
+        store_updated_at=None,
     ) -> None:
         packed = Binary(WalkabilityGrid.pack_bits(grid.walkable))
         self.db.store_graphs.update_one(
@@ -148,6 +179,7 @@ class GraphBuilder:
                     "walkable": packed,
                     "shelf_nodes": shelf_nodes,
                     "shelves_hash": shelves_hash,
+                    "store_updated_at": store_updated_at,
                     "last_updated": datetime.utcnow(),
                 },
                 "$unset": {"graph": ""},

@@ -14,6 +14,7 @@ import {
 } from '../konva/drawUtils.js';
 import {getStore} from '../dataUtils/storeUtils.js';
 import {deleteShelf, updateShelfByOldName, getShelvesByStore} from '../dataUtils/shelfUtils.js';
+import { getPickwalksByStore } from '../dataUtils/pickwalkUtils.js';
 import { ContextMenu} from './contextMenu/contextMenu.js';
 import { createShelf, cloneShelf } from '../dataUtils/shelfUtils.js';
 import { GTSP_SERVER_URL } from '../../config.js';
@@ -29,6 +30,7 @@ export class mapController {
     this.stage_height = stage_height;
     this.socket = socket;
     this.palette = null;
+    this.testPickwalks = [];
   }
 
   
@@ -38,6 +40,7 @@ export class mapController {
     this.layer = layer; // Store the layer for later use
     this.stage = stage; // Store the stage for later use
     this.map = map; // Store the map data for later use
+    await this.loadTestWalks();
    // Expose createAndAddShelf globally for use in the context menu
     window.createAndAddShelf = this.createAndAddShelf.bind(this);
     window.cloneAndAddShelf = this.cloneAndAddShelf.bind(this);
@@ -69,7 +72,11 @@ export class mapController {
     let store = await getStore(store_number);
     
     let shelves = await getShelvesByStore(store_number);
-    console.log('Fetched store and shelves:', store, shelves);
+    console.log(
+      'Fetched store and shelves:',
+      store?.store_number ?? store_number,
+      shelves?.length ?? 0
+    );
     return { store, shelves };
   }
 
@@ -423,23 +430,63 @@ export class mapController {
     }
   }
 
+  async loadTestWalks() {
+    const select = document.getElementById('testWalkSelect');
+    if (!select) return;
+
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Select a test walk';
+    select.replaceChildren(placeholder);
+
+    try {
+      const walks = await getPickwalksByStore(this.store_number);
+      this.testPickwalks = Array.isArray(walks) ? walks : [];
+    } catch (error) {
+      console.error('Failed to load test pickwalks:', error);
+      this.testPickwalks = [];
+    }
+
+    for (const walk of this.testPickwalks) {
+      const option = document.createElement('option');
+      option.value = walk.pickwalk_id;
+      option.textContent = walk.name || walk.pickwalk_id;
+      select.appendChild(option);
+    }
+
+    select.onchange = () => this._syncTestWalkButton();
+    this._syncTestWalkButton();
+  }
+
+  _selectedTestWalk() {
+    const select = document.getElementById('testWalkSelect');
+    const pickwalkId = select?.value;
+    if (!pickwalkId) return null;
+    return this.testPickwalks.find((walk) => walk.pickwalk_id === pickwalkId) || null;
+  }
+
+  _syncTestWalkButton() {
+    const btn = document.getElementById('testWalksBtn');
+    if (btn) btn.disabled = !this._selectedTestWalk();
+  }
+
   async testWalks() {
     const btn = document.getElementById('testWalksBtn');
-    const originalLabel = btn.textContent;
-    console.log('Testing walks...');
+    const originalLabel = btn?.textContent;
+    const pickwalk = this._selectedTestWalk();
+    if (!pickwalk) {
+      this.pathResultsPopup?.showError('Select a test walk first.');
+      this._syncTestWalkButton();
+      return;
+    }
 
-    const pickwalk = {
-      starting_point: { id: 'Main_Entrance', point: [10, 50] },
-      itemList: [
-        { upc: '0020001000011', quantity: 1 },
-        { upc: '0030001000022', quantity: 2 },
-      ],
-    };
     console.log('Finding path for pickwalk:', pickwalk);
 
     try {
-      btn.disabled = true;
-      btn.textContent = 'Finding path…';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Finding path…';
+      }
       this.pathOverlay.clear();
 
       const { result, startPoint, endPoint } = await this.walkFinder.findPath(
@@ -455,8 +502,8 @@ export class mapController {
         error.message || 'Failed to find path. Is gtsp-server running?'
       );
     } finally {
-      btn.disabled = false;
-      btn.textContent = originalLabel;
+      if (btn) btn.textContent = originalLabel;
+      this._syncTestWalkButton();
     }
   }
 }

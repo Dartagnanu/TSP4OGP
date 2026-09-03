@@ -22,6 +22,7 @@ const pointSchema = new mongoose.Schema({
 // pickwalk schema for pickwalks
 const pickwalkListSchema = new mongoose.Schema({
     pickwalk_id: { type: String, required: true },
+    name: { type: String, required: false, default: '' },
     store_id: { type: Number, required: false },
     pickwalk_subtype: { type: String, required: true },
     starting_point: { type: [pointSchema], required: false },
