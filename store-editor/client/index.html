@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Store Map Editor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loginOverlay" class="login-overlay">
+        <form id="loginForm" class="login-card">
+            <h1>Store Map Editor</h1>
+            <p class="login-subtitle">Sign in with your manager account</p>
+            <div class="form-field">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername" name="username" autocomplete="username" required>
+            </div>
+            <div class="form-field">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
+            </div>
+            <div class="form-field">
+                <label for="loginStoreNumber">Store number</label>
+                <input type="number" id="loginStoreNumber" name="store_number" value="3260" required>
+            </div>
+            <p id="loginError" class="login-error" role="alert"></p>
+            <button type="submit" class="btn btn-primary login-submit">Log in</button>
+            <p class="login-hint muted">Dev: manager / manager1 / manager2 (password matches username) · store 3260</p>
+        </form>
+    </div>
+
+    <div id="appShell" class="app-shell hidden">
+    <div id="topBar">
+        <div class="topbar-left">
+            <button type="button" id="toggleSidebar" class="btn btn-ghost" title="Show or hide shelf templates" aria-expanded="false">☰ Templates</button>
+            <span id="sessionInfo" class="session-info"></span>
+        </div>
+        <div class="topbar-right">
+            <button id="logoutBtn" type="button" class="btn btn-ghost">Logout</button>
+            <select id="testWalkSelect" aria-label="Select a test walk">
+                <option value="">Select a test walk</option>
+            </select>
+            <button id="testWalksBtn" class="btn btn-primary" disabled>Test Walks</button>
+            <span class="topbar-divider" aria-hidden="true"></span>
+            <label class="random-sku-label" for="randomSkuCount">Random SKUs</label>
+            <input type="number" id="randomSkuCount" min="1" step="1" inputmode="numeric" placeholder="N" aria-label="Number of random SKUs" title="Random locatable SKUs">
+            <button type="button" id="randomWalkBtn" class="btn btn-primary" disabled>Random walk</button>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="collapsed">
+        <h2 class="sidebar-section-header">Shelf templates</h2>
+        <div id="palette-container"></div>
+        <h2 class="sidebar-section-header">Aisles</h2>
+        <button type="button" id="detectAislesBtn" class="btn btn-primary sidebar-aisle-btn">Detect aisles</button>
+        <details class="activity-panel">
+            <summary>My recent activity</summary>
+            <ul id="myActivityList" class="activity-list"></ul>
+        </details>
+        <details class="activity-panel">
+            <summary>Store access</summary>
+            <button type="button" id="refreshActivityBtn" class="btn btn-ghost btn-sm">Refresh</button>
+            <ul id="storeAccessList" class="activity-list"></ul>
+        </details>
+    </div>
+
+    <!-- Right-click menu (single shelf / empty map) -->
+    <div id="contextMenu" class="context-menu">
+        <button id="addShelfBtn">Add Shelf</button>
+        <button id="pasteShelfBtn">Paste</button>
+        <button id="copyShelfBtn">Copy Shelf</button>
+        <button id="deleteShelfBtn">Delete Shelf</button>
+        <button id="editShelfBtn">Edit Shelf</button>
+        <button type="button" id="makeCorridorSingleBtn">Make corridor</button>
+        <button type="button" id="addToCorridorSingleBtn">Add to corridor…</button>
+        <button type="button" id="detectAislesEmptyBtn">Detect aisles</button>
+    </div>
+
+    <!-- Right-click menu (multi-shelf selection) -->
+    <div id="multiShelfContextMenu" class="context-menu">
+        <button id="copyShelvesBtn">Copy Shelves</button>
+        <button type="button" id="makeCorridorBtn">Make corridor</button>
+        <button type="button" id="addToCorridorBtn">Add to corridor…</button>
+        <button id="deleteShelvesBtn">Delete Shelves</button>
+    </div>
+
+    <div id="corridorContextMenu" class="context-menu">
+        <button type="button" id="detectAislesCorridorBtn">Detect aisles</button>
+        <button type="button" id="renameCorridorBtn">Rename</button>
+        <button type="button" id="setCorridorDirectionBtn">Set direction…</button>
+        <button type="button" id="removeCorridorShelvesBtn">Remove selected shelves</button>
+        <button type="button" id="deleteCorridorBtn">Delete corridor</button>
+    </div>
+
+    <div id="pasteOptionsModal" class="modal-card">
+        <h3>Paste shelves</h3>
+        <p id="pasteOptionsMessage"></p>
+        <div class="modal-actions">
+            <button type="button" id="pasteKeepItemsCancel" class="btn">Cancel</button>
+            <button type="button" id="pasteKeepItemsNo" class="btn">Layout only</button>
+            <button type="button" id="pasteKeepItemsYes" class="btn btn-primary">Keep items</button>
+        </div>
+    </div>
+
+    <div id="corridorModal" class="modal-card">
+        <h3 id="corridorModalTitle">Corridor</h3>
+        <p id="corridorModalMessage"></p>
+        <div class="form-field" id="corridorExistingRow">
+            <label for="corridorExistingSelect">Existing corridor</label>
+            <select id="corridorExistingSelect"></select>
+        </div>
+        <div class="form-field" id="corridorNameRow">
+            <label for="corridorNameInput">Name</label>
+            <input type="text" id="corridorNameInput" autocomplete="off">
+        </div>
+        <div class="form-field" id="corridorDirectionRow">
+            <label for="corridorDirectionSelect">Pickwalk direction</label>
+            <select id="corridorDirectionSelect">
+                <option value="auto">Auto (nearest end)</option>
+                <option value="+">This way: low end → high end</option>
+                <option value="-">This way: high end → low end</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button type="button" id="corridorModalCancel" class="btn">Cancel</button>
+            <button type="button" id="corridorModalConfirm" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+
+    <!-- Shelf Edit Popup -->
+    <div id="shelfEditPopup">
+        <h3>Edit Shelf</h3>
+        <div class="form-field">
+            <label for="editShelfId">Shelf Name</label>
+            <input type="text" id="editShelfId">
+        </div>
+        <div class="form-field">
+            <label for="editTemplate">Template</label>
+            <select id="editTemplate"></select>
+        </div>
+        <div class="form-field">
+            <label for="editRotation">Rotation (degrees)</label>
+            <input type="number" id="editRotation" min="0" max="360" step="90">
+        </div>
+        <div class="form-field">
+            <label for="editModulars">Modulars (comma-separated)</label>
+            <input type="text" id="editModulars" placeholder="mod1, mod2, mod3">
+        </div>
+        <div class="form-field">
+            <label for="editDepartment">Department</label>
+            <input type="text" id="editDepartment">
+        </div>
+        <div class="modal-actions">
+            <button id="cancelEditShelf" class="btn">Cancel</button>
+            <button id="saveEditShelf" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+
+    <!-- Path results panel (docked, draggable, resizable; no overlay) -->
+    <div id="pathResultsPopup" class="path-results-panel path-results-panel--docked" role="dialog" aria-labelledby="pathResultsTitle" aria-modal="false">
+        <div id="pathResultsDragHandle" class="path-results-header" title="Drag to move">
+            <span class="path-results-grip" aria-hidden="true">⋮⋮</span>
+            <h3 id="pathResultsTitle">Pick path</h3>
+            <button type="button" id="minimizePathResults" class="btn btn-ghost path-results-close" aria-label="Minimize pick path" title="Minimize">–</button>
+            <button type="button" id="closePathResults" class="btn btn-ghost path-results-close" aria-label="Close pick path">×</button>
+        </div>
+        <div class="path-results-body">
+            <p id="pathResultsUpcs" class="path-results-upcs"></p>
+            <ol id="pathResultsSteps" class="path-results-steps"></ol>
+        </div>
+        <div id="pathResultsResizeHandle" class="path-results-resize" title="Drag to resize" aria-hidden="true"></div>
+    </div>
+
+    <!-- Overlay for popup -->
+    <div id="popupOverlay"></div>
+
+    <!-- Stage container -->
+    <div id="container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/konva@8/konva.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pathfinding@0.4.18/visual/lib/pathfinding-browser.min.js"></script>
+    <script>
+        console.log('Pathfinding library loaded:', typeof PF !== 'undefined' ? 'Yes' : 'No');
+    </script>
+    <script src="app.js"></script>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+    </div><!-- #appShell -->
+
+    <!-- Debug: pathfinding grid & graph viz (unused in normal flow) -->
+    <div id="debugSection">
+        <canvas id="storeGrid" width="1000" height="600"></canvas>
+        <div id="graph"></div>
+    </div>
+</body>
+</html>

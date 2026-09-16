@@ -1,0 +1,14 @@
+{
+  "name": "tsp4ogp-obfuscated-build",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Build tools only — not part of the runtime image",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.9",
+    "javascript-obfuscator": "^4.1.1"
+  }
+}

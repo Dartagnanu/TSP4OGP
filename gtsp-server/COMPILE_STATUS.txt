@@ -1,0 +1,9 @@
+gtsp_solver: cython_c
+corridor_blocks: cython_c
+heuristics: cython_c
+distance_cache: cython_c
+shelf_access: cython_c
+polygon_grid: cython_c
+graphBuilder: cython_c
+store_cache: cython_c
+pathFinder: cython_c

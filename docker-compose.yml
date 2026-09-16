@@ -1,0 +1,79 @@
+# gtsp-only debug: docker compose up mongo gtsp-server
+# Paths are relative to this obfuscated/ folder. Do not bind-mount source.
+services:
+  mongo:
+    image: mongo:7
+    container_name: store-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    build: ./store-editor
+    container_name: store-app
+    ports:
+      - "42069:42069"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/storemaps
+    depends_on:
+      - mongo
+
+  gtsp-server:
+    build: ./gtsp-server
+    container_name: gtsp-server
+    ports:
+      - "5000:5000"
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PATHFINDER_GPU_PROBE=0
+    depends_on:
+      - mongo
+
+  seed:
+    profiles: [seed]
+    build: ./store-editor
+    container_name: store-seed
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/storemaps
+    working_dir: /usr/src/app
+    entrypoint: ["node", "server/models/seed.js"]
+
+  seed-3260:
+    profiles: [seed-3260]
+    build: ./store-editor
+    container_name: store-seed-3260
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/storemaps
+    working_dir: /usr/src/app
+    entrypoint: ["node", "server/scripts/seedStore3260.js"]
+
+  seed-3261:
+    profiles: [seed-3261]
+    build: ./store-editor
+    container_name: store-seed-3261
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/storemaps
+    working_dir: /usr/src/app
+    entrypoint: ["node", "server/scripts/seedStore3261.js"]
+
+  seed-3262:
+    profiles: [seed-3262]
+    build: ./store-editor
+    container_name: store-seed-3262
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/storemaps
+    working_dir: /usr/src/app
+    entrypoint: ["node", "server/scripts/seedStore3262.js"]
+
+volumes:
+  mongo-data:
