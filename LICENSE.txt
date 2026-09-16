@@ -1,0 +1,21 @@
+Strictly Proprietary & Confidential Code License
+Copyright (c) 2026 Dominick Joe Dartagnan Urbina Sunderland. All Rights Reserved.
+
+1. PROPRIETARY RIGHTS
+This software, including its source code, obfuscated code, and compiled binary 
+assets, is the exclusive intellectual property of the copyright holder.
+
+2. RESTRICTIONS ON USE
+No individual, group, or corporate entity (including the author's current or 
+former employers) may download, copy, distribute, execute, modify, decompile, 
+reverse-engineer, or use this software for any commercial, production, or 
+corporate purposes without the express, prior written permission of the author.
+
+3. GITHUB TERMS ALLOWANCE
+As dictated by the GitHub Terms of Service, other GitHub users are granted the 
+limited right to view and fork this repository strictly within the GitHub 
+platform for evaluation purposes only. This does not grant a license to deploy 
+or use the software.
+
+Unauthorized reproduction or corporate use of this file will be considered a 
+direct violation of copyright law.
