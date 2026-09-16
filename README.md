@@ -1,6 +1,6 @@
 # Store pick paths (demo)
 
-Interactive store map that plans **aisle-based pick paths** instead of a single giant shelf sequence (the kind of walk that can stretch to ~150k ft). You see the floor, detect aisles, and generate a walk that actually goes down those aisles.
+Interactive store map that can be used to create pick paths for any number of picks in seconds, instead of a single giant shelf list. You see the floor, detect aisles, and generate a walk that finds the shortest path through each point.
 
 **Watch first:** [Intro presentation](./IntroPresentation.mp4)
 
