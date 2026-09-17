@@ -5,10 +5,10 @@ Interactive store map that can be used to create pick paths for any number of pi
 **Watch first:** [Intro presentation](./IntroPresentation.mp4)
 
 Proof of concept:
-[Store Building Demo](./Project demo.mp4)
-[Multiple Users Sync Demo](./Store Sync Demo.mp4)
-[20 Sku solve on big lot store](./20 SKUS on 150K Square Foot Store.png)
-[100 Sku solve on big lot store](./100 SKUS on 150K Square Foot Store.png)
+[Store Building Demo](./ProjectDemo.mp4)
+[Multiple Users Sync Demo](./StoreSyncDemo.mp4)
+[20 Sku solve on big lot store](./20SKUSon150KSquareFootStore.png)
+[100 Sku solve on big lot store](./100SKUSon150KSquareFootStore.png)
 
 This folder is a **runtime demo**. The editor is obfuscated JavaScript; pathfinding is compiled Cython. You can run it and try it on any computer.
 
