@@ -2,13 +2,15 @@
 
 Interactive store map that can be used to create pick paths for any number of picks in seconds, instead of a single giant shelf list. You see the floor, detect aisles, and generate a walk that finds the shortest path through each point.
 
-**Watch first:** [Intro presentation](./IntroPresentation.mp4)
+**Watch first:** [Intro presentation](https://youtu.be/1fjKfbaf9TU)
+
+[![Intro presentation](https://img.youtube.com/vi/1fjKfbaf9TU/maxresdefault.jpg)](https://youtu.be/1fjKfbaf9TU)
 
 Proof of concept:
 [Store Building Demo](./ProjectDemo.mp4)
 [Multiple Users Sync Demo](./StoreSyncDemo.mp4)
-[20 Sku solve on big lot store](./20SKUSon150KSquareFootStore.png)
-[100 Sku solve on big lot store](./100SKUSon150KSquareFootStore.png)
+[20 Sku solve on big lot store](./20SKUSOn150KSquareFootStore.png)
+[100 Sku solve on big lot store](./100SKUSOn150KSquareFootStore.png)
 
 This folder is a **runtime demo**. The editor is obfuscated JavaScript; pathfinding is compiled Cython. You can run it and try it on any computer.
 
