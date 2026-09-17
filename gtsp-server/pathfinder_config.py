@@ -13,23 +13,27 @@ MAX_CACHE_MB = int(os.environ.get("PATHFINDER_MAX_CACHE_MB", "512"))
 FIELD_CACHE_MAX = int(os.environ.get("PATHFINDER_FIELD_CACHE_MAX", "128"))
 FIELD_CACHE_MAX_COMPLETE = int(os.environ.get("PATHFINDER_FIELD_CACHE_MAX_COMPLETE", "48"))
 TWO_OPT_MAX_K = int(os.environ.get("PATHFINDER_TWO_OPT_MAX_K", "150"))
-TWO_OPT_FULL_K = int(os.environ.get("PATHFINDER_TWO_OPT_FULL_K", "80"))
-TWO_OPT_MAX_ITER = int(os.environ.get("PATHFINDER_TWO_OPT_MAX_ITER", "50"))
+TWO_OPT_FULL_K = int(os.environ.get("PATHFINDER_TWO_OPT_FULL_K", "150"))
+TWO_OPT_MAX_ITER = int(os.environ.get("PATHFINDER_TWO_OPT_MAX_ITER", "80"))
 TWO_OPT_FULL_ITER = int(os.environ.get("PATHFINDER_TWO_OPT_FULL_ITER", "500"))
 MAX_MAP_WIDTH = int(os.environ.get("PATHFINDER_MAX_MAP_WIDTH", "2000"))
 MAX_MAP_HEIGHT = int(os.environ.get("PATHFINDER_MAX_MAP_HEIGHT", "2500"))
-GTSP_EXACT_MAX_K = int(os.environ.get("PATHFINDER_GTSP_EXACT_MAX_K", "12"))
+GTSP_EXACT_MAX_K = int(os.environ.get("PATHFINDER_GTSP_EXACT_MAX_K", "16"))
 MATRIX_MIN_K = int(os.environ.get("PATHFINDER_MATRIX_MIN_K", "13"))
 COLLATION_WEIGHT = float(os.environ.get("PATHFINDER_COLLATION_WEIGHT", "2"))
 COLLATION_MERGE_PASS = int(os.environ.get("PATHFINDER_COLLATION_MERGE_PASS", "1"))
-RELOCATE_MAX_OUTLIERS = int(os.environ.get("PATHFINDER_RELOCATE_MAX_OUTLIERS", "3"))
+RELOCATE_MAX_OUTLIERS = int(os.environ.get("PATHFINDER_RELOCATE_MAX_OUTLIERS", "5"))
 RELOCATE_MAX_PASSES = int(os.environ.get("PATHFINDER_RELOCATE_MAX_PASSES", "2"))
 RELOCATE_LARGE_K_THRESHOLD = int(os.environ.get("PATHFINDER_RELOCATE_LARGE_K", "50"))
-RELOCATE_MAX_OUTLIERS_LARGE = int(os.environ.get("PATHFINDER_RELOCATE_MAX_OUTLIERS_LARGE", "10"))
+RELOCATE_MAX_OUTLIERS_LARGE = int(os.environ.get("PATHFINDER_RELOCATE_MAX_OUTLIERS_LARGE", "12"))
 OROPT_ENABLED = os.environ.get("PATHFINDER_OROPT", "1").lower() in ("1", "true", "yes")
-OROPT_MAX_LEGS = int(os.environ.get("PATHFINDER_OROPT_MAX_LEGS", "8"))
-OROPT_NEIGHBORS = int(os.environ.get("PATHFINDER_OROPT_NEIGHBORS", "12"))
+OROPT_MAX_LEGS = int(os.environ.get("PATHFINDER_OROPT_MAX_LEGS", "12"))
+OROPT_NEIGHBORS = int(os.environ.get("PATHFINDER_OROPT_NEIGHBORS", "16"))
 OROPT_MAX_PASSES = int(os.environ.get("PATHFINDER_OROPT_MAX_PASSES", "3"))
+# Prefer a candidate in a grocery field the tour already visits.
+FIELD_STICK_WEIGHT = float(os.environ.get("PATHFINDER_FIELD_STICK_WEIGHT", "12"))
+# Extra feet when insertion would land between two other fields.
+BLOCK_SWITCH_PENALTY_FT = float(os.environ.get("PATHFINDER_BLOCK_SWITCH_FT", "20"))
 LONGHOP_ENABLED = os.environ.get("PATHFINDER_LONGHOP", "1").lower() in (
     "1",
     "true",
@@ -38,13 +42,26 @@ LONGHOP_ENABLED = os.environ.get("PATHFINDER_LONGHOP", "1").lower() in (
 LONGHOP_FRAC = float(os.environ.get("PATHFINDER_LONGHOP_FRAC", "0.10"))
 LONGHOP_MIN_LEGS = int(os.environ.get("PATHFINDER_LONGHOP_MIN_LEGS", "2"))
 LONGHOP_MAX_LEGS = int(os.environ.get("PATHFINDER_LONGHOP_MAX_LEGS", "12"))
-LONGHOP_SLACK_FT = float(os.environ.get("PATHFINDER_LONGHOP_SLACK_FT", "4"))
+LONGHOP_SLACK_FT = float(os.environ.get("PATHFINDER_LONGHOP_SLACK_FT", "8"))
+LONGHOP_SLACK_FRAC = float(os.environ.get("PATHFINDER_LONGHOP_SLACK_FRAC", "0.15"))
 LONGHOP_MAX_PASSES = int(os.environ.get("PATHFINDER_LONGHOP_MAX_PASSES", "3"))
 # Split stays off: pulling a far bay out of a locked/one-pass aisle is worse
 # than leaving it; long-hop insert covers skipped aisles on the way.
 CORRIDOR_SPLIT_FT = float(os.environ.get("PATHFINDER_CORRIDOR_SPLIT_FT", "0"))
 # Adjacent flush corridors are 8–10 ft apart; inter-block walkways are ~20+ ft.
 PARALLEL_FIELD_CONNECT_FT = float(os.environ.get("PATHFINDER_PARALLEL_FIELD_CONNECT_FT", "14"))
+# Field-level outer GTSP (parallel-aisle clusters), then S-shape inside a field.
+# Corridor-level hierarchical recrossed mixed H/V grocery blocks; this does not.
+HIERARCHICAL_ENABLED = os.environ.get("PATHFINDER_HIERARCHICAL", "1").lower() in (
+    "1",
+    "true",
+    "yes",
+)
+SWEEP_FIELDS_ENABLED = os.environ.get("PATHFINDER_SWEEP_FIELDS", "1").lower() in (
+    "1",
+    "true",
+    "yes",
+)
 
 WALKABILITY_FORMAT = "walkability_v2"
 
@@ -122,3 +139,10 @@ def should_run_longhop(k: int) -> bool:
     if not LONGHOP_ENABLED:
         return False
     return k > GTSP_EXACT_MAX_K
+
+
+def longhop_slack(hop_dist: float) -> float:
+    """Allow a skipped aisle if the detour is a fraction of the hop."""
+    if hop_dist <= 0 or hop_dist == float("inf"):
+        return LONGHOP_SLACK_FT
+    return max(LONGHOP_SLACK_FT, LONGHOP_SLACK_FRAC * hop_dist)

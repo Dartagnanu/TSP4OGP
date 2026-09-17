@@ -1,8 +1,7 @@
 """Build Cython / C extension modules for the obfuscated pathfinder.
 
-Prefers pre-generated .c files (no readable .py in the public tree).
-Falls back to Cythonizing a minified .py if a module could not be translated
-ahead of time.
+Compiles pre-generated .c from the company tree. Falls back to minified
+.py / .pyx only when a C source is missing.
 """
 from pathlib import Path
 
@@ -37,15 +36,17 @@ def _extensions():
         c_file = here / f"{name}.c"
         py_file = here / f"{name}.py"
         pyx_file = here / f"{name}.pyx"
+        # Company tree: compile committed C. Only fall back to .py/.pyx if
+        # Cython generation failed and a minified source was left behind.
         if c_file.exists():
             print(f"setup.py: compiling {c_file.name}")
             c_exts.append(Extension(name, sources=[str(c_file)]))
-        elif pyx_file.exists():
-            print(f"setup.py: cythonizing {pyx_file.name}")
-            py_files.append(str(pyx_file))
         elif py_file.exists():
             print(f"setup.py: cythonizing {py_file.name}")
             py_files.append(str(py_file))
+        elif pyx_file.exists():
+            print(f"setup.py: cythonizing {pyx_file.name}")
+            py_files.append(str(pyx_file))
         else:
             raise FileNotFoundError(
                 f"No source for extension {name} ({name}.c / .pyx / .py)"

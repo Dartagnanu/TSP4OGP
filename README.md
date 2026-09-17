@@ -6,6 +6,17 @@ Interactive store map that plans **aisle-based pick paths** instead of a single 
 
 This folder is a **runtime demo**, not the private original. The UI JavaScript is bundled and obfuscated; pathfinding is compiled (Cython). You can run it and try the product. You cannot read the real source here.
 
+## Rebuild from Original
+
+Keep `TSP4OGPOriginal` as a sibling of this folder (or set `TSP4OGP_ORIGINAL`). From **this** directory:
+
+```bash
+npm install
+npm run build
+```
+
+That reads Original, writes obfuscated JS and Cython `.c` here, and does not change Original. Do not publish `.tmp/`.
+
 ## Run
 
 From **this** directory:
@@ -17,7 +28,7 @@ docker compose --profile seed run --rm seed
 
 Then open:
 
-- Store editor: http://localhost:42069
+- Store editor: http://localhost:3000
 - Pathfinder API: http://localhost:5000
 
 **Login:** `manager` / `manager` (password matches username). Use store **3260**. Stores **3261** and **3262** work the same way (`manager1` / `manager1`, `manager2` / `manager2`).
@@ -52,11 +63,9 @@ After login:
 | --- | --- |
 | Browser UI: one bundled, obfuscated `app.js` | `index.html`, `style.css` |
 | Node server and seed CLIs | `package.json`, seed JSON / maps if present |
-| Pathfinding modules (Cython → `.so` in Docker) | Flask `app.py`, `walkability.py` (Numba BFS) |
+| Pathfinding modules (Cython → `.so` in Docker) | Flask `app.py`, `walkability.py`, `pathfinder_config.py` |
 
 Readable leftovers exist so the demo can boot. They are not the private original. **Readable product source is not in this folder.**
-
-`walkability.py` stays as Python because Numba compiles it at runtime. That file is the main readable pathfinding leftover.
 
 ## Copying this folder to a public repo
 

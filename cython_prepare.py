@@ -1,11 +1,13 @@
-"""Generate Cython C sources (or minified Python fallback) for obfuscated/gtsp-server.
+"""Generate Cython C sources (or minified Python fallback) for TSP4OGP/gtsp-server.
 
-Run from the private monorepo. Output has no readable algorithm .py when Cython succeeds.
+Run from the company TSP4OGP repo. Reads TSP4OGPOriginal; does not modify it.
+Output has no readable algorithm .py when Cython succeeds.
 """
 from __future__ import annotations
 
 import ast
 import importlib.util
+import os
 import shutil
 import subprocess
 import sys
@@ -39,7 +41,13 @@ COMPILER_DIRECTIVES = [
 
 def repo_paths() -> tuple[Path, Path, Path]:
     here = Path(__file__).resolve().parent
-    orig = here.parent / "gtsp-server"
+    env = os.environ.get("TSP4OGP_ORIGINAL")
+    if env:
+        orig_root = Path(env).resolve()
+    else:
+        sibling = here.parent / "TSP4OGPOriginal"
+        orig_root = sibling if (sibling / "gtsp-server").is_dir() else here.parent
+    orig = orig_root / "gtsp-server"
     out = here / "gtsp-server"
     work = here / ".tmp" / "cython_src"
     return orig, out, work

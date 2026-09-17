@@ -13,9 +13,10 @@ services:
     build: ./store-editor
     container_name: store-app
     ports:
-      - "42069:42069"
+      - "3000:3000"
     environment:
       - MONGO_URL=mongodb://mongo:27017/storemaps
+      - PORT=3000
     depends_on:
       - mongo
 
@@ -25,8 +26,11 @@ services:
     ports:
       - "5000:5000"
     restart: always
+    # Do not bind-mount ./gtsp-server:/app. Host has pathFinder.c, not
+    # pathFinder.py; a mount hides the image's compiled pathFinder*.so.
     environment:
       - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
       - PATHFINDER_GPU_PROBE=0
     depends_on:
       - mongo

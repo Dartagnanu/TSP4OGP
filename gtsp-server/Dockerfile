@@ -19,7 +19,18 @@ RUN (command -v gcc >/dev/null 2>&1 || (apt-get update \
 
 COPY . /app/
 
+# Compile Cython C sources in place, then copy .so files into site-packages
+# so `from pathFinder import Pathfinder` works even if /app is not on sys.path.
+# Fail the build if the import does not work (do not delete sources first).
 RUN /opt/conda/bin/python setup.py build_ext --inplace \
+    && /opt/conda/bin/python -c "\
+import pathlib, shutil, sysconfig; \
+plat = pathlib.Path(sysconfig.get_path('platlib')); \
+mods = sorted(pathlib.Path('/app').glob('*.so')); \
+assert mods, 'no compiled .so modules in /app'; \
+[shutil.copy2(p, plat / p.name) for p in mods]; \
+print('compiled:', ', '.join(p.name for p in mods))" \
+    && /opt/conda/bin/python -c "from pathFinder import Pathfinder; from graphBuilder import GraphBuilder; print('pathFinder import ok')" \
     && rm -rf build /app/*.egg-info \
     && rm -f \
         gtsp_solver.py gtsp_solver.c \
@@ -32,13 +43,12 @@ RUN /opt/conda/bin/python setup.py build_ext --inplace \
         store_cache.py store_cache.c \
         pathFinder.py pathFinder.c \
         setup.py setup.cfg \
-    && find /app -name '*.html' -delete \
-    && echo "Compiled extension modules:" \
-    && ls -1 /app/*.so 2>/dev/null || ls -1 /app/*.cpython* 2>/dev/null || true
+    && find /app -name '*.html' -delete
 
 EXPOSE 5000
 
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 
 ENTRYPOINT []
 CMD ["/opt/conda/bin/python", "-u", "app.py"]

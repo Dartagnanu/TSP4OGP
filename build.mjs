@@ -1,6 +1,6 @@
 /**
- * Build the obfuscated/ runtime tree from the private original sources.
- * Does not modify ../store-editor or ../gtsp-server.
+ * Build the company-facing TSP4OGP runtime from the private original sources.
+ * Reads TSP4OGPOriginal (sibling, or TSP4OGP_ORIGINAL). Does not modify Original.
  */
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -10,11 +10,36 @@ import * as esbuild from 'esbuild';
 import JavaScriptObfuscator from 'javascript-obfuscator';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const REPO = path.resolve(HERE, '..');
-const ORIG_EDITOR = path.join(REPO, 'store-editor');
+
+function resolveOrigRoot() {
+  if (process.env.TSP4OGP_ORIGINAL) {
+    return path.resolve(process.env.TSP4OGP_ORIGINAL);
+  }
+  const sibling = path.resolve(HERE, '..', 'TSP4OGPOriginal');
+  if (
+    fs.existsSync(path.join(sibling, 'store-editor', 'client')) &&
+    fs.existsSync(path.join(sibling, 'gtsp-server'))
+  ) {
+    return sibling;
+  }
+  const parent = path.resolve(HERE, '..');
+  if (
+    parent !== HERE &&
+    fs.existsSync(path.join(parent, 'store-editor', 'client')) &&
+    fs.existsSync(path.join(parent, 'gtsp-server'))
+  ) {
+    return parent;
+  }
+  throw new Error(
+    'TSP4OGPOriginal not found. Place it as a sibling of this repo or set TSP4OGP_ORIGINAL.'
+  );
+}
+
+const ORIG_ROOT = resolveOrigRoot();
+const ORIG_EDITOR = path.join(ORIG_ROOT, 'store-editor');
 const ORIG_CLIENT = path.join(ORIG_EDITOR, 'client');
 const ORIG_SERVER = path.join(ORIG_EDITOR, 'server');
-const ORIG_GTSP = path.join(REPO, 'gtsp-server');
+const ORIG_GTSP = path.join(ORIG_ROOT, 'gtsp-server');
 const OUT_EDITOR = path.join(HERE, 'store-editor');
 const OUT_CLIENT = path.join(OUT_EDITOR, 'client');
 const OUT_SERVER = path.join(OUT_EDITOR, 'server');
@@ -190,6 +215,10 @@ function writeIndexHtml() {
 function copyGlue() {
   copyFile(path.join(ORIG_CLIENT, 'style.css'), path.join(OUT_CLIENT, 'style.css'));
   writeIndexHtml();
+  const origEntrypoint = path.join(ORIG_EDITOR, 'docker-entrypoint.sh');
+  if (fs.existsSync(origEntrypoint)) {
+    copyFile(origEntrypoint, path.join(OUT_EDITOR, 'docker-entrypoint.sh'));
+  }
   copyDirIfExists(path.join(ORIG_SERVER, 'data'), path.join(OUT_SERVER, 'data'));
   copyDirIfExists(path.join(ORIG_SERVER, 'maps'), path.join(OUT_SERVER, 'maps'));
   writeServerPackageJson();
@@ -224,6 +253,7 @@ function runCythonPrepare() {
     cwd: HERE,
     encoding: 'utf8',
     stdio: 'inherit',
+    env: { ...process.env, TSP4OGP_ORIGINAL: ORIG_ROOT },
   });
   if (r.status !== 0) {
     throw new Error(`cython_prepare.py exited ${r.status}`);
@@ -265,12 +295,21 @@ function assertObfuscated() {
       fs.unlinkSync(py);
     }
   }
+  for (const extra of [
+    'test_gtsp_pathfinding.py',
+    'bench_pathfinding.py',
+    'OPERATIONS.md',
+  ]) {
+    const p = path.join(OUT_GTSP, extra);
+    if (fs.existsSync(p)) fs.unlinkSync(p);
+  }
 }
 
 async function main() {
   if (!fs.existsSync(ORIG_CLIENT) || !fs.existsSync(ORIG_SERVER) || !fs.existsSync(ORIG_GTSP)) {
-    throw new Error('Original store-editor / gtsp-server not found next to obfuscated/');
+    throw new Error(`Original store-editor / gtsp-server not found at ${ORIG_ROOT}`);
   }
+  console.log('Building company tree from', ORIG_ROOT);
 
   mkdirp(TMP);
   mkdirp(OUT_CLIENT);
@@ -312,7 +351,7 @@ async function main() {
   );
   runCythonPrepare();
   assertObfuscated();
-  console.log('Obfuscated tree ready at', HERE);
+  console.log('Obfuscated tree ready at', HERE, '(from', ORIG_ROOT + ')');
 }
 
 main().catch((err) => {
