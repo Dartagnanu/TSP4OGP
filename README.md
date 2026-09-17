@@ -8,6 +8,7 @@ Interactive store map that can be used to create pick paths for any number of pi
 
 Proof of concept:
 [Store Building Demo](./ProjectDemo.mp4)
+
 [Multiple Users Sync Demo](./StoreSyncDemo.mp4)
 [20 Sku solve on big lot store](./20SKUSOn150KSquareFootStore.png)
 [100 Sku solve on big lot store](./100SKUSOn150KSquareFootStore.png)
