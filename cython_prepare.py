@@ -1,6 +1,6 @@
 """Generate Cython C sources (or minified Python fallback) for TSP4OGP/gtsp-server.
 
-Run from the company TSP4OGP repo. Reads TSP4OGPOriginal; does not modify it.
+Run from this repo. Reads the source tree via TSP4OGP_SOURCE; does not modify it.
 Output has no readable algorithm .py when Cython succeeds.
 """
 from __future__ import annotations
@@ -41,16 +41,22 @@ COMPILER_DIRECTIVES = [
 
 def repo_paths() -> tuple[Path, Path, Path]:
     here = Path(__file__).resolve().parent
-    env = os.environ.get("TSP4OGP_ORIGINAL")
+    env = os.environ.get("TSP4OGP_SOURCE")
     if env:
-        orig_root = Path(env).resolve()
+        src_root = Path(env).resolve()
     else:
-        sibling = here.parent / "TSP4OGPOriginal"
-        orig_root = sibling if (sibling / "gtsp-server").is_dir() else here.parent
-    orig = orig_root / "gtsp-server"
+        parent = here.parent
+        if (parent / "store-editor").is_dir() and (parent / "gtsp-server").is_dir():
+            src_root = parent
+        else:
+            raise SystemExit(
+                "Source tree not found. Set TSP4OGP_SOURCE to a directory "
+                "that contains store-editor and gtsp-server."
+            )
+    src = src_root / "gtsp-server"
     out = here / "gtsp-server"
     work = here / ".tmp" / "cython_src"
-    return orig, out, work
+    return src, out, work
 
 
 def strip_module(src: str) -> str:
@@ -115,7 +121,7 @@ def cythonize_file(py_path: Path, c_path: Path) -> None:
 def main() -> int:
     orig, out, work = repo_paths()
     if not orig.is_dir():
-        print(f"Original gtsp-server not found at {orig}", file=sys.stderr)
+        print(f"gtsp-server not found at {orig}", file=sys.stderr)
         return 1
 
     out.mkdir(parents=True, exist_ok=True)

@@ -1,6 +1,6 @@
 """Build Cython / C extension modules for the obfuscated pathfinder.
 
-Compiles pre-generated .c from the company tree. Falls back to minified
+Compiles pre-generated .c in this tree. Falls back to minified
 .py / .pyx only when a C source is missing.
 """
 from pathlib import Path
@@ -36,7 +36,7 @@ def _extensions():
         c_file = here / f"{name}.c"
         py_file = here / f"{name}.py"
         pyx_file = here / f"{name}.pyx"
-        # Company tree: compile committed C. Only fall back to .py/.pyx if
+        # Compile committed C. Only fall back to .py/.pyx if
         # Cython generation failed and a minified source was left behind.
         if c_file.exists():
             print(f"setup.py: compiling {c_file.name}")

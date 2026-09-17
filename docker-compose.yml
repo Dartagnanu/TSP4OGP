@@ -1,5 +1,5 @@
 # gtsp-only debug: docker compose up mongo gtsp-server
-# Paths are relative to this obfuscated/ folder. Do not bind-mount source.
+# Paths are relative to this repo. Do not bind-mount host source over containers.
 services:
   mongo:
     image: mongo:7
