@@ -7,3 +7,7 @@ polygon_grid: cython_c
 graphBuilder: cython_c
 store_cache: cython_c
 pathFinder: cython_c
+location_choice: cython_c
+pick_modes: cython_c
+store_cases: cython_c
+walkability: cython_c

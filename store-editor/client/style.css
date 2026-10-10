@@ -649,6 +649,13 @@ textarea {
   color: #0f766e;
 }
 
+.path-step-nil {
+  height: 22px;
+  margin-left: var(--space-1);
+  padding: 0 var(--space-1);
+  font-size: 12px;
+}
+
 .path-step-end strong {
   color: #7c3aed;
 }
@@ -682,4 +689,164 @@ textarea {
 #debugSection #graph {
   width: 800px;
   height: 600px;
+}
+
+/* ── Test-case page ─────────────────────────────────────────────── */
+.cases-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cases-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: var(--topbar-height);
+  padding: 0 var(--space-2);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cases-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.cases-stats strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.cases-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.cases-map {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  background: var(--color-surface-muted);
+}
+
+.cases-map canvas {
+  display: block;
+}
+
+.cases-panel {
+  width: 380px;
+  flex: 0 0 380px;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  min-height: 0;
+}
+
+.cases-status {
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 13px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cases-status.error {
+  color: var(--color-danger);
+}
+
+.cases-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  flex: 1;
+}
+
+.cases-list li {
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.cases-list li.selected {
+  background: #eff6ff;
+}
+
+.case-top {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-1);
+}
+
+.case-name {
+  font-weight: 600;
+}
+
+.case-desc {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--color-text-muted);
+}
+
+.case-time {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.case-result {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.cases-list li[data-state="running"] .case-result {
+  color: var(--color-primary);
+}
+
+.cases-list li[data-state="pass"] .case-result {
+  color: #15803d;
+}
+
+.cases-list li[data-state="fail"] .case-result {
+  color: var(--color-danger);
+}
+
+.case-detail {
+  margin: 0;
+  padding: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  max-height: 34%;
+  overflow: auto;
+  background: #f8fafc;
+}
+
+.case-detail h2 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.case-detail p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.case-detail p:last-child {
+  margin-bottom: 0;
+  color: var(--color-text-muted);
+}
+
+.cases-summary {
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border-top: 1px solid var(--color-border);
+  font-size: 13px;
 }

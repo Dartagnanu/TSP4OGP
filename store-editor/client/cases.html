@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test cases</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loginOverlay" class="login-overlay">
+        <form id="loginForm" class="login-card">
+            <h1>Store Map Editor</h1>
+            <p class="login-subtitle">Sign in to view test cases</p>
+            <div class="form-field">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername" name="username" autocomplete="username" required>
+            </div>
+            <div class="form-field">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
+            </div>
+            <div class="form-field">
+                <label for="loginStoreNumber">Store number</label>
+                <input type="number" id="loginStoreNumber" name="store_number" required>
+            </div>
+            <p id="loginError" class="login-error" role="alert"></p>
+            <button type="submit" class="btn btn-primary login-submit">Log in</button>
+        </form>
+    </div>
+
+    <div id="appShell" class="cases-shell hidden">
+        <header class="cases-top">
+            <div>
+                <div id="casesTitle">Test cases</div>
+                <div id="casesStats" class="cases-stats"></div>
+            </div>
+            <button id="logoutBtn" type="button" class="btn btn-ghost">Logout</button>
+        </header>
+        <div class="cases-body">
+            <div id="mapContainer" class="cases-map"></div>
+            <aside class="cases-panel">
+                <p id="casesStatus" class="cases-status">Loading the store…</p>
+                <ul id="casesList" class="cases-list"></ul>
+                <section id="caseDetail" class="case-detail" hidden>
+                    <h2 id="caseDetailTitle"></h2>
+                    <p id="caseDetailUse"></p>
+                    <p id="caseDetailCheck"></p>
+                </section>
+                <p id="casesSummary" class="cases-summary"></p>
+            </aside>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/konva@8/konva.min.js"></script>
+    <script src="cases.js"></script>
+</body>
+</html>

@@ -30,7 +30,7 @@ mods = sorted(pathlib.Path('/app').glob('*.so')); \
 assert mods, 'no compiled .so modules in /app'; \
 [shutil.copy2(p, plat / p.name) for p in mods]; \
 print('compiled:', ', '.join(p.name for p in mods))" \
-    && /opt/conda/bin/python -c "from pathFinder import Pathfinder; from graphBuilder import GraphBuilder; print('pathFinder import ok')" \
+    && /opt/conda/bin/python -c "from pathFinder import Pathfinder; from graphBuilder import GraphBuilder; from store_cases import iter_store_cases; print('pathFinder import ok')" \
     && rm -rf build /app/*.egg-info \
     && rm -f \
         gtsp_solver.py gtsp_solver.c \
@@ -42,6 +42,10 @@ print('compiled:', ', '.join(p.name for p in mods))" \
         graphBuilder.py graphBuilder.c \
         store_cache.py store_cache.c \
         pathFinder.py pathFinder.c \
+        location_choice.py location_choice.c \
+        pick_modes.py pick_modes.c \
+        store_cases.py store_cases.c \
+        walkability.py walkability.c \
         setup.py setup.cfg \
     && find /app -name '*.html' -delete
 

@@ -6,8 +6,10 @@ Output has no readable algorithm .py when Cython succeeds.
 from __future__ import annotations
 
 import ast
+import base64
 import importlib.util
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -23,6 +25,10 @@ MODULE_NAMES = [
     "graphBuilder",
     "store_cache",
     "pathFinder",
+    "location_choice",
+    "pick_modes",
+    "store_cases",
+    "walkability",
 ]
 
 CYTHON_DIRECTIVE = (
@@ -59,9 +65,34 @@ def repo_paths() -> tuple[Path, Path, Path]:
     return src, out, work
 
 
-def strip_module(src: str) -> str:
+def _keep_numba_kernels(tree: ast.AST) -> None:
+    """Leave Numba kernels as real Python inside the Cython module.
+
+    Cython compiles nested functions, and Numba cannot njit a Cython function.
+    The kernels are stored encoded and exec'd when the module builds them.
+    """
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.FunctionDef) or node.name != "_make_compiled_bfs":
+            continue
+        kernels = [stmt for stmt in node.body if isinstance(stmt, ast.FunctionDef)]
+        if not kernels:
+            return
+        src = "\n\n".join(ast.unparse(stmt) for stmt in kernels) + "\n"
+        encoded = base64.b64encode(src.encode("utf-8")).decode("ascii")
+        node.body = ast.parse(
+            "import base64 as _cy_b64\n"
+            "_cy_ns = {'njit': njit, '_NEIGHBOR_DX': _NEIGHBOR_DX, '_NEIGHBOR_DY': _NEIGHBOR_DY}\n"
+            f"exec(_cy_b64.b64decode({encoded!r}).decode(), _cy_ns)\n"
+            "return _cy_ns['_bfs_search']\n"
+        ).body
+        return
+
+
+def strip_module(src: str, module_name: str = "") -> str:
     tree = ast.parse(src)
     _strip_docstrings(tree)
+    if module_name == "walkability":
+        _keep_numba_kernels(tree)
     text = ast.unparse(tree)
     lines = []
     skipped_future = False
@@ -75,6 +106,14 @@ def strip_module(src: str) -> str:
     if skipped_future:
         # Cython handles PEP 563 poorly; drop future annotations.
         pass
+    # ast.unparse writes "for (a, b) in". Cython 3 crashes on that form.
+    body = re.sub(r"\bfor \(([^()\n]+)\) in ", r"for \1 in ", body)
+    # Cython 3 crashes inferring `(expr or {}).items()`.
+    body = body.replace(
+        "    for upc, data in (upc_to_data or {}).items():",
+        "    _cy_items_src = upc_to_data or {}\n"
+        "    for upc, data in _cy_items_src.items():",
+    )
     return body
 
 
@@ -138,7 +177,7 @@ def main() -> int:
             failures.append(f"{name}: missing {src_path}")
             continue
         raw = src_path.read_text(encoding="utf-8")
-        prepared = CYTHON_DIRECTIVE + strip_module(raw)
+        prepared = CYTHON_DIRECTIVE + strip_module(raw, name)
         py_work = work / f"{name}.py"
         py_work.write_text(prepared, encoding="utf-8")
         c_out = out / f"{name}.c"

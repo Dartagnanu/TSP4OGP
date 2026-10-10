@@ -39,7 +39,7 @@ const OUT_SERVER = path.join(OUT_EDITOR, 'server');
 const OUT_GTSP = path.join(HERE, 'gtsp-server');
 const TMP = path.join(HERE, '.tmp');
 
-const KEEP_PYTHON = ['app.py', 'pathfinder_config.py', 'walkability.py', 'debug_log.py'];
+const KEEP_PYTHON = ['app.py', 'pathfinder_config.py', 'debug_log.py'];
 
 function rmrf(p) {
   fs.rmSync(p, { recursive: true, force: true });
@@ -112,7 +112,7 @@ function obfuscate(code, target) {
   return JavaScriptObfuscator.obfuscate(code, obfuscateOptions(target)).getObfuscatedCode();
 }
 
-async function bundleClient() {
+async function prepareClientSrc() {
   // Source client/package.json is an empty tracked file; esbuild cannot parse it.
   // Bundle from a temp copy so the source tree is never modified.
   const clientSrc = path.join(TMP, 'client-src');
@@ -122,10 +122,14 @@ async function bundleClient() {
     path.join(clientSrc, 'package.json'),
     `${JSON.stringify({ private: true, type: 'module' })}\n`
   );
-  const outfile = path.join(TMP, 'client.bundle.js');
+  return clientSrc;
+}
+
+async function bundleBrowser(clientSrc, entryRel, outName) {
+  const outfile = path.join(TMP, `${outName}.bundle.js`);
   await esbuild.build({
     absWorkingDir: clientSrc,
-    entryPoints: [path.join(clientSrc, 'app.js')],
+    entryPoints: [path.join(clientSrc, entryRel)],
     bundle: true,
     format: 'iife',
     platform: 'browser',
@@ -136,8 +140,8 @@ async function bundleClient() {
   });
   const code = fs.readFileSync(outfile, 'utf8');
   const out = obfuscate(code, 'browser');
-  fs.writeFileSync(path.join(OUT_CLIENT, 'app.js'), out);
-  console.log(`client app.js obfuscated (${out.length} chars)`);
+  fs.writeFileSync(path.join(OUT_CLIENT, outName), out);
+  console.log(`${outName} obfuscated (${out.length} chars)`);
 }
 
 const importMetaUrlPlugin = {
@@ -196,18 +200,32 @@ function writeServerPackageJson() {
   fs.writeFileSync(path.join(OUT_SERVER, 'package.json'), JSON.stringify(pkg, null, 2) + '\n');
 }
 
+function writeHtml(name, scriptFrom, scriptTo) {
+  let html = fs.readFileSync(path.join(SRC_CLIENT, name), 'utf8');
+  html = html.replace(scriptFrom, scriptTo);
+  fs.writeFileSync(path.join(OUT_CLIENT, name), html);
+}
+
 function writeIndexHtml() {
-  let html = fs.readFileSync(path.join(SRC_CLIENT, 'index.html'), 'utf8');
-  html = html.replace(
+  writeHtml(
+    'index.html',
     '<script type="module" src="app.js"></script>',
     '<script src="app.js"></script>'
   );
-  fs.writeFileSync(path.join(OUT_CLIENT, 'index.html'), html);
+}
+
+function writeCasesHtml() {
+  writeHtml(
+    'cases.html',
+    '<script type="module" src="js/casesPage.js"></script>',
+    '<script src="cases.js"></script>'
+  );
 }
 
 function copyGlue() {
   copyFile(path.join(SRC_CLIENT, 'style.css'), path.join(OUT_CLIENT, 'style.css'));
   writeIndexHtml();
+  writeCasesHtml();
   const origEntrypoint = path.join(SRC_EDITOR, 'docker-entrypoint.sh');
   if (fs.existsSync(origEntrypoint)) {
     copyFile(origEntrypoint, path.join(OUT_EDITOR, 'docker-entrypoint.sh'));
@@ -255,15 +273,17 @@ function runCythonPrepare() {
 
 function assertObfuscated() {
   const client = fs.readFileSync(path.join(OUT_CLIENT, 'app.js'), 'utf8');
+  const cases = fs.readFileSync(path.join(OUT_CLIENT, 'cases.js'), 'utf8');
   const server = fs.readFileSync(path.join(OUT_SERVER, 'index.js'), 'utf8');
   const needles = [
     'export class mapController',
     'function detectCorridorsFromShelves',
+    'function renderWaiting',
     'from flask import Flask',
     'async find_pick_path_bfs',
   ];
   for (const needle of needles) {
-    if (client.includes(needle) || server.includes(needle)) {
+    if (client.includes(needle) || cases.includes(needle) || server.includes(needle)) {
       throw new Error(`obfuscated JS still contains readable marker: ${needle}`);
     }
   }
@@ -277,6 +297,10 @@ function assertObfuscated() {
     'graphBuilder',
     'store_cache',
     'pathFinder',
+    'location_choice',
+    'pick_modes',
+    'store_cases',
+    'walkability',
   ]) {
     const py = path.join(OUT_GTSP, `${name}.py`);
     const c = path.join(OUT_GTSP, `${name}.c`);
@@ -311,7 +335,7 @@ async function main() {
 
   // Drop previously generated JS so leftover readable modules cannot remain.
   rmrf(path.join(OUT_CLIENT, 'js'));
-  for (const rel of ['app.js']) {
+  for (const rel of ['app.js', 'cases.js']) {
     const p = path.join(OUT_CLIENT, rel);
     if (fs.existsSync(p)) fs.unlinkSync(p);
   }
@@ -327,7 +351,9 @@ async function main() {
   }
 
   copyGlue();
-  await bundleClient();
+  const clientSrc = await prepareClientSrc();
+  await bundleBrowser(clientSrc, 'app.js', 'app.js');
+  await bundleBrowser(clientSrc, path.join('js', 'casesPage.js'), 'cases.js');
   await bundleNodeEntry(path.join(SRC_SERVER, 'index.js'), 'index.js');
   await bundleNodeEntry(path.join(SRC_SERVER, 'models', 'seed.js'), path.join('models', 'seed.js'));
   await bundleNodeEntry(

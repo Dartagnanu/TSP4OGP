@@ -53,8 +53,63 @@ A manager can open stores listed on their account. After the first seed, the def
 2. Detect aisles on the map.
 3. Run a **Test Walk** (20/60/80/100 SKU ambient) from the dropdown, or a **Random walk**.
 4. Watch the pick path overlay and the pick-path panel.
-5. Move a shelf, rerun a walk, and see the path change.
-6. Optionally try store **3261** or **3262** the same way. Those maps are much larger; the first path can take longer.
+5. On a pick, click **Empty** if that spot had no product. The picker is treated as standing there. The other stops keep their order, and a new location of that item is inserted, including the walk back to the entrance. Marking another stop empty keeps the earlier empties.
+6. Click **Run test cases** to open the case page on that store’s map. The cases are written for store **3262** (see below).
+7. Move a shelf, rerun a walk, and see the path change.
+8. Optionally try store **3261** the same way. That map is much larger; the first path can take longer.
+
+## How a walk is chosen
+
+A walk is no longer one distance sort. The pathfinder has three modes.
+
+**Default.** Feature locations are preferred. A home replaces a feature only when the full trip is shorter. An equal trip stays on the feature. Topstock is used only when that item has no feature and no home.
+
+**Mixed.** If the request leaves the mode unset and the items span more than one cold chain, it is one tour: all ambient, then all frozen, then all chilled, then a single return to the entrance. An explicit default walk stays distance-only.
+
+**Nil-pick.** The picker is standing at the empty spot. The other stops keep their order. A new location of that item is inserted, including the leg back to the entrance. Topstock still on that shelf is taken first. If the picker names only the shelf, the whole shelf is skipped. Items with no location are listed as `UNKNOWN` after the return and are not drawn on the map.
+
+Small walks of 16 stops or fewer are solved exactly, and that solve includes the return to the end. Shelf choice and stop order are solved together when that cannot make the tour longer. Larger walks run the local improvement passes and the aisle-blocking rules.
+
+## Test cases
+
+**Run test cases** opens a second page on the store you are logged into. Each real walk is 40 SKUs from the entrance back to the entrance. Clicking a case draws that walk and explains the store situation.
+
+The cases run on **3262**. That store’s seed has the items they need: features, homes, topstock, and cold chain. Load it with the seed command in [Extra seeds](#extra-seeds-optional) if the rows cannot find their items.
+
+| Case | What it checks |
+|------|----------------|
+| Home-only | Forty items that each have one home. Every stop is that home. |
+| Flex-only | Items that exist only on a feature. Those stops stay on the feature. |
+| Flex stays | An item has a feature and a home, and the feature is the shorter stop. |
+| Home wins | The home is the shorter stop, so the walk uses the home. |
+| Equal distance | Feature and home are the same shelf approach. The feature stays. |
+| Lone flex | One item only, with both a feature and a home. The feature stays. |
+| Two homes | An item has two homes and no feature. The walk uses the home that shortens the whole trip. |
+| Mixed | Ambient, frozen, and chilled items in that order, then one return. |
+| Topstock last resort | An item exists only on topstock, so that is the stop. |
+| Topstock hidden | The item also has a feature or a home, so topstock is not used. |
+| Nil-pick same-shelf topstock | The home was empty. Topstock on that shelf is inserted. |
+| Topstock also nil-picked | That home and its topstock were both empty. The insert is the feature on another shelf. |
+| Tie rank | The empty spot was on another shelf. Feature, topstock, and home on the remaining shelf are the same distance, so the insert is the feature. |
+| Nil shelf | The picker named the shelf and not the spot. That whole shelf is skipped. |
+| Sampler | An item that exists only on topstock still counts as locatable. This one does not build a walk. |
+
+## How pathfinding got faster
+
+The tour rules are the same. The exact 16-stop solve, the local improvement passes, aisle blocking, and 1-foot distances are unchanged.
+
+What changed is repeated work. A search from a cell keeps the distances it already found and continues from there. A walk whose items have only one possible stop skips the extra all-pairs table. Shelf candidates are built once. A nil-pick scores every insert slot from one distance table and loads only the emptied item. Find-path reads skip photos, prices, and other unused fields.
+
+The compiled search runs that same 4-neighbor walk as machine code when Numba is installed. Distances match the Python version, including a search that stops early and is continued later. If Numba is missing, the Python walk is used. The first compile takes under a second. Later searches reuse it.
+
+Docker does not use that compiled search until the pathfinder image is rebuilt. From this directory:
+
+```bash
+docker compose build gtsp-server
+docker compose up -d mongo app gtsp-server
+```
+
+Then load 3262 with the seed command below.
 
 ## Extra seeds (optional)
 

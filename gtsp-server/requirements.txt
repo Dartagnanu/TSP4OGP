@@ -5,3 +5,4 @@ networkx
 flask_cors
 pymongo
 numpy
+numba

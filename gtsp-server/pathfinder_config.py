@@ -19,6 +19,11 @@ TWO_OPT_FULL_ITER = int(os.environ.get("PATHFINDER_TWO_OPT_FULL_ITER", "500"))
 MAX_MAP_WIDTH = int(os.environ.get("PATHFINDER_MAX_MAP_WIDTH", "2000"))
 MAX_MAP_HEIGHT = int(os.environ.get("PATHFINDER_MAX_MAP_HEIGHT", "2500"))
 GTSP_EXACT_MAX_K = int(os.environ.get("PATHFINDER_GTSP_EXACT_MAX_K", "16"))
+# On the first default or mixed walk, a feature may add this many feet
+# before a home is chosen. 20 keeps the feature; 21 uses the home.
+FLEX_EXTRA_FT = float(os.environ.get("PATHFINDER_FLEX_EXTRA_FT", "20"))
+# Joint pin+order inside exact DP stays on only while the candidate set is small.
+JOINT_DP_MAX_LOCATIONS = int(os.environ.get("PATHFINDER_JOINT_DP_MAX_LOCATIONS", "48"))
 MATRIX_MIN_K = int(os.environ.get("PATHFINDER_MATRIX_MIN_K", "13"))
 COLLATION_WEIGHT = float(os.environ.get("PATHFINDER_COLLATION_WEIGHT", "2"))
 COLLATION_MERGE_PASS = int(os.environ.get("PATHFINDER_COLLATION_MERGE_PASS", "1"))

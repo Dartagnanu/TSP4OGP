@@ -25,6 +25,10 @@ MODULE_NAMES = [
     "graphBuilder",
     "store_cache",
     "pathFinder",
+    "location_choice",
+    "pick_modes",
+    "store_cases",
+    "walkability",
 ]
 
 
