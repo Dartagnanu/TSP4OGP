@@ -4,6 +4,8 @@ Interactive store map that can be used to create pick paths for any number of pi
 
 **Watch first:** [Intro presentation](https://youtu.be/1fjKfbaf9TU)
 
+**New Update Cuts Pathfinding Time Nearly HALF by Precompiling the Pathfinding Code Into Assembly.**
+
 [![Intro presentation](https://img.youtube.com/vi/1fjKfbaf9TU/maxresdefault.jpg)](https://youtu.be/1fjKfbaf9TU)
 
 Proof of concept:
